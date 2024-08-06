@@ -7,7 +7,7 @@ const nextConfig = {
     });
     return config;
   },
-
+  output: 'standalone',
   images: {
     remotePatterns: [
       {
