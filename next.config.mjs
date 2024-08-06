@@ -8,11 +8,6 @@ const nextConfig = {
         });
         return config;
     },
-    eslint: {
-        ignoreDuringBuilds: [
-            "./src/__generated"
-        ]
-    },
     images: {
         remotePatterns: [
             {
