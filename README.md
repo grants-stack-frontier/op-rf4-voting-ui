@@ -4,6 +4,8 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
+Set up .env by providing copying .env.template and fill in the blanks
+
 First, run the development server:
 
 ```bash

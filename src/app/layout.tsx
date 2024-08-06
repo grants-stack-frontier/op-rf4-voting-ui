@@ -54,7 +54,7 @@ export default function RootLayout({
               <div className="sm:hidden h-screen -mt-16 px-4 flex flex-col gap-4 justify-center items-center">
                 <SunnySVG />
                 <div className="text-center">
-                  The mobile version of this website isn't ready yet. Please use
+                  The mobile version of this website isn&apos;t ready yet. Please use
                   your desktop computer.
                 </div>
               </div>
