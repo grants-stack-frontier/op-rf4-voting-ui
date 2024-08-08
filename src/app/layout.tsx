@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "@rainbow-me/rainbowkit/styles.css";
-import "./globals.css";
-import { cn } from "@/lib/utils";
-import { Provider } from "./providers";
-import { Header } from "@/components/common/header";
-import { Toaster } from "@/components/ui/toaster";
 import { BallotProvider } from "@/components/ballot/provider";
 import { Callouts } from "@/components/common/callouts";
+import { Header } from "@/components/common/header";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+import { cn } from "@/lib/utils";
+import "@rainbow-me/rainbowkit/styles.css";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { Provider } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -47,26 +48,34 @@ export default function RootLayout({
           inter.className
         )}
       >
-        <Provider>
-          <BallotProvider>
-            <main className="">
-              <Header />
-              <div className="sm:hidden h-screen -mt-16 px-4 flex flex-col gap-4 justify-center items-center">
-                <SunnySVG />
-                <div className="text-center">
-                  The mobile version of this website isn&apos;t ready yet. Please use
-                  your desktop computer.
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+
+          <Provider>
+            <BallotProvider>
+              <main className="">
+                <Header />
+                <div className="sm:hidden h-screen -mt-16 px-4 flex flex-col gap-4 justify-center items-center">
+                  <SunnySVG />
+                  <div className="text-center">
+                    The mobile version of this website isn&apos;t ready yet. Please use
+                    your desktop computer.
+                  </div>
                 </div>
-              </div>
-              <div className="hidden sm:block">
-                <Callouts />
-              </div>
-              <div className="hidden sm:flex gap-8 max-w-[1072px] mx-auto px-4 pt-16 pb-32 mb-24">
-                {children}
-              </div>
-            </main>
-          </BallotProvider>
-        </Provider>
+                <div className="hidden sm:block">
+                  <Callouts />
+                </div>
+                <div className="hidden sm:flex gap-8 max-w-[1072px] mx-auto px-4 pt-16 pb-32 mb-24">
+                  {children}
+                </div>
+              </main>
+            </BallotProvider>
+          </Provider>
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>
