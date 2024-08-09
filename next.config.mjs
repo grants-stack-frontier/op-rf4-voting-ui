@@ -16,6 +16,12 @@ const nextConfig = {
                 port: "",
                 pathname: "/**",
             },
+            {
+                protocol: "https",
+                hostname: "ens.xyz",
+                port: "",
+                pathname: "/**",
+            },
         ],
     },
 };

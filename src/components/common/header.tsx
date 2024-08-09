@@ -1,15 +1,17 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { Button } from "@/components/ui/button";
+import { ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 
+import { badgeholderManualUrl, votingEndDate } from "@/config";
+import mixpanel from "mixpanel-browser";
 import { ConnectButton } from "../auth/connect-button";
 import { SignMessage } from "../auth/sign-message";
+import { ModeToggle } from "../dark-mode-toggle";
+import { Separator } from "../ui/separator";
 import { VotingEndsIn } from "../voting-ends-in";
-import { votingEndDate, badgeholderManualUrl } from "@/config";
-import mixpanel from "mixpanel-browser";
 
 export function Header() {
   return (
@@ -33,8 +35,12 @@ export function Header() {
           </Button>
         </Link>
       </div>
-      <div className="hidden sm:block">
-        <ConnectButton />
+      <div className="flex items-center gap-2">
+        <ModeToggle />
+        <Separator orientation="vertical" />
+        <div className="hidden sm:block">
+          <ConnectButton />
+        </div>
       </div>
 
       <SignMessage />
