@@ -2,7 +2,7 @@
 import { CategoryDetails } from "@/components/category-details";
 import { CategoryPagination } from "@/components/category/category-pagination";
 import { PageView } from "@/components/common/page-view";
-import { DistributionSidebar } from "@/components/metrics/distribution-sidebar";
+import { ProjectsSidebar } from "@/components/common/projects-sidebar";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -34,12 +34,15 @@ export default function CategoryDetailsPage({ params: { id = "" } }) {
 					</BreadcrumbList>
 				</Breadcrumb>
 
-				<CategoryDetails {...category} />
+				<CategoryDetails {...category} id={id} />
 				<PageView title={'category-details'} />
 				<CategoryPagination id={id} />
 			</section>
 			<aside>
-				<DistributionSidebar id={id} />
+				<ProjectsSidebar
+					id={id}
+					{...category}
+				/>
 			</aside>
 		</>
 	);

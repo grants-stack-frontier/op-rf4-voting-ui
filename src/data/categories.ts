@@ -3,6 +3,7 @@ export const getCategories = async () => {
 };
 
 export type Category = {
+	id: string;
 	name: string;
 	description: string;
 	examples: string[];
@@ -10,10 +11,15 @@ export type Category = {
 		eligible_projects: string[];
 		note: string;
 	};
+	projects: {
+		name: string;
+		description: string;
+	}[];
 };
 
 const categories: Category[] = [
 	{
+		id: 'ethereum_core_contributions',
 		name: 'Ethereum Core Contributions',
 		description: 'Ethereum Core Contributions are infrastructure which supports, or is a dependency, of the OP Stack.',
 		examples: [
@@ -32,9 +38,16 @@ const categories: Category[] = [
 			],
 			note: 'Projects that are used to develop or deploy contracts or apps, including in the development and deployment of Optimism contracts, may be rewarded in Retro Funding 7: Dev Tooling, and are not in scope for this category.',
 		},
+		projects: [
+			{
+				name: 'Ethereum',
+				description: 'Ethereum is a decentralized, open-source blockchain with smart contract functionality.',
+			},
+		],
 	},
 	{
-		name: 'OP Stack Research AndDevelopment',
+		id: 'op_stack_research_and_development',
+		name: 'OP Stack Research & Development',
 		description:
 			'Direct research & development contributions to the OP Stack, and contributions that support protocol upgrades',
 		examples: [
@@ -51,9 +64,16 @@ const categories: Category[] = [
 			],
 			note: 'Only Optimism Monorepo contributions by core devs may be rewarded within Retro Funding 5. Commits to the monorepo are currently mainly done by Optimism core devs and the core dev program is not developed enough to support outside contributions to the monorepo yet. As the core dev program evolves, more contributions to the monorepo may become eligible.',
 		},
+		projects: [
+			{
+				name: 'Optimism Monorepo',
+				description: 'The Optimism Monorepo is the source code repository for the Optimism Protocol.',
+			},
+		],
 	},
 	{
-		name: 'OPStackTooling',
+		id: 'opstack_tooling',
+		name: 'OP Stack Tooling',
 		description: 'Efforts that improve the usability and accessibility of the OP Stack through tooling enhancements.',
 		examples: [
 			'Integration and load testing infrastructure',
@@ -69,5 +89,12 @@ const categories: Category[] = [
 			],
 			note: '',
 		},
+		projects: [
+			{
+				name: 'OP Stack',
+				description:
+					'The OP Stack is the set of tools and libraries that enable the development of Optimistic Rollup chains.',
+			},
+		],
 	},
 ];

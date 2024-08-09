@@ -7,15 +7,19 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useCategories } from "@/hooks/useCategories";
 import { cn } from "@/lib/utils";
 
 export function CategoryPagination({ id = "" }) {
-  if (!id) return null;
-  const current = 0;
-  const pages: string[] = [];
+  const categories = useCategories()
+  const { data, isPending } = categories
+  if (isPending) return null;
+  const current = data?.findIndex((category) => category.id === id) ?? 0;
+  const pageIds = data?.map((category) => category.id) ?? [];
+  const pages = pageIds ?? [];
 
   return (
-    <div className="fixed z-10 bottom-10 bg-white shadow border rounded-lg p-2 left-1/2 -translate-x-1/2">
+    <div className="fixed z-10 bottom-10 bg-white dark:bg-black shadow border rounded-lg p-2 left-1/2 -translate-x-1/2">
       <Pagination>
         <PaginationContent>
           <PaginationItem
@@ -26,10 +30,10 @@ export function CategoryPagination({ id = "" }) {
             <PaginationPrevious href={`/category/${pages[current - 1]}`} />
           </PaginationItem>
 
-          {pages.map((pageId, index) => (
-            <PaginationItem key={pageId}>
+          {pages.map((category, index) => (
+            <PaginationItem key={category}>
               <PaginationLink
-                href={`/category/${pageId}`}
+                href={`/category/${category}`}
                 isActive={index === current}
               >
                 {index + 1}
