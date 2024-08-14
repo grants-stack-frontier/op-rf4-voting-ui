@@ -1,8 +1,6 @@
 "use client";
-import { CategoryDetails } from "@/components/category-details";
-import { CategoryPagination } from "@/components/category/category-pagination";
 import { PageView } from "@/components/common/page-view";
-import { ProjectsSidebar } from "@/components/projects/projects-sidebar";
+import { ProjectDetails } from "@/components/project-details";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -10,11 +8,12 @@ import {
 	BreadcrumbList,
 	BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
-import { useCategories } from "@/hooks/useCategories";
+import { useProjectById } from "@/hooks/useProjects";
 import Link from "next/link";
 
-export default function CategoryDetailsPage({ params: { id = "" } }) {
-	const category = useCategories();
+export default function ProjectDetailsPage({ params: { id = "" } }) {
+	const { data: project = {}, isPending } = useProjectById(id);
+	console.log({ project });
 	return (
 		<>
 			<section className="flex-1 space-y-6">
@@ -22,28 +21,28 @@ export default function CategoryDetailsPage({ params: { id = "" } }) {
 					<BreadcrumbList>
 						<BreadcrumbItem>
 							<BreadcrumbLink asChild>
-								<Link href="/budget">Budget</Link>
+								<Link href="/ballot">Ballot</Link>
 							</BreadcrumbLink>
 						</BreadcrumbItem>
 						<BreadcrumbSeparator />
 						<BreadcrumbItem>
 							<BreadcrumbLink asChild>
-								<Link href="/budget/category">Category</Link>
+								<Link href="/ballot/project">Project</Link>
 							</BreadcrumbLink>
 						</BreadcrumbItem>
 					</BreadcrumbList>
 				</Breadcrumb>
 
-				<CategoryDetails {...category} id={id} />
-				<PageView title={'category-details'} />
-				<CategoryPagination id={id} />
+				<ProjectDetails {...project} isPending={isPending} />
+				<PageView title={'project-details'} />
+				{/* <CategoryPagination id={id} /> */}
 			</section>
-			<aside>
+			{/* <aside>
 				<ProjectsSidebar
 					id={id}
 					{...category}
 				/>
-			</aside>
+			</aside> */}
 		</>
 	);
 }

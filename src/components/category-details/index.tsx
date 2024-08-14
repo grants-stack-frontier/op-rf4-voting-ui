@@ -1,23 +1,21 @@
 "use client";
 import { Heading } from "@/components/ui/headings";
 import { Category } from "@/data/categories";
+import { useProjectsByCategory } from "@/hooks/useProjects";
 import Image from "next/image";
-import OpLogo from "../../../public/logo.png";
 import { Markdown } from "../markdown";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
-
 export function CategoryDetails({
 	id,
 	data,
-	isPending,
 }: {
 	id: string;
 	data?: Category[];
-	isPending: boolean;
 }) {
 	const category = data?.find(cat => cat.id === id);
-	const { name, description, eligibility, examples, projects } = category ?? {};
+	const { data: { data: projects = [] } = {}, isPending } = useProjectsByCategory(id);
+	const { name, image, description, eligibility, examples } = category ?? {};
 	const { eligible_projects, note } = eligibility ?? {};
 	return (
 		<section className="space-y-16">
@@ -33,7 +31,7 @@ export function CategoryDetails({
 					</>
 				) : (
 					<>
-						<Image className="rounded-md" src={OpLogo.src} alt="OpStack" width={100} height={100} />
+						<Image className="rounded-md" src={image} alt={name || id} width={100} height={100} />
 						<Heading variant="h2">{name}</Heading>
 						<Markdown className="dark:text-white">{description}</Markdown>
 						<div className="flex items-center gap-2">
