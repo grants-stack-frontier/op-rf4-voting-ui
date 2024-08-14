@@ -69,7 +69,7 @@ export function useProjectById(projectId: string) {
 	return useQuery({
 		queryKey: ['projectId', { projectId }],
 		queryFn: async () => {
-			return request.get(`${agoraRoundsAPI}/projects/`).json<Project>();
+			return request.get(`${agoraRoundsAPI}/projects/${projectId}`).json<Project>();
 		},
 	});
 }

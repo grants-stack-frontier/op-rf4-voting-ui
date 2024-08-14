@@ -12,7 +12,7 @@ import { useProjectById } from "@/hooks/useProjects";
 import Link from "next/link";
 
 export default function ProjectDetailsPage({ params: { id = "" } }) {
-	const { data: { data: project = [] } = {}, isPending } = useProjectById(id);
+	const { data: project = {}, isPending } = useProjectById(id);
 	console.log({ project });
 	return (
 		<>
