@@ -1,7 +1,6 @@
 "use client";
 import { PropsWithChildren, useRef, useState } from "react";
 
-import { ProjectAllocation } from "@/hooks/useMetrics";
 import { cn } from "@/lib/utils";
 import { ArrowDown } from "lucide-react";
 import { useIntersection } from "react-use";
@@ -10,7 +9,6 @@ import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
 import { Heading } from "../ui/headings";
 import { ScrollArea } from "../ui/scroll-area";
-import { OpenSourceIcon } from "./opensource-icon";
 
 import {
 	Tooltip,
@@ -19,20 +17,20 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Category } from "@/data/categories";
+import { Project, useProjectsByCategory } from "@/hooks/useProjects";
+import Link from "next/link";
+import { ManualDialog } from "../common/manual-dialog";
 import { Skeleton } from "../ui/skeleton";
-import { ManualDialog } from "./manual-dialog";
 
 export function ProjectsSidebar({
 	id,
 	data,
-	isPending,
 }: {
 	id: string;
 	data?: Category[];
-	isPending: boolean;
 }) {
 	const category = data?.find(cat => cat.id === id);
-	const { projects } = category ?? {};
+	const { data: { data: projects = [] } = {}, isPending } = useProjectsByCategory(id);
 	const intersectionRef = useRef(null);
 	const intersection = useIntersection(intersectionRef, {
 		root: null,
@@ -63,14 +61,16 @@ export function ProjectsSidebar({
 						Array(8)
 							.fill(0)
 							.map((_, i) => (
-								<AllocationItem key={i} isLoading>
+								<ProjectItem key={i} isLoading>
 									--
-								</AllocationItem>
+								</ProjectItem>
 							))}
 					{projects?.map((item) => (
-						<AllocationItem key={item.name} {...item}>
-							{item.name}
-						</AllocationItem>
+						<Link key={item.name} href={`/ballot/project/${item.id}`}>
+							<ProjectItem  {...item}>
+								{item.name}
+							</ProjectItem>
+						</Link>
 					))}
 					<div ref={intersectionRef} />
 					{(intersection?.intersectionRatio ?? 0) < 1 && (
@@ -87,19 +87,17 @@ export function ProjectsSidebar({
 	);
 }
 
-function AllocationItem({
+function ProjectItem({
 	name,
-	image = AvatarPlaceholder.src,
-	allocations_per_metric,
-	is_os,
+	profileAvatarUrl = AvatarPlaceholder.src,
 	isLoading,
 	children,
-}: PropsWithChildren<Partial<ProjectAllocation>> & { isLoading?: boolean }) {
+}: PropsWithChildren<Partial<Project>> & { isLoading?: boolean }) {
 	const [isOpen, setOpen] = useState(false);
 	return (
 		<>
 			<TooltipProvider
-				delayDuration={allocations_per_metric?.length ? 500 : 1000000}
+				delayDuration={500}
 			>
 				<Tooltip>
 					<TooltipTrigger asChild>
@@ -108,18 +106,15 @@ function AllocationItem({
 								<div
 									className="size-6 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0"
 									style={{
-										backgroundImage: `url(${image})`,
+										backgroundImage: `url(${profileAvatarUrl})`,
 									}}
 								/>
 								<div className="truncate">
 									{name || <Skeleton className="h-3 w-16" />}
 								</div>
-								{is_os && (
-									<OpenSourceIcon className="size-3 flex-shrink-0 mr-1" />
-								)}
 							</div>
 							<div className={cn({ ["text-gray-400"]: isLoading })}>
-								{children}
+								{/* {children} */}
 							</div>
 						</div>
 					</TooltipTrigger>
@@ -129,7 +124,6 @@ function AllocationItem({
 						align="end"
 						alignOffset={-14}
 					>
-
 					</TooltipContent>
 				</Tooltip>
 			</TooltipProvider>

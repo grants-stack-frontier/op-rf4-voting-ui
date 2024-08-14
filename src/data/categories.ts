@@ -1,3 +1,7 @@
+import ethCore from "../../public/eth_core.svg";
+import opRnd from "../../public/op_rnd.svg";
+import opTooling from "../../public/op_tooling.svg";
+
 export const getCategories = async () => {
 	return categories;
 };
@@ -5,6 +9,7 @@ export const getCategories = async () => {
 export type Category = {
 	id: string;
 	name: string;
+	image: any;
 	description: string;
 	examples: string[];
 	eligibility: {
@@ -19,8 +24,9 @@ export type Category = {
 
 const categories: Category[] = [
 	{
-		id: 'ethereum_core_contributions',
+		id: 'eth_core',
 		name: 'Ethereum Core Contributions',
+		image: ethCore.src,
 		description: 'Ethereum Core Contributions are infrastructure which supports, or is a dependency, of the OP Stack.',
 		examples: [
 			'Smart contract languages',
@@ -46,8 +52,9 @@ const categories: Category[] = [
 		],
 	},
 	{
-		id: 'op_stack_research_and_development',
+		id: 'op_rnd',
 		name: 'OP Stack Research & Development',
+		image: opRnd.src,
 		description:
 			'Direct research & development contributions to the OP Stack, and contributions that support protocol upgrades',
 		examples: [
@@ -72,8 +79,9 @@ const categories: Category[] = [
 		],
 	},
 	{
-		id: 'opstack_tooling',
+		id: 'op_tooling',
 		name: 'OP Stack Tooling',
+		image: opTooling.src,
 		description: 'Efforts that improve the usability and accessibility of the OP Stack through tooling enhancements.',
 		examples: [
 			'Integration and load testing infrastructure',
