@@ -13,7 +13,6 @@ import Link from "next/link";
 
 export default function ProjectDetailsPage({ params: { id = "" } }) {
 	const { data: project = {}, isPending } = useProjectById(id);
-	console.log({ project });
 	return (
 		<>
 			<section className="flex-1 space-y-6">

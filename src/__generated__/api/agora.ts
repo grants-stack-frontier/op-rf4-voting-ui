@@ -47,8 +47,6 @@ Not Live.
 | OP 0.2.3 | ON TRACK   | Sep 20th |
  * OpenAPI spec version: 0.1.3
  */
-import axios from "axios";
-import type { AxiosRequestConfig, AxiosResponse } from "axios";
 import type {
   AddImpactMetricToRetroFundingBallotBody,
   AuthToken,
@@ -95,36 +93,78 @@ import type {
   UpdateRetroFundingRoundProjectByIdBody,
   VotingToken,
 } from "./agora.schemas";
+import { customFetch } from "../../lib/custom-fetch";
 
 /**
  * Retrieves the full OAS/Swagger spec for the API in YAML.
  * @summary Gets this specification
  */
-export const getSpec = <TData = AxiosResponse<string>>(
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/spec`, options);
+export type getSpecResponse = {
+  data: string;
+  status: number;
+};
+
+export const getGetSpecUrl = () => {
+  return `/api/agora/spec`;
+};
+
+export const getSpec = async (
+  options?: RequestInit
+): Promise<getSpecResponse> => {
+  return customFetch<Promise<getSpecResponse>>(getGetSpecUrl(), {
+    ...options,
+    method: "GET",
+  });
 };
 
 /**
  * Gets nonce for SIWE authentication.
  * @summary Gets nonce for SIWE authentication
  */
-export const getNonce = <TData = AxiosResponse<string>>(
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/auth/nonce`, options);
+export type getNonceResponse = {
+  data: string;
+  status: number;
+};
+
+export const getGetNonceUrl = () => {
+  return `/api/agora/auth/nonce`;
+};
+
+export const getNonce = async (
+  options?: RequestInit
+): Promise<getNonceResponse> => {
+  return customFetch<Promise<getNonceResponse>>(getGetNonceUrl(), {
+    ...options,
+    method: "GET",
+  });
 };
 
 /**
  * Posts SIWE message and signature.
  * @summary Posts SIWE verification payload
  */
-export const postSiweVerificationMessage = <TData = AxiosResponse<AuthToken>>(
+export type postSiweVerificationMessageResponse = {
+  data: AuthToken;
+  status: number;
+};
+
+export const getPostSiweVerificationMessageUrl = () => {
+  return `/api/agora/auth/verify`;
+};
+
+export const postSiweVerificationMessage = async (
   sIWEVerificationBody: SIWEVerificationBody,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post(`/auth/verify`, sIWEVerificationBody, options);
+  options?: RequestInit
+): Promise<postSiweVerificationMessageResponse> => {
+  return customFetch<Promise<postSiweVerificationMessageResponse>>(
+    getPostSiweVerificationMessageUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(sIWEVerificationBody),
+    }
+  );
 };
 
 /**
@@ -132,14 +172,38 @@ export const postSiweVerificationMessage = <TData = AxiosResponse<AuthToken>>(
 
  * @summary Gets a list of delegates
  */
-export const getDelegates = <TData = AxiosResponse<GetDelegates200>>(
-  params?: GetDelegatesParams,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/delegates`, {
-    ...options,
-    params: { ...params, ...options?.params },
+export type getDelegatesResponse = {
+  data: GetDelegates200;
+  status: number;
+};
+
+export const getGetDelegatesUrl = (params?: GetDelegatesParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
   });
+
+  return normalizedParams.size
+    ? `/api/agora/delegates?${normalizedParams.toString()}`
+    : `/api/agora/delegates`;
+};
+
+export const getDelegates = async (
+  params?: GetDelegatesParams,
+  options?: RequestInit
+): Promise<getDelegatesResponse> => {
+  return customFetch<Promise<getDelegatesResponse>>(
+    getGetDelegatesUrl(params),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -147,11 +211,26 @@ export const getDelegates = <TData = AxiosResponse<GetDelegates200>>(
 
  * @summary Gets a specific delegate
  */
-export const getDelegateByAddress = <TData = AxiosResponse<Delegate>>(
+export type getDelegateByAddressResponse = {
+  data: Delegate;
+  status: number;
+};
+
+export const getGetDelegateByAddressUrl = (addressOrEnsName: string) => {
+  return `/api/agora/delegates/${addressOrEnsName}`;
+};
+
+export const getDelegateByAddress = async (
   addressOrEnsName: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/delegates/${addressOrEnsName}`, options);
+  options?: RequestInit
+): Promise<getDelegateByAddressResponse> => {
+  return customFetch<Promise<getDelegateByAddressResponse>>(
+    getGetDelegateByAddressUrl(addressOrEnsName),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -159,15 +238,42 @@ export const getDelegateByAddress = <TData = AxiosResponse<Delegate>>(
 
  * @summary Gets a paginated list of votes for a delegate
  */
-export const getDelegateVotes = <TData = AxiosResponse<GetDelegateVotes200>>(
+export type getDelegateVotesResponse = {
+  data: GetDelegateVotes200;
+  status: number;
+};
+
+export const getGetDelegateVotesUrl = (
+  addressOrEnsName: string,
+  params?: GetDelegateVotesParams
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/api/agora/delegates/${addressOrEnsName}/votes?${normalizedParams.toString()}`
+    : `/api/agora/delegates/${addressOrEnsName}/votes`;
+};
+
+export const getDelegateVotes = async (
   addressOrEnsName: string,
   params?: GetDelegateVotesParams,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/delegates/${addressOrEnsName}/votes`, {
-    ...options,
-    params: { ...params, ...options?.params },
-  });
+  options?: RequestInit
+): Promise<getDelegateVotesResponse> => {
+  return customFetch<Promise<getDelegateVotesResponse>>(
+    getGetDelegateVotesUrl(addressOrEnsName, params),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -175,14 +281,38 @@ export const getDelegateVotes = <TData = AxiosResponse<GetDelegateVotes200>>(
 
  * @summary Gets a list of proposals
  */
-export const getProposals = <TData = AxiosResponse<GetProposals200>>(
-  params?: GetProposalsParams,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/proposals`, {
-    ...options,
-    params: { ...params, ...options?.params },
+export type getProposalsResponse = {
+  data: GetProposals200;
+  status: number;
+};
+
+export const getGetProposalsUrl = (params?: GetProposalsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
   });
+
+  return normalizedParams.size
+    ? `/api/agora/proposals?${normalizedParams.toString()}`
+    : `/api/agora/proposals`;
+};
+
+export const getProposals = async (
+  params?: GetProposalsParams,
+  options?: RequestInit
+): Promise<getProposalsResponse> => {
+  return customFetch<Promise<getProposalsResponse>>(
+    getGetProposalsUrl(params),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -190,11 +320,26 @@ export const getProposals = <TData = AxiosResponse<GetProposals200>>(
 
  * @summary Gets a specific proposal
  */
-export const getProposalById = <TData = AxiosResponse<Proposal>>(
+export type getProposalByIdResponse = {
+  data: Proposal;
+  status: number;
+};
+
+export const getGetProposalByIdUrl = (proposalId: string) => {
+  return `/api/agora/proposals/${proposalId}`;
+};
+
+export const getProposalById = async (
   proposalId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/proposals/${proposalId}`, options);
+  options?: RequestInit
+): Promise<getProposalByIdResponse> => {
+  return customFetch<Promise<getProposalByIdResponse>>(
+    getGetProposalByIdUrl(proposalId),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -202,15 +347,42 @@ export const getProposalById = <TData = AxiosResponse<Proposal>>(
 
  * @summary Gets a paginated list of votes for a proposal
  */
-export const getProposalVotes = <TData = AxiosResponse<GetProposalVotes200>>(
+export type getProposalVotesResponse = {
+  data: GetProposalVotes200;
+  status: number;
+};
+
+export const getGetProposalVotesUrl = (
+  proposalId: string,
+  params?: GetProposalVotesParams
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/api/agora/proposals/${proposalId}/votes?${normalizedParams.toString()}`
+    : `/api/agora/proposals/${proposalId}/votes`;
+};
+
+export const getProposalVotes = async (
   proposalId: string,
   params?: GetProposalVotesParams,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/proposals/${proposalId}/votes`, {
-    ...options,
-    params: { ...params, ...options?.params },
-  });
+  options?: RequestInit
+): Promise<getProposalVotesResponse> => {
+  return customFetch<Promise<getProposalVotesResponse>>(
+    getGetProposalVotesUrl(proposalId, params),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -218,11 +390,26 @@ export const getProposalVotes = <TData = AxiosResponse<GetProposalVotes200>>(
 
  * @summary Gets delegatees (delegating to) information for an address
  */
-export const getDelegateesByAddress = <TData = AxiosResponse<Delegation>>(
+export type getDelegateesByAddressResponse = {
+  data: Delegation;
+  status: number;
+};
+
+export const getGetDelegateesByAddressUrl = (addressOrEnsName: string) => {
+  return `/api/agora/delegates/${addressOrEnsName}/delegatees`;
+};
+
+export const getDelegateesByAddress = async (
   addressOrEnsName: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/delegates/${addressOrEnsName}/delegatees`, options);
+  options?: RequestInit
+): Promise<getDelegateesByAddressResponse> => {
+  return customFetch<Promise<getDelegateesByAddressResponse>>(
+    getGetDelegateesByAddressUrl(addressOrEnsName),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -230,13 +417,26 @@ export const getDelegateesByAddress = <TData = AxiosResponse<Delegation>>(
 
  * @summary Gets delegator (delegating to) information for an address
  */
-export const getDelegatorsByAddress = <
-  TData = AxiosResponse<GetDelegatorsByAddress200>
->(
+export type getDelegatorsByAddressResponse = {
+  data: GetDelegatorsByAddress200;
+  status: number;
+};
+
+export const getGetDelegatorsByAddressUrl = (addressOrEnsName: string) => {
+  return `/api/agora/delegates/${addressOrEnsName}/delegators`;
+};
+
+export const getDelegatorsByAddress = async (
   addressOrEnsName: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/delegates/${addressOrEnsName}/delegators`, options);
+  options?: RequestInit
+): Promise<getDelegatorsByAddressResponse> => {
+  return customFetch<Promise<getDelegatorsByAddressResponse>>(
+    getGetDelegatorsByAddressUrl(addressOrEnsName),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -244,10 +444,25 @@ export const getDelegatorsByAddress = <
 
  * @summary Gets the governor contract address
  */
-export const getGovernorContract = <TData = AxiosResponse<Contract>>(
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/contracts/governor`, options);
+export type getGovernorContractResponse = {
+  data: Contract;
+  status: number;
+};
+
+export const getGetGovernorContractUrl = () => {
+  return `/api/agora/contracts/governor`;
+};
+
+export const getGovernorContract = async (
+  options?: RequestInit
+): Promise<getGovernorContractResponse> => {
+  return customFetch<Promise<getGovernorContractResponse>>(
+    getGetGovernorContractUrl(),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -255,10 +470,25 @@ export const getGovernorContract = <TData = AxiosResponse<Contract>>(
 
  * @summary Gets the alligator contract address
  */
-export const getAlligatorContract = <TData = AxiosResponse<Contract>>(
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/contracts/alligator`, options);
+export type getAlligatorContractResponse = {
+  data: Contract;
+  status: number;
+};
+
+export const getGetAlligatorContractUrl = () => {
+  return `/api/agora/contracts/alligator`;
+};
+
+export const getAlligatorContract = async (
+  options?: RequestInit
+): Promise<getAlligatorContractResponse> => {
+  return customFetch<Promise<getAlligatorContractResponse>>(
+    getGetAlligatorContractUrl(),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -266,10 +496,25 @@ export const getAlligatorContract = <TData = AxiosResponse<Contract>>(
 
  * @summary Gets the voting token contract address
  */
-export const getVotingTokenContract = <TData = AxiosResponse<VotingToken>>(
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/contracts/token`, options);
+export type getVotingTokenContractResponse = {
+  data: VotingToken;
+  status: number;
+};
+
+export const getGetVotingTokenContractUrl = () => {
+  return `/api/agora/contracts/token`;
+};
+
+export const getVotingTokenContract = async (
+  options?: RequestInit
+): Promise<getVotingTokenContractResponse> => {
+  return customFetch<Promise<getVotingTokenContractResponse>>(
+    getGetVotingTokenContractUrl(),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -277,13 +522,34 @@ export const getVotingTokenContract = <TData = AxiosResponse<VotingToken>>(
 
  * @summary Gets a list of projects
  */
-export const getProjects = <TData = AxiosResponse<GetProjects200>>(
+export type getProjectsResponse = {
+  data: GetProjects200;
+  status: number;
+};
+
+export const getGetProjectsUrl = (params?: GetProjectsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/api/agora/projects?${normalizedParams.toString()}`
+    : `/api/agora/projects`;
+};
+
+export const getProjects = async (
   params?: GetProjectsParams,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/projects`, {
+  options?: RequestInit
+): Promise<getProjectsResponse> => {
+  return customFetch<Promise<getProjectsResponse>>(getGetProjectsUrl(params), {
     ...options,
-    params: { ...params, ...options?.params },
+    method: "GET",
   });
 };
 
@@ -292,16 +558,40 @@ export const getProjects = <TData = AxiosResponse<GetProjects200>>(
 
  * @summary Gets a list of RetroFunding rounds
  */
-export const getRetroFundingRounds = <
-  TData = AxiosResponse<GetRetroFundingRounds200>
->(
-  params?: GetRetroFundingRoundsParams,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/retrofunding/rounds`, {
-    ...options,
-    params: { ...params, ...options?.params },
+export type getRetroFundingRoundsResponse = {
+  data: GetRetroFundingRounds200;
+  status: number;
+};
+
+export const getGetRetroFundingRoundsUrl = (
+  params?: GetRetroFundingRoundsParams
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
   });
+
+  return normalizedParams.size
+    ? `/api/agora/retrofunding/rounds?${normalizedParams.toString()}`
+    : `/api/agora/retrofunding/rounds`;
+};
+
+export const getRetroFundingRounds = async (
+  params?: GetRetroFundingRoundsParams,
+  options?: RequestInit
+): Promise<getRetroFundingRoundsResponse> => {
+  return customFetch<Promise<getRetroFundingRoundsResponse>>(
+    getGetRetroFundingRoundsUrl(params),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -309,13 +599,26 @@ export const getRetroFundingRounds = <
 
  * @summary Gets a specific RetroFunding round
  */
-export const getRetroFundingRoundById = <
-  TData = AxiosResponse<RetroFundingRound>
->(
+export type getRetroFundingRoundByIdResponse = {
+  data: RetroFundingRound;
+  status: number;
+};
+
+export const getGetRetroFundingRoundByIdUrl = (roundId: number) => {
+  return `/api/agora/retrofunding/rounds/${roundId}`;
+};
+
+export const getRetroFundingRoundById = async (
   roundId: number,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/retrofunding/rounds/${roundId}`, options);
+  options?: RequestInit
+): Promise<getRetroFundingRoundByIdResponse> => {
+  return customFetch<Promise<getRetroFundingRoundByIdResponse>>(
+    getGetRetroFundingRoundByIdUrl(roundId),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -323,17 +626,42 @@ export const getRetroFundingRoundById = <
 
  * @summary Gets a list of ballots for an RetroFunding round
  */
-export const getRetroFundingRoundBallots = <
-  TData = AxiosResponse<GetRetroFundingRoundBallots200>
->(
+export type getRetroFundingRoundBallotsResponse = {
+  data: GetRetroFundingRoundBallots200;
+  status: number;
+};
+
+export const getGetRetroFundingRoundBallotsUrl = (
+  roundId: number,
+  params?: GetRetroFundingRoundBallotsParams
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/api/agora/retrofunding/rounds/${roundId}/ballots?${normalizedParams.toString()}`
+    : `/api/agora/retrofunding/rounds/${roundId}/ballots`;
+};
+
+export const getRetroFundingRoundBallots = async (
   roundId: number,
   params?: GetRetroFundingRoundBallotsParams,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/retrofunding/rounds/${roundId}/ballots`, {
-    ...options,
-    params: { ...params, ...options?.params },
-  });
+  options?: RequestInit
+): Promise<getRetroFundingRoundBallotsResponse> => {
+  return customFetch<Promise<getRetroFundingRoundBallotsResponse>>(
+    getGetRetroFundingRoundBallotsUrl(roundId, params),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -341,16 +669,29 @@ export const getRetroFundingRoundBallots = <
 
  * @summary Gets a specific ballot for an RetroFunding round
  */
-export const getRetroFundingRoundBallotById = <
-  TData = AxiosResponse<GetRetroFundingRoundBallotById200>
->(
+export type getRetroFundingRoundBallotByIdResponse = {
+  data: GetRetroFundingRoundBallotById200;
+  status: number;
+};
+
+export const getGetRetroFundingRoundBallotByIdUrl = (
+  roundId: number,
+  ballotCasterAddressOrEns: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}`;
+};
+
+export const getRetroFundingRoundBallotById = async (
   roundId: number,
   ballotCasterAddressOrEns: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(
-    `/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}`,
-    options
+  options?: RequestInit
+): Promise<getRetroFundingRoundBallotByIdResponse> => {
+  return customFetch<Promise<getRetroFundingRoundBallotByIdResponse>>(
+    getGetRetroFundingRoundBallotByIdUrl(roundId, ballotCasterAddressOrEns),
+    {
+      ...options,
+      method: "GET",
+    }
   );
 };
 
@@ -359,18 +700,35 @@ export const getRetroFundingRoundBallotById = <
 
  * @summary Updates the OS only flag for a specific RetroFunding ballot
  */
-export const updateRetroFundingBallotOSOnly = <
-  TData = AxiosResponse<Round4Ballot>
->(
+export type updateRetroFundingBallotOSOnlyResponse = {
+  data: Round4Ballot;
+  status: number;
+};
+
+export const getUpdateRetroFundingBallotOSOnlyUrl = (
+  roundId: number,
+  ballotCasterAddressOrEns: string,
+  osOnly: boolean
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}/osOnly/${osOnly}`;
+};
+
+export const updateRetroFundingBallotOSOnly = async (
   roundId: number,
   ballotCasterAddressOrEns: string,
   osOnly: boolean,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post(
-    `/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}/osOnly/${osOnly}`,
-    undefined,
-    options
+  options?: RequestInit
+): Promise<updateRetroFundingBallotOSOnlyResponse> => {
+  return customFetch<Promise<updateRetroFundingBallotOSOnlyResponse>>(
+    getUpdateRetroFundingBallotOSOnlyUrl(
+      roundId,
+      ballotCasterAddressOrEns,
+      osOnly
+    ),
+    {
+      ...options,
+      method: "POST",
+    }
   );
 };
 
@@ -378,18 +736,32 @@ export const updateRetroFundingBallotOSOnly = <
  * Submits the content of a ballot to be counted as final for the round.
  * @summary Submits a particular ballot
  */
-export const submitRetroFundingBallot = <
-  TData = AxiosResponse<SubmitRetroFundingBallot200>
->(
+export type submitRetroFundingBallotResponse = {
+  data: SubmitRetroFundingBallot200;
+  status: number;
+};
+
+export const getSubmitRetroFundingBallotUrl = (
+  roundId: number,
+  ballotCasterAddressOrEns: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}/submit`;
+};
+
+export const submitRetroFundingBallot = async (
   roundId: number,
   ballotCasterAddressOrEns: string,
   submitRetroFundingBallotBody: SubmitRetroFundingBallotBody,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post(
-    `/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}/submit`,
-    submitRetroFundingBallotBody,
-    options
+  options?: RequestInit
+): Promise<submitRetroFundingBallotResponse> => {
+  return customFetch<Promise<submitRetroFundingBallotResponse>>(
+    getSubmitRetroFundingBallotUrl(roundId, ballotCasterAddressOrEns),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(submitRetroFundingBallotBody),
+    }
   );
 };
 
@@ -398,17 +770,42 @@ export const submitRetroFundingBallot = <
 
  * @summary Gets a list of projects for an RetroFunding round
  */
-export const getRetroFundingRoundProjects = <
-  TData = AxiosResponse<GetRetroFundingRoundProjects200>
->(
+export type getRetroFundingRoundProjectsResponse = {
+  data: GetRetroFundingRoundProjects200;
+  status: number;
+};
+
+export const getGetRetroFundingRoundProjectsUrl = (
+  roundId: number,
+  params?: GetRetroFundingRoundProjectsParams
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/api/agora/retrofunding/rounds/${roundId}/projects?${normalizedParams.toString()}`
+    : `/api/agora/retrofunding/rounds/${roundId}/projects`;
+};
+
+export const getRetroFundingRoundProjects = async (
   roundId: number,
   params?: GetRetroFundingRoundProjectsParams,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/retrofunding/rounds/${roundId}/projects`, {
-    ...options,
-    params: { ...params, ...options?.params },
-  });
+  options?: RequestInit
+): Promise<getRetroFundingRoundProjectsResponse> => {
+  return customFetch<Promise<getRetroFundingRoundProjectsResponse>>(
+    getGetRetroFundingRoundProjectsUrl(roundId, params),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -416,14 +813,29 @@ export const getRetroFundingRoundProjects = <
 
  * @summary Gets a specific project for an RetroFunding round
  */
-export const getRetroFundingRoundProjectById = <TData = AxiosResponse<Project>>(
+export type getRetroFundingRoundProjectByIdResponse = {
+  data: Project;
+  status: number;
+};
+
+export const getGetRetroFundingRoundProjectByIdUrl = (
+  roundId: number,
+  projectId: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/projects/${projectId}`;
+};
+
+export const getRetroFundingRoundProjectById = async (
   roundId: number,
   projectId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(
-    `/retrofunding/rounds/${roundId}/projects/${projectId}`,
-    options
+  options?: RequestInit
+): Promise<getRetroFundingRoundProjectByIdResponse> => {
+  return customFetch<Promise<getRetroFundingRoundProjectByIdResponse>>(
+    getGetRetroFundingRoundProjectByIdUrl(roundId, projectId),
+    {
+      ...options,
+      method: "GET",
+    }
   );
 };
 
@@ -432,18 +844,35 @@ export const getRetroFundingRoundProjectById = <TData = AxiosResponse<Project>>(
 
  * @summary Adds or updates an impact metric on a specific RetroFunding ballot
  */
-export const addImpactMetricToRetroFundingBallot = <
-  TData = AxiosResponse<Round4Ballot>
->(
+export type addImpactMetricToRetroFundingBallotResponse = {
+  data: Round4Ballot;
+  status: number;
+};
+
+export const getAddImpactMetricToRetroFundingBallotUrl = (
+  roundId: number,
+  ballotCasterAddressOrEns: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}/impactMetrics`;
+};
+
+export const addImpactMetricToRetroFundingBallot = async (
   roundId: number,
   ballotCasterAddressOrEns: string,
   addImpactMetricToRetroFundingBallotBody: AddImpactMetricToRetroFundingBallotBody,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post(
-    `/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}/impactMetrics`,
-    addImpactMetricToRetroFundingBallotBody,
-    options
+  options?: RequestInit
+): Promise<addImpactMetricToRetroFundingBallotResponse> => {
+  return customFetch<Promise<addImpactMetricToRetroFundingBallotResponse>>(
+    getAddImpactMetricToRetroFundingBallotUrl(
+      roundId,
+      ballotCasterAddressOrEns
+    ),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(addImpactMetricToRetroFundingBallotBody),
+    }
   );
 };
 
@@ -452,19 +881,38 @@ export const addImpactMetricToRetroFundingBallot = <
 
  * @summary Updates a specific project in ballot for a RetroFunding round
  */
-export const updateRetroFundingRoundProjectById = <
-  TData = AxiosResponse<Round5Ballot>
->(
+export type updateRetroFundingRoundProjectByIdResponse = {
+  data: Round5Ballot;
+  status: number;
+};
+
+export const getUpdateRetroFundingRoundProjectByIdUrl = (
+  roundId: number,
+  addressOrEnsName: string,
+  projectId: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/projects/${projectId}`;
+};
+
+export const updateRetroFundingRoundProjectById = async (
   roundId: number,
   addressOrEnsName: string,
   projectId: string,
   updateRetroFundingRoundProjectByIdBody: UpdateRetroFundingRoundProjectByIdBody,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post(
-    `/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/projects/${projectId}`,
-    updateRetroFundingRoundProjectByIdBody,
-    options
+  options?: RequestInit
+): Promise<updateRetroFundingRoundProjectByIdResponse> => {
+  return customFetch<Promise<updateRetroFundingRoundProjectByIdResponse>>(
+    getUpdateRetroFundingRoundProjectByIdUrl(
+      roundId,
+      addressOrEnsName,
+      projectId
+    ),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updateRetroFundingRoundProjectByIdBody),
+    }
   );
 };
 
@@ -473,19 +921,40 @@ export const updateRetroFundingRoundProjectById = <
 
  * @summary Updates a specific allocation for a RetroFunding round
  */
-export const updateRetroFundingRoundCategoryAllocation = <
-  TData = AxiosResponse<Round5Ballot>
->(
+export type updateRetroFundingRoundCategoryAllocationResponse = {
+  data: Round5Ballot;
+  status: number;
+};
+
+export const getUpdateRetroFundingRoundCategoryAllocationUrl = (
+  roundId: number,
+  addressOrEnsName: string,
+  categoryId: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/categories/${categoryId}`;
+};
+
+export const updateRetroFundingRoundCategoryAllocation = async (
   roundId: number,
   addressOrEnsName: string,
   categoryId: string,
   updateRetroFundingRoundCategoryAllocationBody: UpdateRetroFundingRoundCategoryAllocationBody,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post(
-    `/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/categories/${categoryId}`,
-    updateRetroFundingRoundCategoryAllocationBody,
-    options
+  options?: RequestInit
+): Promise<updateRetroFundingRoundCategoryAllocationResponse> => {
+  return customFetch<
+    Promise<updateRetroFundingRoundCategoryAllocationResponse>
+  >(
+    getUpdateRetroFundingRoundCategoryAllocationUrl(
+      roundId,
+      addressOrEnsName,
+      categoryId
+    ),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updateRetroFundingRoundCategoryAllocationBody),
+    }
   );
 };
 
@@ -494,18 +963,34 @@ export const updateRetroFundingRoundCategoryAllocation = <
 
  * @summary Updates the distribution method for a specific RetroFunding ballot
  */
-export const updateRetroFundingBallotDistributionMethod = <
-  TData = AxiosResponse<Round5Ballot>
->(
+export type updateRetroFundingBallotDistributionMethodResponse = {
+  data: Round5Ballot;
+  status: number;
+};
+
+export const getUpdateRetroFundingBallotDistributionMethodUrl = (
+  roundId: number,
+  addressOrEnsName: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/distribution_method`;
+};
+
+export const updateRetroFundingBallotDistributionMethod = async (
   roundId: number,
   addressOrEnsName: string,
   updateRetroFundingBallotDistributionMethodBody: UpdateRetroFundingBallotDistributionMethodBody,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post(
-    `/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/distribution_method`,
-    updateRetroFundingBallotDistributionMethodBody,
-    options
+  options?: RequestInit
+): Promise<updateRetroFundingBallotDistributionMethodResponse> => {
+  return customFetch<
+    Promise<updateRetroFundingBallotDistributionMethodResponse>
+  >(
+    getUpdateRetroFundingBallotDistributionMethodUrl(roundId, addressOrEnsName),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updateRetroFundingBallotDistributionMethodBody),
+    }
   );
 };
 
@@ -514,17 +999,35 @@ export const updateRetroFundingBallotDistributionMethod = <
 
  * @summary Removes an impact metric from a ballot
  */
-export const removeImpactMetricFromRetroFundingBallot = <
-  TData = AxiosResponse<void>
->(
+export type removeImpactMetricFromRetroFundingBallotResponse = {
+  data: void;
+  status: number;
+};
+
+export const getRemoveImpactMetricFromRetroFundingBallotUrl = (
+  roundId: number,
+  ballotCasterAddressOrEns: string,
+  impactMetricId: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}/impactMetrics/${impactMetricId}`;
+};
+
+export const removeImpactMetricFromRetroFundingBallot = async (
   roundId: number,
   ballotCasterAddressOrEns: string,
   impactMetricId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.delete(
-    `/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}/impactMetrics/${impactMetricId}`,
-    options
+  options?: RequestInit
+): Promise<removeImpactMetricFromRetroFundingBallotResponse> => {
+  return customFetch<Promise<removeImpactMetricFromRetroFundingBallotResponse>>(
+    getRemoveImpactMetricFromRetroFundingBallotUrl(
+      roundId,
+      ballotCasterAddressOrEns,
+      impactMetricId
+    ),
+    {
+      ...options,
+      method: "DELETE",
+    }
   );
 };
 
@@ -533,13 +1036,26 @@ export const removeImpactMetricFromRetroFundingBallot = <
 
  * @summary Gets impact metrics for a specific RetroFunding round
  */
-export const getImpactMetricsOnRetroFundingRound = <
-  TData = AxiosResponse<RetroFundingImpactMetric[]>
->(
+export type getImpactMetricsOnRetroFundingRoundResponse = {
+  data: RetroFundingImpactMetric[];
+  status: number;
+};
+
+export const getGetImpactMetricsOnRetroFundingRoundUrl = (roundId: number) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/impactMetrics`;
+};
+
+export const getImpactMetricsOnRetroFundingRound = async (
   roundId: number,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(`/retrofunding/rounds/${roundId}/impactMetrics`, options);
+  options?: RequestInit
+): Promise<getImpactMetricsOnRetroFundingRoundResponse> => {
+  return customFetch<Promise<getImpactMetricsOnRetroFundingRoundResponse>>(
+    getGetImpactMetricsOnRetroFundingRoundUrl(roundId),
+    {
+      ...options,
+      method: "GET",
+    }
+  );
 };
 
 /**
@@ -547,16 +1063,29 @@ export const getImpactMetricsOnRetroFundingRound = <
 
  * @summary Gets a specific impact metric for an RetroFunding round
  */
-export const getImpactMetricOnRetroFundingRound = <
-  TData = AxiosResponse<RetroFundingImpactMetric>
->(
+export type getImpactMetricOnRetroFundingRoundResponse = {
+  data: RetroFundingImpactMetric;
+  status: number;
+};
+
+export const getGetImpactMetricOnRetroFundingRoundUrl = (
+  roundId: number,
+  impactMetricId: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}`;
+};
+
+export const getImpactMetricOnRetroFundingRound = async (
   roundId: number,
   impactMetricId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(
-    `/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}`,
-    options
+  options?: RequestInit
+): Promise<getImpactMetricOnRetroFundingRoundResponse> => {
+  return customFetch<Promise<getImpactMetricOnRetroFundingRoundResponse>>(
+    getGetImpactMetricOnRetroFundingRoundUrl(roundId, impactMetricId),
+    {
+      ...options,
+      method: "GET",
+    }
   );
 };
 
@@ -565,18 +1094,31 @@ export const getImpactMetricOnRetroFundingRound = <
 
  * @summary Records a view of an impact metric
  */
-export const recordImpactMetricView = <
-  TData = AxiosResponse<RecordImpactMetricView200>
->(
+export type recordImpactMetricViewResponse = {
+  data: RecordImpactMetricView200;
+  status: number;
+};
+
+export const getRecordImpactMetricViewUrl = (
+  roundId: number,
+  impactMetricId: string,
+  addressOrEnsName: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/${addressOrEnsName}`;
+};
+
+export const recordImpactMetricView = async (
   roundId: number,
   impactMetricId: string,
   addressOrEnsName: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.post(
-    `/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/${addressOrEnsName}`,
-    undefined,
-    options
+  options?: RequestInit
+): Promise<recordImpactMetricViewResponse> => {
+  return customFetch<Promise<recordImpactMetricViewResponse>>(
+    getRecordImpactMetricViewUrl(roundId, impactMetricId, addressOrEnsName),
+    {
+      ...options,
+      method: "POST",
+    }
   );
 };
 
@@ -585,19 +1127,42 @@ export const recordImpactMetricView = <
 
  * @summary Gets comments on an impact metric
  */
-export const getImpactMetricComments = <
-  TData = AxiosResponse<GetImpactMetricComments200>
->(
+export type getImpactMetricCommentsResponse = {
+  data: GetImpactMetricComments200;
+  status: number;
+};
+
+export const getGetImpactMetricCommentsUrl = (
+  roundId: number,
+  impactMetricId: string,
+  params?: GetImpactMetricCommentsParams
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/api/agora/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments?${normalizedParams.toString()}`
+    : `/api/agora/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments`;
+};
+
+export const getImpactMetricComments = async (
   roundId: number,
   impactMetricId: string,
   params?: GetImpactMetricCommentsParams,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(
-    `/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments`,
+  options?: RequestInit
+): Promise<getImpactMetricCommentsResponse> => {
+  return customFetch<Promise<getImpactMetricCommentsResponse>>(
+    getGetImpactMetricCommentsUrl(roundId, impactMetricId, params),
     {
       ...options,
-      params: { ...params, ...options?.params },
+      method: "GET",
     }
   );
 };
@@ -607,16 +1172,32 @@ export const getImpactMetricComments = <
 
  * @summary Creates a comment on an impact metric
  */
-export const putImpactMetricComment = <TData = AxiosResponse<Comment>>(
+export type putImpactMetricCommentResponse = {
+  data: Comment;
+  status: number;
+};
+
+export const getPutImpactMetricCommentUrl = (
+  roundId: number,
+  impactMetricId: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments`;
+};
+
+export const putImpactMetricComment = async (
   roundId: number,
   impactMetricId: string,
   putImpactMetricCommentBody: PutImpactMetricCommentBody,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.put(
-    `/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments`,
-    putImpactMetricCommentBody,
-    options
+  options?: RequestInit
+): Promise<putImpactMetricCommentResponse> => {
+  return customFetch<Promise<putImpactMetricCommentResponse>>(
+    getPutImpactMetricCommentUrl(roundId, impactMetricId),
+    {
+      ...options,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(putImpactMetricCommentBody),
+    }
   );
 };
 
@@ -625,15 +1206,31 @@ export const putImpactMetricComment = <TData = AxiosResponse<Comment>>(
 
  * @summary Gets a specific comment on an impact metric
  */
-export const getImpactMetricComment = <TData = AxiosResponse<Comment>>(
+export type getImpactMetricCommentResponse = {
+  data: Comment;
+  status: number;
+};
+
+export const getGetImpactMetricCommentUrl = (
+  roundId: number,
+  impactMetricId: string,
+  commentId: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments/${commentId}`;
+};
+
+export const getImpactMetricComment = async (
   roundId: number,
   impactMetricId: string,
   commentId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(
-    `/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments/${commentId}`,
-    options
+  options?: RequestInit
+): Promise<getImpactMetricCommentResponse> => {
+  return customFetch<Promise<getImpactMetricCommentResponse>>(
+    getGetImpactMetricCommentUrl(roundId, impactMetricId, commentId),
+    {
+      ...options,
+      method: "GET",
+    }
   );
 };
 
@@ -642,17 +1239,34 @@ export const getImpactMetricComment = <TData = AxiosResponse<Comment>>(
 
  * @summary Updates existing comment
  */
-export const updateImpactMetricComment = <TData = AxiosResponse<Comment>>(
+export type updateImpactMetricCommentResponse = {
+  data: Comment;
+  status: number;
+};
+
+export const getUpdateImpactMetricCommentUrl = (
+  roundId: number,
+  impactMetricId: string,
+  commentId: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments/${commentId}`;
+};
+
+export const updateImpactMetricComment = async (
   roundId: number,
   impactMetricId: string,
   commentId: string,
   updateImpactMetricCommentBody: UpdateImpactMetricCommentBody,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.put(
-    `/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments/${commentId}`,
-    updateImpactMetricCommentBody,
-    options
+  options?: RequestInit
+): Promise<updateImpactMetricCommentResponse> => {
+  return customFetch<Promise<updateImpactMetricCommentResponse>>(
+    getUpdateImpactMetricCommentUrl(roundId, impactMetricId, commentId),
+    {
+      ...options,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updateImpactMetricCommentBody),
+    }
   );
 };
 
@@ -661,15 +1275,31 @@ export const updateImpactMetricComment = <TData = AxiosResponse<Comment>>(
 
  * @summary Deletes a comment on an impact metric
  */
-export const deleteImpactMetricComment = <TData = AxiosResponse<void>>(
+export type deleteImpactMetricCommentResponse = {
+  data: void;
+  status: number;
+};
+
+export const getDeleteImpactMetricCommentUrl = (
+  roundId: number,
+  impactMetricId: string,
+  commentId: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments/${commentId}`;
+};
+
+export const deleteImpactMetricComment = async (
   roundId: number,
   impactMetricId: string,
   commentId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.delete(
-    `/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments/${commentId}`,
-    options
+  options?: RequestInit
+): Promise<deleteImpactMetricCommentResponse> => {
+  return customFetch<Promise<deleteImpactMetricCommentResponse>>(
+    getDeleteImpactMetricCommentUrl(roundId, impactMetricId, commentId),
+    {
+      ...options,
+      method: "DELETE",
+    }
   );
 };
 
@@ -678,17 +1308,31 @@ export const deleteImpactMetricComment = <TData = AxiosResponse<void>>(
 
  * @summary Gets all votes for a speciffic comment
  */
-export const getImpactMetricCommentVote = <
-  TData = AxiosResponse<CommentVote[]>
->(
+export type getImpactMetricCommentVoteResponse = {
+  data: CommentVote[];
+  status: number;
+};
+
+export const getGetImpactMetricCommentVoteUrl = (
+  roundId: number,
+  impactMetricId: string,
+  commentId: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments/${commentId}/votes`;
+};
+
+export const getImpactMetricCommentVote = async (
   roundId: number,
   impactMetricId: string,
   commentId: string,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.get(
-    `/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments/${commentId}/votes`,
-    options
+  options?: RequestInit
+): Promise<getImpactMetricCommentVoteResponse> => {
+  return customFetch<Promise<getImpactMetricCommentVoteResponse>>(
+    getGetImpactMetricCommentVoteUrl(roundId, impactMetricId, commentId),
+    {
+      ...options,
+      method: "GET",
+    }
   );
 };
 
@@ -697,71 +1341,33 @@ export const getImpactMetricCommentVote = <
 
  * @summary Creates or updates vote for a speciffic comment
  */
-export const putImactMetricCommentVote = <TData = AxiosResponse<CommentVote>>(
+export type putImactMetricCommentVoteResponse = {
+  data: CommentVote;
+  status: number;
+};
+
+export const getPutImactMetricCommentVoteUrl = (
+  roundId: number,
+  impactMetricId: string,
+  commentId: string
+) => {
+  return `/api/agora/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments/${commentId}/votes`;
+};
+
+export const putImactMetricCommentVote = async (
   roundId: number,
   impactMetricId: string,
   commentId: string,
   putImactMetricCommentVoteBody: PutImactMetricCommentVoteBody,
-  options?: AxiosRequestConfig
-): Promise<TData> => {
-  return axios.put(
-    `/retrofunding/rounds/${roundId}/impactMetrics/${impactMetricId}/comments/${commentId}/votes`,
-    putImactMetricCommentVoteBody,
-    options
+  options?: RequestInit
+): Promise<putImactMetricCommentVoteResponse> => {
+  return customFetch<Promise<putImactMetricCommentVoteResponse>>(
+    getPutImactMetricCommentVoteUrl(roundId, impactMetricId, commentId),
+    {
+      ...options,
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(putImactMetricCommentVoteBody),
+    }
   );
 };
-
-export type GetSpecResult = AxiosResponse<string>;
-export type GetNonceResult = AxiosResponse<string>;
-export type PostSiweVerificationMessageResult = AxiosResponse<AuthToken>;
-export type GetDelegatesResult = AxiosResponse<GetDelegates200>;
-export type GetDelegateByAddressResult = AxiosResponse<Delegate>;
-export type GetDelegateVotesResult = AxiosResponse<GetDelegateVotes200>;
-export type GetProposalsResult = AxiosResponse<GetProposals200>;
-export type GetProposalByIdResult = AxiosResponse<Proposal>;
-export type GetProposalVotesResult = AxiosResponse<GetProposalVotes200>;
-export type GetDelegateesByAddressResult = AxiosResponse<Delegation>;
-export type GetDelegatorsByAddressResult =
-  AxiosResponse<GetDelegatorsByAddress200>;
-export type GetGovernorContractResult = AxiosResponse<Contract>;
-export type GetAlligatorContractResult = AxiosResponse<Contract>;
-export type GetVotingTokenContractResult = AxiosResponse<VotingToken>;
-export type GetProjectsResult = AxiosResponse<GetProjects200>;
-export type GetRetroFundingRoundsResult =
-  AxiosResponse<GetRetroFundingRounds200>;
-export type GetRetroFundingRoundByIdResult = AxiosResponse<RetroFundingRound>;
-export type GetRetroFundingRoundBallotsResult =
-  AxiosResponse<GetRetroFundingRoundBallots200>;
-export type GetRetroFundingRoundBallotByIdResult =
-  AxiosResponse<GetRetroFundingRoundBallotById200>;
-export type UpdateRetroFundingBallotOSOnlyResult = AxiosResponse<Round4Ballot>;
-export type SubmitRetroFundingBallotResult =
-  AxiosResponse<SubmitRetroFundingBallot200>;
-export type GetRetroFundingRoundProjectsResult =
-  AxiosResponse<GetRetroFundingRoundProjects200>;
-export type GetRetroFundingRoundProjectByIdResult = AxiosResponse<Project>;
-export type AddImpactMetricToRetroFundingBallotResult =
-  AxiosResponse<Round4Ballot>;
-export type UpdateRetroFundingRoundProjectByIdResult =
-  AxiosResponse<Round5Ballot>;
-export type UpdateRetroFundingRoundCategoryAllocationResult =
-  AxiosResponse<Round5Ballot>;
-export type UpdateRetroFundingBallotDistributionMethodResult =
-  AxiosResponse<Round5Ballot>;
-export type RemoveImpactMetricFromRetroFundingBallotResult =
-  AxiosResponse<void>;
-export type GetImpactMetricsOnRetroFundingRoundResult = AxiosResponse<
-  RetroFundingImpactMetric[]
->;
-export type GetImpactMetricOnRetroFundingRoundResult =
-  AxiosResponse<RetroFundingImpactMetric>;
-export type RecordImpactMetricViewResult =
-  AxiosResponse<RecordImpactMetricView200>;
-export type GetImpactMetricCommentsResult =
-  AxiosResponse<GetImpactMetricComments200>;
-export type PutImpactMetricCommentResult = AxiosResponse<Comment>;
-export type GetImpactMetricCommentResult = AxiosResponse<Comment>;
-export type UpdateImpactMetricCommentResult = AxiosResponse<Comment>;
-export type DeleteImpactMetricCommentResult = AxiosResponse<void>;
-export type GetImpactMetricCommentVoteResult = AxiosResponse<CommentVote[]>;
-export type PutImactMetricCommentVoteResult = AxiosResponse<CommentVote>;

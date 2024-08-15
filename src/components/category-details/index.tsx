@@ -14,9 +14,12 @@ export function CategoryDetails({
 	data?: Category[];
 }) {
 	const category = data?.find(cat => cat.id === id);
-	const { data: { data: projects = [] } = {}, isPending } = useProjectsByCategory(id);
+	const { data: projectsRes, isPending } = useProjectsByCategory(id);
 	const { name, image, description, eligibility, examples } = category ?? {};
 	const { eligible_projects, note } = eligibility ?? {};
+
+	const projects = projectsRes?.projects;
+
 	return (
 		<section className="space-y-16">
 			<div className="space-y-6">

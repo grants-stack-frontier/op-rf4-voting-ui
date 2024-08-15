@@ -5,9 +5,9 @@ import { Card } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
 import { ArrowDownToLineIcon, LoaderIcon } from "lucide-react";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useState } from "react";
 import { SubmitDialog, downloadImage } from "@/components/ballot/submit-dialog";
-import { MetricsEditor } from "../../components/metrics-editor";
+import { MetricsEditor } from "@/components/metrics-editor";
 import {
   MAX_MULTIPLIER_VALUE,
   useBallot,
@@ -15,7 +15,7 @@ import {
   useIsSavingBallot,
   useOsMultiplier,
 } from "@/hooks/useBallot";
-import { useMetrics } from "@/hooks/useMetrics";
+import { useMetricsByRound } from "@/hooks/useMetrics";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
@@ -26,7 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert } from "@/components/ui/alert";
 import { formatDate } from "@/lib/utils";
 import { useIsBadgeholder } from "@/hooks/useIsBadgeholder";
-import { ManualDialog } from "../../components/common/manual-dialog";
+import { ManualDialog } from "@/components/common/manual-dialog";
 import { PageView } from "@/components/common/page-view";
 import Image from "next/image";
 import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
@@ -61,7 +61,7 @@ function CheckBallotState() {
 
 function YourBallot() {
   const [isSubmitting, setSubmitting] = useState(false);
-  const metrics = useMetrics();
+  const metrics = useMetricsByRound(4);
 
   const { ballot } = useBallotContext();
 
@@ -96,7 +96,7 @@ function YourBallot() {
         </Alert>
       )}
       <Card className="p-6 space-y-8">
-        <MetricsEditor metrics={metrics.data} isLoading={metrics.isPending} />
+        <MetricsEditor metrics={metrics.data?.data} isLoading={metrics.isPending} />
         <OpenSourceMultiplier initialValue={ballot?.os_multiplier} />
 
         <div className="flex items-center gap-4">
