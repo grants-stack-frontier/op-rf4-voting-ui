@@ -17,10 +17,11 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Category } from "@/data/categories";
-import { Project, useProjectsByCategory } from "@/hooks/useProjects";
+import { useProjectsByCategory } from "@/hooks/useProjects";
 import Link from "next/link";
 import { ManualDialog } from "../common/manual-dialog";
 import { Skeleton } from "../ui/skeleton";
+import {Project} from "@/__generated__/api/agora.schemas";
 
 export function ProjectsSidebar({
 	id,
@@ -30,13 +31,15 @@ export function ProjectsSidebar({
 	data?: Category[];
 }) {
 	const category = data?.find(cat => cat.id === id);
-	const { data: { data: projects = [] } = {}, isPending } = useProjectsByCategory(id);
+	const { data: projectsRes , isPending } = useProjectsByCategory(id);
 	const intersectionRef = useRef(null);
 	const intersection = useIntersection(intersectionRef, {
 		root: null,
 		rootMargin: "0px",
 		threshold: 1,
 	});
+
+	const projects = projectsRes?.projects
 
 	return (
 		<Card
@@ -92,7 +95,7 @@ function ProjectItem({
 	profileAvatarUrl = AvatarPlaceholder.src,
 	isLoading,
 	children,
-}: PropsWithChildren<Partial<Project>> & { isLoading?: boolean }) {
+}: PropsWithChildren<Project> & { isLoading?: boolean }) {
 	const [isOpen, setOpen] = useState(false);
 	return (
 		<>

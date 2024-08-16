@@ -1,8 +1,8 @@
 "use client";
 import { Heading } from "@/components/ui/headings";
-import { Project } from "@/hooks/useProjects";
 import Image from "next/image";
 import { Skeleton } from "../ui/skeleton";
+import {Project} from "@/__generated__/api/agora.schemas";
 export function ProjectDetails({
 	data,
 	isPending,

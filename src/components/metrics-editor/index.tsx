@@ -9,16 +9,16 @@ import { useMemo } from "react";
 import { useBallotContext } from "../ballot/provider";
 import { useSortBallot } from "@/hooks/useBallotEditor";
 import { BallotFilter } from "../ballot/ballot-filter";
-import { Metric } from "@/hooks/useMetrics";
 import Link from "next/link";
 import { Skeleton } from "../ui/skeleton";
 import mixpanel from "@/lib/mixpanel";
+import {RetroFundingImpactMetric} from "@/__generated__/api/agora.schemas";
 
 export function MetricsEditor({
   metrics = [],
   isLoading,
 }: {
-  metrics?: Metric[];
+  metrics?: RetroFundingImpactMetric[];
   isLoading: boolean;
 }) {
   const { state, inc, dec, set, remove } = useBallotContext();
