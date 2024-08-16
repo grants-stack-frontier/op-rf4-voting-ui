@@ -1,6 +1,6 @@
 "use client";
 import { NumericFormat } from "react-number-format";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { InfoIcon, Minus, Plus, Trash2 } from "lucide-react";
 import { Heading } from "@/components/ui/headings";
 
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,9 @@ import { Metric } from "@/hooks/useMetrics";
 import Link from "next/link";
 import { Skeleton } from "../ui/skeleton";
 import mixpanel from "@/lib/mixpanel";
+import { DistributionChart } from "../metrics/distribution-chart";
+import { Card } from "../ui/card";
+import { SearchInput } from "../common/search-input";
 
 export function MetricsEditor({
   metrics = [],
@@ -31,6 +34,35 @@ export function MetricsEditor({
     [metrics]
   );
 
+  // Dummy data for the allocation methods
+  const allocationMethods = [
+    {
+      data: [
+        {x: 0, y: 0},
+        {x: 10, y: 10},
+        {x: 20, y: 20},
+        {x: 30, y: 30},
+        {x: 40, y: 40},
+      ],
+      formatChartTick: (tick: number) => `${tick}%`,
+      method: "Linear",
+      description: "blah blah blah",
+    },
+    {
+      data: [
+        {x: 0, y: 0},
+        {x: 10, y: 10},
+        {x: 20, y: 20},
+        {x: 30, y: 30},
+        {x: 40, y: 40},
+      ],
+      formatChartTick: (tick: number) => `${tick}%`,
+      method: "Exponential",
+      description: "blah blah blah",
+    },
+  ]
+  const allocationAmount = "3,333,333";
+
   return (
     <div>
       <div className="flex items-center justify-between">
@@ -42,6 +74,31 @@ export function MetricsEditor({
         </div>
         <BallotFilter />
       </div>
+
+      {/* This sections is a work in progress */}
+      <div className=" flex flex-col gap-4 py-4 text-sm">
+        <p>First, review your project rankings in the list below.</p>
+        <p>Then, choose a method to easily allocate rewards across prjects. You can also customize percentages at any time.</p>
+        <p>OP calcilations in this ballot are based on your budget of {allocationAmount} OP</p>
+      </div>
+
+      <div className="flex flex-row justify-between items-end">
+        <p className="font-semibold mb-2">Allocation method</p>
+        <p className="font-semibold mb-2 text-sm">None selected</p>
+      </div>
+      <div className="grid grid-cols-4 sm:grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+        {allocationMethods.map((method, index) => (
+          <Card>
+            <DistributionChart key={index} data={method.data} formatChartTick={method.formatChartTick} />
+            <div className="mb-2 mx-4 flex flex-row justify-between items-center">
+              <p className="font-bold text-sm">{method.method}</p>
+              <InfoIcon className="h-4 w-4" />
+            </div>
+          </Card>
+        ))}
+      </div>
+      <SearchInput className="my-2" placeholder="Search projects..." />
+      {/* ^^This sections is a work in progress^^ */}
 
       <div className="divide-y border-y">
         {isLoading &&

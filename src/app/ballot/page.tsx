@@ -46,16 +46,16 @@ function CheckBallotState() {
   const { address, isConnecting } = useAccount();
   const { isPending } = useBallot(address);
   const { state } = useBallotContext();
-  if (isPending) {
-    return <Skeleton className="p-6 h-96" />;
-  }
-  if (!address && !isConnecting) {
-    return <NonBadgeholder />;
-  }
-  const isEmptyBallot = !Object.keys(state).length;
-  if (isEmptyBallot) {
-    return <EmptyBallot />;
-  }
+  // if (isPending) {
+  //   return <Skeleton className="p-6 h-96" />;
+  // }
+  // if (!address && !isConnecting) {
+  //   return <NonBadgeholder />;
+  // }
+  // const isEmptyBallot = !Object.keys(state).length;
+  // if (isEmptyBallot) {
+  //   return <EmptyBallot />;
+  // }
   return <YourBallot />;
 }
 
