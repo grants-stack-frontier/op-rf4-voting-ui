@@ -10,6 +10,7 @@ import { Card } from "../ui/card";
 import { Heading } from "../ui/headings";
 import { ScrollArea } from "../ui/scroll-area";
 
+import { Project } from "@/__generated__/api/agora.schemas";
 import {
 	Tooltip,
 	TooltipContent,
@@ -21,7 +22,6 @@ import { useProjectsByCategory } from "@/hooks/useProjects";
 import Link from "next/link";
 import { ManualDialog } from "../common/manual-dialog";
 import { Skeleton } from "../ui/skeleton";
-import {Project} from "@/__generated__/api/agora.schemas";
 
 export function ProjectsSidebar({
 	id,
@@ -31,7 +31,8 @@ export function ProjectsSidebar({
 	data?: Category[];
 }) {
 	const category = data?.find(cat => cat.id === id);
-	const { data: projectsRes , isPending } = useProjectsByCategory(id);
+	const { data: projectsRes, isPending } = useProjectsByCategory(id);
+	console.log({ projectsRes })
 	const intersectionRef = useRef(null);
 	const intersection = useIntersection(intersectionRef, {
 		root: null,
