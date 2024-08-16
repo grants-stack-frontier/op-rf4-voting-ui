@@ -9,24 +9,29 @@ export type Project = {
 	id: string;
 	name: string;
 	category: string;
+	organization: {
+		name: string;
+		profileAvatarUrl: string;
+	} | null;
 	description: string;
 	profileAvatarUrl: string;
 	projectCoverImageUrl: string;
 	socialLinks: {
-		twitter: string;
-		farcaster: string;
-		mirror: string;
-		website: string;
+		twitter?: string;
+		farcaster?: string[];
+		mirror?: string;
+		website?: string[];
 	};
 	team: string[];
 	github: string[];
 	packages: string[];
 	links: string[];
-	organization: {
-		name: string;
-		profileAvatarUrl: string;
-	};
-	contracts: Record<string, unknown>[];
+	contracts: {
+		address: string;
+		deploymentTxHash: string;
+		deployerAddress: string;
+		chainId: number;
+	}[];
 	grantsAndFunding: {
 		ventureFunding: {
 			amount: string;
