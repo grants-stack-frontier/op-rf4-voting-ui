@@ -5,6 +5,9 @@ import mixpanel from "@/lib/mixpanel";
 import { Github, Link2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { Mirror } from "../common/mirror";
+import { Warpcast } from "../common/warpcast";
+import { X } from "../common/x";
 import { Markdown } from "../markdown";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import { Badge } from "../ui/badge";
@@ -63,18 +66,6 @@ export function ProjectDetails({
 									</Button>
 								</Link>
 							)}
-							{twitter && (
-								<Link href={twitter} target="_blank">
-									<Button
-										variant="link"
-										className="gap-1"
-										onClick={() => mixpanel.track("Open Twitter", { external: true })}
-									>
-										<Link2 className="-rotate-45 h-4 w-4" />
-										{twitter}
-									</Button>
-								</Link>
-							)}
 							{farcaster && (
 								<Link href={farcaster} target="_blank">
 									<Button
@@ -82,8 +73,20 @@ export function ProjectDetails({
 										className="gap-1"
 										onClick={() => mixpanel.track("Open Farcaster", { external: true })}
 									>
-										<Link2 className="-rotate-45 h-4 w-4" />
+										<Warpcast />
 										{farcaster}
+									</Button>
+								</Link>
+							)}
+							{twitter && (
+								<Link href={twitter} target="_blank">
+									<Button
+										variant="link"
+										className="gap-1"
+										onClick={() => mixpanel.track("Open Twitter", { external: true })}
+									>
+										<X />
+										{twitter}
 									</Button>
 								</Link>
 							)}
@@ -94,7 +97,7 @@ export function ProjectDetails({
 										className="gap-1"
 										onClick={() => mixpanel.track("Open Mirror", { external: true })}
 									>
-										<Link2 className="-rotate-45 h-4 w-4" />
+										<Mirror />
 										{mirror}
 									</Button>
 								</Link>
@@ -113,7 +116,7 @@ export function ProjectDetails({
 									github.map((repo, index) => (
 										<Accordion type="single" collapsible key={index}>
 											<AccordionItem value={repo}>
-												<AccordionTrigger><Github /> {repo}</AccordionTrigger>
+												<AccordionTrigger><Github className="h-4 w-4" /> {repo}</AccordionTrigger>
 												<AccordionContent>
 												</AccordionContent>
 											</AccordionItem>
@@ -122,7 +125,6 @@ export function ProjectDetails({
 								}
 							</>
 						)}
-
 					</>
 				)}
 			</div>

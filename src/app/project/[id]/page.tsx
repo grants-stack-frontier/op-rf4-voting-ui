@@ -2,6 +2,7 @@
 import { Project } from "@/__generated__/api/agora.schemas";
 import { PageView } from "@/components/common/page-view";
 import { ProjectDetails } from "@/components/project-details";
+import { ReviewSidebar } from "@/components/projects/review-sidebar";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -152,6 +153,9 @@ export default function ProjectDetailsPage({ params: { id = "" } }) {
 				<PageView title={'project-details'} />
 				{/* <CategoryPagination id={id} /> */}
 			</section>
+			<aside>
+				<ReviewSidebar />
+			</aside>
 			{/* <aside>
 				<ProjectsSidebar
 					id={id}

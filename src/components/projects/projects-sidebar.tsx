@@ -41,6 +41,7 @@ export function ProjectsSidebar({
 	});
 
 	const projects = projectsRes?.projects
+	console.log({ projects })
 
 	return (
 		<Card
