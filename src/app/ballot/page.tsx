@@ -47,7 +47,7 @@ const projects: ProjectAllocation[] = [
   {
     allocation: 0,
     image: "https://via.placeholder.com/150",
-    name: "Project name",
+    name: "Project name 1",
     is_os: true,
     project_id: "1",
     allocations_per_metric: undefined,
@@ -55,7 +55,7 @@ const projects: ProjectAllocation[] = [
   {
     allocation: 0,
     image: "https://via.placeholder.com/150",
-    name: "Project name",
+    name: "Project name 2",
     is_os: true,
     project_id: "1",
     allocations_per_metric: undefined,
@@ -63,7 +63,7 @@ const projects: ProjectAllocation[] = [
   {
     allocation: 0,
     image: "https://via.placeholder.com/150",
-    name: "Project name",
+    name: "Project name 3",
     is_os: true,
     project_id: "1",
     allocations_per_metric: undefined,
@@ -71,7 +71,7 @@ const projects: ProjectAllocation[] = [
   {
     allocation: 0,
     image: "https://via.placeholder.com/150",
-    name: "Project name",
+    name: "Project name 4",
     is_os: true,
     project_id: "1",
     allocations_per_metric: undefined,
@@ -79,7 +79,7 @@ const projects: ProjectAllocation[] = [
   {
     allocation: 0,
     image: "https://via.placeholder.com/150",
-    name: "Project name",
+    name: "Project name 5",
     is_os: true,
     project_id: "1",
     allocations_per_metric: undefined,
@@ -118,6 +118,12 @@ function YourBallot() {
 
   const { ballot } = useBallotContext();
 
+  const [projectList, setProjectList] = useState(projects);
+
+  const updateProjects = (newProjects: ProjectAllocation[]) => {
+    setProjectList(newProjects);
+  };
+
   return (
     <div className="space-y-4">
       {ballot?.status === "SUBMITTED" && (
@@ -153,49 +159,69 @@ function YourBallot() {
         <SearchInput className="my-2" placeholder="Search projects..." />
 
         <div>
-          {projects.map((proj, i) => {
+          {projectList.map((proj, i) => {
             return (
-              <div className="flex justify-between flex-1 border-b gap-1 py-2">
-                <div className="flex items-start justify-between flex-grow">
-                  <div className="flex items-start gap-1">
-                    <div
-                      className="size-12 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0"
-                      style={{
-                        backgroundImage: `url(${proj.image})`,
-                      }}
-                    />
-                    <div className="flex flex-col gap-1 ml-4">
-                      <div>
-                        <Link href={`/project/${proj.project_id}`}>
-                          <p className="font-semibold">{proj.name}</p>
-                        </Link>
-                        <p className="text-sm text-gray-400">
-                          Some one-line description of project
-                        </p>
+                <div key={proj.project_id} className="flex justify-between flex-1 border-b gap-1 py-2" draggable="true">
+                  <div className="flex items-start justify-between flex-grow">
+                    <div className="flex items-start gap-1">
+                      <div
+                        className="size-12 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0"
+                        style={{
+                          backgroundImage: `url(${proj.image})`,
+                        }}
+                      />
+                      <div className="flex flex-col gap-1 ml-4">
+                        <div>
+                          <Link href={`/project/${proj.project_id}`}>
+                            <p className="font-semibold">{proj.name}</p>
+                          </Link>
+                          <p className="text-sm text-gray-400">
+                            Some one-line description of project
+                          </p>
+                        </div>
+                        <div className="text-muted-foreground text-xs">
+                          You scored: Very high impact
+                        </div>
                       </div>
-                      <div className="text-muted-foreground text-xs">
-                        You scored: Very high impact
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="flex justify-center items-center rounded-md border-2 w-10 h-10">
+                        {i + 1}
+                      </div>
+                      <div 
+                        className="flex justify-center items-center rounded-md border-2 w-10 h-10 cursor-move"
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData('text/plain', i.toString());
+                        }}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                        }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          const draggedIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                          console.log(draggedIndex, i);
+                          const newIndex = i;
+                          if (draggedIndex !== newIndex) {
+                            const newProjects = [...projectList];
+                            const [removed] = newProjects.splice(draggedIndex, 1);
+                            newProjects.splice(newIndex, 0, removed);
+                            updateProjects(newProjects);
+                          }
+                        }}
+                      >
+                        <Menu />
                       </div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <div className="flex justify-center items-center rounded-md border-2 w-10 h-10">
-                      {i + 1}
-                    </div>
-                    <div className="flex justify-center items-center rounded-md border-2 w-10 h-10">
-                      <Menu />
-                    </div>
+                  <div className="px-1">
+                    <Separator orientation="vertical" className="h-10" />
+                  </div>
+                  <div className="flex flex-col justify-start items-center gap-1">
+                    <Input type="number" placeholder="-- %" className="text-center" />
+                    <div className="text-muted-foreground text-xs">-- OP</div>
                   </div>
                 </div>
-                <div className="px-1">
-                  <Separator orientation="vertical" className="h-10" />
-                </div>
-                <div className="flex flex-col justify-start items-center gap-1">
-                  <Input type="number" placeholder="-- %" className="text-center" />
-                  <div className="text-muted-foreground text-xs">-- OP</div>
-                </div>
-              </div>
-            )
+              );
           })}
         </div>
 
