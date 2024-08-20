@@ -4,7 +4,7 @@ import { EmptyBallot, NonBadgeholder } from "@/components/ballot/ballot-states";
 import { Card } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
-import { ArrowDownToLineIcon, LoaderIcon } from "lucide-react";
+import { ArrowDownToLineIcon, LoaderIcon, Menu } from "lucide-react";
 import { ComponentProps, useEffect, useState } from "react";
 import { SubmitDialog, downloadImage } from "@/components/ballot/submit-dialog";
 import { MetricsEditor } from "../../components/metrics-editor";
@@ -15,7 +15,7 @@ import {
   useIsSavingBallot,
   useOsMultiplier,
 } from "@/hooks/useBallot";
-import { useMetrics } from "@/hooks/useMetrics";
+import { ProjectAllocation, useMetrics } from "@/hooks/useMetrics";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
@@ -32,6 +32,59 @@ import Image from "next/image";
 import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
 import { votingEndDate } from "@/config";
 import { useVotingTimeLeft } from "@/components/voting-ends-in";
+import { SearchInput } from "@/components/common/search-input";
+import Link from "next/link";
+
+const impactScores: { [key: number]: string } = {
+  1: "Very low",
+  2: "Low",
+  3: "Medium",
+  4: "High",
+  5: "Very high",
+}
+
+const projects: ProjectAllocation[] = [
+  {
+    allocation: 0,
+    image: "https://via.placeholder.com/150",
+    name: "Project name",
+    is_os: true,
+    project_id: "1",
+    allocations_per_metric: undefined,
+  },
+  {
+    allocation: 0,
+    image: "https://via.placeholder.com/150",
+    name: "Project name",
+    is_os: true,
+    project_id: "1",
+    allocations_per_metric: undefined,
+  },
+  {
+    allocation: 0,
+    image: "https://via.placeholder.com/150",
+    name: "Project name",
+    is_os: true,
+    project_id: "1",
+    allocations_per_metric: undefined,
+  },
+  {
+    allocation: 0,
+    image: "https://via.placeholder.com/150",
+    name: "Project name",
+    is_os: true,
+    project_id: "1",
+    allocations_per_metric: undefined,
+  },
+  {
+    allocation: 0,
+    image: "https://via.placeholder.com/150",
+    name: "Project name",
+    is_os: true,
+    project_id: "1",
+    allocations_per_metric: undefined,
+  },
+]
 
 export default function BallotPage() {
   return (
@@ -97,6 +150,55 @@ function YourBallot() {
       )}
       <Card className="p-6 space-y-8">
         <MetricsEditor metrics={metrics.data} isLoading={metrics.isPending} />
+        <SearchInput className="my-2" placeholder="Search projects..." />
+
+        <div>
+          {projects.map((proj, i) => {
+            return (
+              <div className="flex justify-between flex-1 border-b gap-1 py-2">
+                <div className="flex items-start justify-between flex-grow">
+                  <div className="flex items-start gap-1">
+                    <div
+                      className="size-12 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0"
+                      style={{
+                        backgroundImage: `url(${proj.image})`,
+                      }}
+                    />
+                    <div className="flex flex-col gap-1 ml-4">
+                      <div>
+                        <Link href={`/project/${proj.project_id}`}>
+                          <p className="font-semibold">{proj.name}</p>
+                        </Link>
+                        <p className="text-sm text-gray-400">
+                          Some one-line description of project
+                        </p>
+                      </div>
+                      <div className="text-muted-foreground text-xs">
+                        You scored: Very high impact
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="flex justify-center items-center rounded-md border-2 w-10 h-10">
+                      {i + 1}
+                    </div>
+                    <div className="flex justify-center items-center rounded-md border-2 w-10 h-10">
+                      <Menu />
+                    </div>
+                  </div>
+                </div>
+                <div className="px-1">
+                  <Separator orientation="vertical" className="h-10" />
+                </div>
+                <div className="flex flex-col justify-start items-center gap-1">
+                  <Input type="number" placeholder="-- %" className="text-center" />
+                  <div className="text-muted-foreground text-xs">-- OP</div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
         <OpenSourceMultiplier initialValue={ballot?.os_multiplier} />
 
         <div className="flex items-center gap-4">

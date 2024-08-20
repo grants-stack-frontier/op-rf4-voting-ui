@@ -15,7 +15,6 @@ import { Skeleton } from "../ui/skeleton";
 import mixpanel from "@/lib/mixpanel";
 import { DistributionChart } from "../metrics/distribution-chart";
 import { Card } from "../ui/card";
-import { SearchInput } from "../common/search-input";
 
 export function MetricsEditor({
   metrics = [],
@@ -38,26 +37,49 @@ export function MetricsEditor({
   const allocationMethods = [
     {
       data: [
-        {x: 0, y: 0},
-        {x: 10, y: 10},
-        {x: 20, y: 20},
-        {x: 30, y: 30},
-        {x: 40, y: 40},
+        {x: 0, y: 340},
+        {x: 10, y: 340},
+        {x: 10, y: 255},
+        {x: 20, y: 255},
+        {x: 20, y: 170},
+        {x: 30, y: 170},
+        {x: 30, y: 85},
+        {x: 40, y: 85},
+        {x: 40, y: 0},
+        {x: 50, y: 0},
       ],
-      formatChartTick: (tick: number) => `${tick}%`,
-      method: "Linear",
+      formatChartTick: (tick: number) => `${tick}k`,
+      method: "Impact groups",
       description: "blah blah blah",
     },
     {
       data: [
-        {x: 0, y: 0},
-        {x: 10, y: 10},
-        {x: 20, y: 20},
-        {x: 30, y: 30},
-        {x: 40, y: 40},
+        {x: 0, y: 340},
+        {x: 10, y: 255},
+        {x: 20, y: 170},
+        {x: 30, y: 85},
+        {x: 40, y: 0},
       ],
-      formatChartTick: (tick: number) => `${tick}%`,
-      method: "Exponential",
+      formatChartTick: (tick: number) => `${tick}k`,
+      method: "Top to bottom",
+      description: "blah blah blah",
+    },
+    {
+      data: [
+        {x: 0, y: 400},
+        {x: 10, y: 100},
+        {x: 20, y: 50},
+        {x: 30, y: 30},
+        {x: 40, y: 20},
+      ],
+      formatChartTick: (tick: number) => `${tick}k`,
+      method: "Top weighted",
+      description: "blah blah blah",
+    },
+    {
+      data: [],
+      formatChartTick: (tick: number) => `--k`,
+      method: "Custom",
       description: "blah blah blah",
     },
   ]
@@ -97,7 +119,6 @@ export function MetricsEditor({
           </Card>
         ))}
       </div>
-      <SearchInput className="my-2" placeholder="Search projects..." />
       {/* ^^This sections is a work in progress^^ */}
 
       <div className="divide-y border-y">
