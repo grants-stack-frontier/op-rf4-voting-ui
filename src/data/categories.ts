@@ -1,10 +1,16 @@
-import ethCore from "../../public/eth_core.svg";
-import opRnd from "../../public/op_rnd.svg";
-import opTooling from "../../public/op_tooling.svg";
+import ethCore from '../../public/eth_core.svg';
+import opRnd from '../../public/op_rnd.svg';
+import opTooling from '../../public/op_tooling.svg';
 
 export const getCategories = async () => {
 	return categories;
 };
+
+export enum CategoryType {
+	ETHEREUM_CORE_CONTRIBUTIONS = 'ETHEREUM_CORE_CONTRIBUTIONS',
+	OP_STACK_RESEARCH_AND_DEVELOPMENT = 'OP_STACK_RESEARCH_AND_DEVELOPMENT',
+	OP_STACK_TOOLING = 'OP_STACK_TOOLING',
+}
 
 export type Category = {
 	id: string;
@@ -24,7 +30,7 @@ export type Category = {
 
 const categories: Category[] = [
 	{
-		id: 'eth_core',
+		id: CategoryType.ETHEREUM_CORE_CONTRIBUTIONS,
 		name: 'Ethereum Core Contributions',
 		image: ethCore.src,
 		description: 'Ethereum Core Contributions are infrastructure which supports, or is a dependency, of the OP Stack.',
@@ -52,7 +58,7 @@ const categories: Category[] = [
 		],
 	},
 	{
-		id: 'op_rnd',
+		id: CategoryType.OP_STACK_RESEARCH_AND_DEVELOPMENT,
 		name: 'OP Stack Research & Development',
 		image: opRnd.src,
 		description:
@@ -79,7 +85,7 @@ const categories: Category[] = [
 		],
 	},
 	{
-		id: 'op_tooling',
+		id: CategoryType.OP_STACK_TOOLING,
 		name: 'OP Stack Tooling',
 		image: opTooling.src,
 		description: 'Efforts that improve the usability and accessibility of the OP Stack through tooling enhancements.',

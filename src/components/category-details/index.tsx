@@ -1,6 +1,6 @@
 "use client";
 import { Heading } from "@/components/ui/headings";
-import { Category } from "@/data/categories";
+import { Category, CategoryType } from "@/data/categories";
 import { useProjectsByCategory } from "@/hooks/useProjects";
 import Image from "next/image";
 import { Markdown } from "../markdown";
@@ -14,11 +14,9 @@ export function CategoryDetails({
 	data?: Category[];
 }) {
 	const category = data?.find(cat => cat.id === id);
-	const { data: projectsRes, isPending } = useProjectsByCategory(id);
+	const { data: projects, isPending } = useProjectsByCategory(id);
 	const { name, image, description, eligibility, examples } = category ?? {};
 	const { eligible_projects, note } = eligibility ?? {};
-
-	const projects = projectsRes?.projects;
 
 	return (
 		<section className="space-y-16">
@@ -44,12 +42,14 @@ export function CategoryDetails({
 							>
 								{projects?.length} project(s)
 							</Badge>
-							<Badge
-								variant={null}
-								className="cursor-pointer border-0 bg-green-500/25 text-green-600 font-medium"
-							>
-								This is your voting category
-							</Badge>
+							{id === CategoryType.ETHEREUM_CORE_CONTRIBUTIONS && (
+								<Badge
+									variant={null}
+									className="cursor-pointer border-0 bg-green-500/25 text-green-600 font-medium"
+								>
+									This is your voting category
+								</Badge>
+							)}
 						</div>
 						<Heading variant="h2">Eligibility</Heading>
 						<p>Projects who are eligible can be described as one of the following:

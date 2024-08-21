@@ -64,29 +64,29 @@ export type GetImpactMetricComments200 = {
   metadata?: PageMetadata;
 };
 
-export type GetImpactMetricCommentsSort =
-  typeof GetImpactMetricCommentsSort[keyof typeof GetImpactMetricCommentsSort];
+export type GetImpactMetricCommentsSort = typeof GetImpactMetricCommentsSort[keyof typeof GetImpactMetricCommentsSort];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetImpactMetricCommentsSort = {
-  newest: "newest",
-  votes: "votes",
+  newest: 'newest',
+  votes: 'votes',
 } as const;
 
 export type GetImpactMetricCommentsParams = {
-  /**
-   * Limits the number of returned results.
-   */
-  limit?: LimitParamParameter;
-  /**
-   * Offset from which start returned results.
-   */
-  offset?: OffsetParamParameter;
-  /**
+/**
+ * Limits the number of returned results.
+ */
+limit?: LimitParamParameter;
+/**
+ * Offset from which start returned results.
+ */
+offset?: OffsetParamParameter;
+/**
  * The desired method by which returned comments will be sorted. Supported values are: 'newest', 'votes'
 
  */
-  sort?: GetImpactMetricCommentsSort;
+sort?: GetImpactMetricCommentsSort;
 };
 
 export type RecordImpactMetricView200 = {
@@ -99,16 +99,16 @@ export type UpdateRetroFundingBallotDistributionMethodBody = {
   distribution_method?: string;
 };
 
-export type UpdateRetroFundingRoundCategoryAllocationBodyImpact =
-  typeof UpdateRetroFundingRoundCategoryAllocationBodyImpact[keyof typeof UpdateRetroFundingRoundCategoryAllocationBodyImpact];
+export type UpdateRetroFundingRoundCategoryAllocationBodyImpact = typeof UpdateRetroFundingRoundCategoryAllocationBodyImpact[keyof typeof UpdateRetroFundingRoundCategoryAllocationBodyImpact];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UpdateRetroFundingRoundCategoryAllocationBodyImpact = {
-  VERY_HIGH: "VERY_HIGH",
-  HIGH: "HIGH",
-  MEDIUM: "MEDIUM",
-  LOW: "LOW",
-  VERY_LOW: "VERY_LOW",
+  VERY_HIGH: 'VERY_HIGH',
+  HIGH: 'HIGH',
+  MEDIUM: 'MEDIUM',
+  LOW: 'LOW',
+  VERY_LOW: 'VERY_LOW',
 } as const;
 
 export type UpdateRetroFundingRoundCategoryAllocationBody = {
@@ -132,44 +132,40 @@ export type GetRetroFundingRoundProjects200 = {
   projects?: Project[];
 };
 
-export type GetRetroFundingRoundProjectsCategory =
-  typeof GetRetroFundingRoundProjectsCategory[keyof typeof GetRetroFundingRoundProjectsCategory];
+export type GetRetroFundingRoundProjectsCategory = typeof GetRetroFundingRoundProjectsCategory[keyof typeof GetRetroFundingRoundProjectsCategory];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetRetroFundingRoundProjectsCategory = {
-  all: "all",
-  eth_core: "eth_core",
-  op_tooling: "op_tooling",
-  op_rnd: "op_rnd",
+  all: 'all',
+  eth_core: 'eth_core',
+  op_tooling: 'op_tooling',
+  op_rnd: 'op_rnd',
 } as const;
 
 export type GetRetroFundingRoundProjectsParams = {
-  /**
-   * Limits the number of returned results.
-   */
-  limit?: LimitParamParameter;
-  /**
-   * Offset from which start returned results.
-   */
-  offset?: OffsetParamParameter;
-  /**
+/**
+ * Limits the number of returned results.
+ */
+limit?: LimitParamParameter;
+/**
+ * Offset from which start returned results.
+ */
+offset?: OffsetParamParameter;
+/**
  * The desired method by which returned votes will be filtered. Supported values are: 'all', 'eth_core', "op_tooling", "op_rnd"
 
  */
-  category?: GetRetroFundingRoundProjectsCategory;
+category?: GetRetroFundingRoundProjectsCategory;
 };
 
 export type SubmitRetroFundingBallot200 = Round4Ballot | Round5Ballot;
 
-export type SubmitRetroFundingBallotBody =
-  | RetroFunding4BallotSubmission
-  | RetroFunding5BallotSubmission;
+export type SubmitRetroFundingBallotBody = RetroFunding4BallotSubmission | RetroFunding5BallotSubmission;
 
 export type GetRetroFundingRoundBallotById200 = Round4Ballot | Round5Ballot;
 
-export type GetRetroFundingRoundBallots200BallotsItem =
-  | Round4Ballot
-  | Round5Ballot;
+export type GetRetroFundingRoundBallots200BallotsItem = Round4Ballot | Round5Ballot;
 
 export type GetRetroFundingRoundBallots200 = {
   ballots?: GetRetroFundingRoundBallots200BallotsItem[];
@@ -177,14 +173,14 @@ export type GetRetroFundingRoundBallots200 = {
 };
 
 export type GetRetroFundingRoundBallotsParams = {
-  /**
-   * Limits the number of returned results.
-   */
-  limit?: LimitParamParameter;
-  /**
-   * Offset from which start returned results.
-   */
-  offset?: OffsetParamParameter;
+/**
+ * Limits the number of returned results.
+ */
+limit?: LimitParamParameter;
+/**
+ * Offset from which start returned results.
+ */
+offset?: OffsetParamParameter;
 };
 
 export type GetRetroFundingRounds200 = {
@@ -193,14 +189,14 @@ export type GetRetroFundingRounds200 = {
 };
 
 export type GetRetroFundingRoundsParams = {
-  /**
-   * Limits the number of returned results.
-   */
-  limit?: LimitParamParameter;
-  /**
-   * Offset from which start returned results.
-   */
-  offset?: OffsetParamParameter;
+/**
+ * Limits the number of returned results.
+ */
+limit?: LimitParamParameter;
+/**
+ * Offset from which start returned results.
+ */
+offset?: OffsetParamParameter;
 };
 
 export type GetProjects200 = {
@@ -209,14 +205,14 @@ export type GetProjects200 = {
 };
 
 export type GetProjectsParams = {
-  /**
-   * Limits the number of returned results.
-   */
-  limit?: LimitParamParameter;
-  /**
-   * Offset from which start returned results.
-   */
-  offset?: OffsetParamParameter;
+/**
+ * Limits the number of returned results.
+ */
+limit?: LimitParamParameter;
+/**
+ * Offset from which start returned results.
+ */
+offset?: OffsetParamParameter;
 };
 
 export type GetDelegatorsByAddress200 = {
@@ -229,43 +225,27 @@ export type GetProposalVotes200 = {
   votes?: Vote[];
 };
 
-export type GetProposalVotesSort =
-  typeof GetProposalVotesSort[keyof typeof GetProposalVotesSort];
+export type GetProposalVotesSort = typeof GetProposalVotesSort[keyof typeof GetProposalVotesSort];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetProposalVotesSort = {
-  weight: "weight",
-  block_number: "block_number",
+  weight: 'weight',
+  block_number: 'block_number',
 } as const;
-
-export type GetProposalVotesParams = {
-  /**
-   * Limits the number of returned results.
-   */
-  limit?: LimitParamParameter;
-  /**
-   * Offset from which start returned results.
-   */
-  offset?: OffsetParamParameter;
-  /**
- * The desired method by which returned delegates will be sorted. Supported values are: 'weight' for descending voting weight, or 'block' for descending block number
-
- */
-  sort?: GetProposalVotesSort;
-};
 
 export type GetProposals200 = {
   metadata?: PageMetadata;
   proposals?: Proposal[];
 };
 
-export type GetProposalsFilter =
-  typeof GetProposalsFilter[keyof typeof GetProposalsFilter];
+export type GetProposalsFilter = typeof GetProposalsFilter[keyof typeof GetProposalsFilter];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetProposalsFilter = {
-  relevant: "relevant",
-  everything: "everything",
+  relevant: 'relevant',
+  everything: 'everything',
 } as const;
 
 export type GetDelegateVotes200 = {
@@ -278,30 +258,14 @@ export type GetDelegates200 = {
   metadata?: PageMetadata;
 };
 
-export type GetDelegatesSort =
-  typeof GetDelegatesSort[keyof typeof GetDelegatesSort];
+export type GetDelegatesSort = typeof GetDelegatesSort[keyof typeof GetDelegatesSort];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetDelegatesSort = {
-  most_delegators: "most_delegators",
-  weighted_random: "weighted_random",
+  most_delegators: 'most_delegators',
+  weighted_random: 'weighted_random',
 } as const;
-
-export type GetDelegatesParams = {
-  /**
-   * Limits the number of returned results.
-   */
-  limit?: LimitParamParameter;
-  /**
-   * Offset from which start returned results.
-   */
-  offset?: OffsetParamParameter;
-  /**
- * The desired method by which returned delegates will be sorted. Supported values are: 'voting_power', 'most_delegators', 'weighted_random'
-
- */
-  sort?: GetDelegatesSort;
-};
 
 export type ProposalStatusParamParameter = string;
 
@@ -309,14 +273,14 @@ export type ProposalStatusParamParameter = string;
  * Describes which way the vote was cast (i.e. for/against/abstention)
  * @summary Disposition of the vote
  */
-export type SupportParamParameter =
-  typeof SupportParamParameter[keyof typeof SupportParamParameter];
+export type SupportParamParameter = typeof SupportParamParameter[keyof typeof SupportParamParameter];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const SupportParamParameter = {
-  FOR: "FOR",
-  AGAINST: "AGAINST",
-  ABSTAIN: "ABSTAIN",
+  FOR: 'FOR',
+  AGAINST: 'AGAINST',
+  ABSTAIN: 'ABSTAIN',
 } as const;
 
 /**
@@ -334,40 +298,68 @@ export type OffsetParamParameter = number;
  */
 export type LimitParamParameter = number;
 
+export type GetProposalVotesParams = {
+/**
+ * Limits the number of returned results.
+ */
+limit?: LimitParamParameter;
+/**
+ * Offset from which start returned results.
+ */
+offset?: OffsetParamParameter;
+/**
+ * The desired method by which returned delegates will be sorted. Supported values are: 'weight' for descending voting weight, or 'block' for descending block number
+
+ */
+sort?: GetProposalVotesSort;
+};
+
 export type GetProposalsParams = {
-  /**
-   * Limits the number of returned results.
-   */
-  limit?: LimitParamParameter;
-  /**
-   * Offset from which start returned results.
-   */
-  offset?: OffsetParamParameter;
-  /**
+/**
+ * Limits the number of returned results.
+ */
+limit?: LimitParamParameter;
+/**
+ * Offset from which start returned results.
+ */
+offset?: OffsetParamParameter;
+/**
  * The desired method by which returned votes will be filtered. Supported values are: 'relevant', 'everything'
 
  */
-  filter?: GetProposalsFilter;
+filter?: GetProposalsFilter;
 };
 
 export type GetDelegateVotesParams = {
-  /**
-   * Limits the number of returned results.
-   */
-  limit?: LimitParamParameter;
-  /**
-   * Offset from which start returned results.
-   */
-  offset?: OffsetParamParameter;
+/**
+ * Limits the number of returned results.
+ */
+limit?: LimitParamParameter;
+/**
+ * Offset from which start returned results.
+ */
+offset?: OffsetParamParameter;
 };
 
-export type RetroFunding5BallotSubmissionBallotContentProjectsAllocationItem = {
-  [key: string]: unknown;
+export type GetDelegatesParams = {
+/**
+ * Limits the number of returned results.
+ */
+limit?: LimitParamParameter;
+/**
+ * Offset from which start returned results.
+ */
+offset?: OffsetParamParameter;
+/**
+ * The desired method by which returned delegates will be sorted. Supported values are: 'voting_power', 'most_delegators', 'weighted_random'
+
+ */
+sort?: GetDelegatesSort;
 };
 
-export type RetroFunding5BallotSubmissionBallotContentCategoryAllocationItem = {
-  [key: string]: unknown;
-};
+export type RetroFunding5BallotSubmissionBallotContentProjectsAllocationItem = { [key: string]: unknown };
+
+export type RetroFunding5BallotSubmissionBallotContentCategoryAllocationItem = { [key: string]: unknown };
 
 export type RetroFunding5BallotSubmissionBallotContent = {
   category_allocation?: RetroFunding5BallotSubmissionBallotContentCategoryAllocationItem[];
@@ -394,9 +386,7 @@ export interface RetroFunding5BallotSubmission {
   signature?: string;
 }
 
-export type RetroFunding4BallotSubmissionBallotContentAllocationsItem = {
-  [key: string]: unknown;
-};
+export type RetroFunding4BallotSubmissionBallotContentAllocationsItem = { [key: string]: unknown };
 
 export type RetroFunding4BallotSubmissionBallotContent = {
   allocations?: RetroFunding4BallotSubmissionBallotContentAllocationsItem[];
@@ -424,22 +414,22 @@ export interface RetroFunding4BallotSubmission {
   signature?: string;
 }
 
-export type Round5BallotStatus =
-  typeof Round5BallotStatus[keyof typeof Round5BallotStatus];
+export type Round5BallotStatus = typeof Round5BallotStatus[keyof typeof Round5BallotStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const Round5BallotStatus = {
-  PENDING: "PENDING",
-  SUBMITTED: "SUBMITTED",
+  PENDING: 'PENDING',
+  SUBMITTED: 'SUBMITTED',
 } as const;
 
-export type Round4BallotStatus =
-  typeof Round4BallotStatus[keyof typeof Round4BallotStatus];
+export type Round4BallotStatus = typeof Round4BallotStatus[keyof typeof Round4BallotStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const Round4BallotStatus = {
-  PENDING: "PENDING",
-  SUBMITTED: "SUBMITTED",
+  PENDING: 'PENDING',
+  SUBMITTED: 'SUBMITTED',
 } as const;
 
 /**
@@ -472,16 +462,16 @@ export interface RetroFundingBallotCategoriesAllocation {
   category_id?: number;
 }
 
-export type RetroFundingBallot5ProjectsAllocationImpact =
-  typeof RetroFundingBallot5ProjectsAllocationImpact[keyof typeof RetroFundingBallot5ProjectsAllocationImpact];
+export type RetroFundingBallot5ProjectsAllocationImpact = typeof RetroFundingBallot5ProjectsAllocationImpact[keyof typeof RetroFundingBallot5ProjectsAllocationImpact];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const RetroFundingBallot5ProjectsAllocationImpact = {
-  VERY_HIGH: "VERY_HIGH",
-  HIGH: "HIGH",
-  MEDIUM: "MEDIUM",
-  LOW: "LOW",
-  VERY_LOW: "VERY_LOW",
+  VERY_HIGH: 'VERY_HIGH',
+  HIGH: 'HIGH',
+  MEDIUM: 'MEDIUM',
+  LOW: 'LOW',
+  VERY_LOW: 'VERY_LOW',
 } as const;
 
 /**
@@ -597,6 +587,21 @@ export type ProjectGrantsAndFunding = {
   ventureFunding?: ProjectGrantsAndFundingVentureFundingItem[];
 };
 
+export type ProjectGithubItemOneOf = {
+  age_of_project_years?: number;
+  fork_count?: number;
+  forked_by_top_devs?: number;
+  forked_events?: number;
+  fulltime_developer_average_6_months?: number;
+  new_contributor_count_6_months?: number;
+  repo_rank?: number;
+  star_count?: number;
+  starred_by_top_devs?: number;
+  starred_events?: number;
+};
+
+export type ProjectGithubItem = string | ProjectGithubItemOneOf;
+
 export type ProjectContractsItemAllOf = {
   /**
    * The address of the deployed contract.
@@ -636,7 +641,7 @@ export interface Project {
    */
   contracts?: ProjectContractsItem[];
   description?: string;
-  github?: string[];
+  github?: ProjectGithubItem[];
   grantsAndFunding?: ProjectGrantsAndFunding;
   id?: string;
   links?: string[];
@@ -700,22 +705,22 @@ export interface RetroFundingImpactMetric {
  * Enum description of the status of a RetroFunding round.
  * @summary Status of a RetroFunding round
  */
-export type RetroFundingRoundStatus =
-  typeof RetroFundingRoundStatus[keyof typeof RetroFundingRoundStatus];
+export type RetroFundingRoundStatus = typeof RetroFundingRoundStatus[keyof typeof RetroFundingRoundStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const RetroFundingRoundStatus = {
-  PLANNED: "PLANNED",
-  SCHEDULED: "SCHEDULED",
-  APPLICATIONS_STARTED: "APPLICATIONS_STARTED",
-  APPLICATIONS_REVIEW: "APPLICATIONS_REVIEW",
-  APPLICATIONS_LOCKED: "APPLICATIONS_LOCKED",
-  VOTING: "VOTING",
-  BALLOT_COUNTING: "BALLOT_COUNTING",
-  RESULTS_ANNOUNCED: "RESULTS_ANNOUNCED",
-  FUNDS_DISTRIBUTION: "FUNDS_DISTRIBUTION",
-  DONE: "DONE",
-  CANCELLED: "CANCELLED",
+  PLANNED: 'PLANNED',
+  SCHEDULED: 'SCHEDULED',
+  APPLICATIONS_STARTED: 'APPLICATIONS_STARTED',
+  APPLICATIONS_REVIEW: 'APPLICATIONS_REVIEW',
+  APPLICATIONS_LOCKED: 'APPLICATIONS_LOCKED',
+  VOTING: 'VOTING',
+  BALLOT_COUNTING: 'BALLOT_COUNTING',
+  RESULTS_ANNOUNCED: 'RESULTS_ANNOUNCED',
+  FUNDS_DISTRIBUTION: 'FUNDS_DISTRIBUTION',
+  DONE: 'DONE',
+  CANCELLED: 'CANCELLED',
 } as const;
 
 /**
@@ -853,15 +858,15 @@ export type VotingToken = Contract & VotingTokenAllOf;
  * The type of the proposal.
  * @summary Type of the proposal
  */
-export type VoteProposalType =
-  typeof VoteProposalType[keyof typeof VoteProposalType];
+export type VoteProposalType = typeof VoteProposalType[keyof typeof VoteProposalType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const VoteProposalType = {
-  STANDARD: "STANDARD",
-  APPROVAL: "APPROVAL",
-  OPTIMISTIC: "OPTIMISTIC",
-  SNAPSHOT: "SNAPSHOT",
+  STANDARD: 'STANDARD',
+  APPROVAL: 'APPROVAL',
+  OPTIMISTIC: 'OPTIMISTIC',
+  SNAPSHOT: 'SNAPSHOT',
 } as const;
 
 /**
@@ -870,11 +875,12 @@ export const VoteProposalType = {
  */
 export type VoteSupport = typeof VoteSupport[keyof typeof VoteSupport];
 
+
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const VoteSupport = {
-  FOR: "FOR",
-  AGAINST: "AGAINST",
-  ABSTAIN: "ABSTAIN",
+  FOR: 'FOR',
+  AGAINST: 'AGAINST',
+  ABSTAIN: 'ABSTAIN',
 } as const;
 
 /**
@@ -941,12 +947,13 @@ export interface Vote {
  */
 export type VotingStrategy = typeof VotingStrategy[keyof typeof VotingStrategy];
 
+
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const VotingStrategy = {
-  STANDARD: "STANDARD",
-  ADVANCED: "ADVANCED",
-  OPTIMISTIC: "OPTIMISTIC",
-  SNAPSHOT: "SNAPSHOT",
+  STANDARD: 'STANDARD',
+  ADVANCED: 'ADVANCED',
+  OPTIMISTIC: 'OPTIMISTIC',
+  SNAPSHOT: 'SNAPSHOT',
 } as const;
 
 /**
@@ -995,38 +1002,35 @@ export interface ProposalTemplate {
  */
 export type ProposalStatus = typeof ProposalStatus[keyof typeof ProposalStatus];
 
+
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ProposalStatus = {
-  CANCELLED: "CANCELLED",
-  SUCCEEDED: "SUCCEEDED",
-  DEFEATED: "DEFEATED",
-  ACTIVE: "ACTIVE",
-  PENDING: "PENDING",
-  QUEUED: "QUEUED",
-  EXECUTED: "EXECUTED",
-  CLOSED: "CLOSED",
+  CANCELLED: 'CANCELLED',
+  SUCCEEDED: 'SUCCEEDED',
+  DEFEATED: 'DEFEATED',
+  ACTIVE: 'ACTIVE',
+  PENDING: 'PENDING',
+  QUEUED: 'QUEUED',
+  EXECUTED: 'EXECUTED',
+  CLOSED: 'CLOSED',
 } as const;
 
 /**
  * The type of proposal; can be standard, approval, optimistic, or snapshot.
  * @summary Type of proposal
  */
-export type ProposalProposalType =
-  typeof ProposalProposalType[keyof typeof ProposalProposalType];
+export type ProposalProposalType = typeof ProposalProposalType[keyof typeof ProposalProposalType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ProposalProposalType = {
-  STANDARD: "STANDARD",
-  APPROVAL: "APPROVAL",
-  OPTIMISTIC: "OPTIMISTIC",
-  SNAPSHOT: "SNAPSHOT",
+  STANDARD: 'STANDARD',
+  APPROVAL: 'APPROVAL',
+  OPTIMISTIC: 'OPTIMISTIC',
+  SNAPSHOT: 'SNAPSHOT',
 } as const;
 
-export type ProposalProposalData =
-  | SnapshotProposalData
-  | StandardProposalData
-  | ApprovalProposalData
-  | OptimisticProposalData;
+export type ProposalProposalData = SnapshotProposalData | StandardProposalData | ApprovalProposalData | OptimisticProposalData;
 
 /**
  * An object describing the specifics and metadata associated with a particular governance proposal, including the specific measure, proposer, data, etc.
@@ -1171,13 +1175,13 @@ export interface OptimisticProposalData {
 /**
  * @summary Criteria for the proposal
  */
-export type ApprovalProposalDataProposalSettingsCriteria =
-  typeof ApprovalProposalDataProposalSettingsCriteria[keyof typeof ApprovalProposalDataProposalSettingsCriteria];
+export type ApprovalProposalDataProposalSettingsCriteria = typeof ApprovalProposalDataProposalSettingsCriteria[keyof typeof ApprovalProposalDataProposalSettingsCriteria];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ApprovalProposalDataProposalSettingsCriteria = {
-  THRESHOLD: "THRESHOLD",
-  TOP_CHOICES: "TOP_CHOICES",
+  THRESHOLD: 'THRESHOLD',
+  TOP_CHOICES: 'TOP_CHOICES',
 } as const;
 
 export type ApprovalProposalDataProposalSettings = {
@@ -1229,14 +1233,14 @@ export interface StandardProposalData {
 /**
  * @summary State of the proposal
  */
-export type SnapshotProposalDataState =
-  typeof SnapshotProposalDataState[keyof typeof SnapshotProposalDataState];
+export type SnapshotProposalDataState = typeof SnapshotProposalDataState[keyof typeof SnapshotProposalDataState];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const SnapshotProposalDataState = {
-  ACTIVE: "ACTIVE",
-  CLOSED: "CLOSED",
-  PENDING: "PENDING",
+  ACTIVE: 'ACTIVE',
+  CLOSED: 'CLOSED',
+  PENDING: 'PENDING',
 } as const;
 
 /**
@@ -1282,13 +1286,13 @@ export type ApprovalProposalResultsOptionsItem = {
   votes?: string;
 };
 
-export type ApprovalProposalResultsCriteria =
-  typeof ApprovalProposalResultsCriteria[keyof typeof ApprovalProposalResultsCriteria];
+export type ApprovalProposalResultsCriteria = typeof ApprovalProposalResultsCriteria[keyof typeof ApprovalProposalResultsCriteria];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ApprovalProposalResultsCriteria = {
-  THRESHOLD: "THRESHOLD",
-  TOP_CHOICES: "TOP_CHOICES",
+  THRESHOLD: 'THRESHOLD',
+  TOP_CHOICES: 'TOP_CHOICES',
 } as const;
 
 /**
@@ -1321,23 +1325,19 @@ export interface StandardProposalResults {
   for?: string;
 }
 
-export type ProposalProposalResults =
-  | SnapshotProposalResults
-  | StandardProposalResults
-  | ApprovalProposalResults
-  | OptimisticProposalResults;
+export type ProposalProposalResults = SnapshotProposalResults | StandardProposalResults | ApprovalProposalResults | OptimisticProposalResults;
 
 /**
  * @summary Status of the proposal
  */
-export type SnapshotProposalResultsStatus =
-  typeof SnapshotProposalResultsStatus[keyof typeof SnapshotProposalResultsStatus];
+export type SnapshotProposalResultsStatus = typeof SnapshotProposalResultsStatus[keyof typeof SnapshotProposalResultsStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const SnapshotProposalResultsStatus = {
-  pending: "pending",
-  active: "active",
-  closed: "closed",
+  pending: 'pending',
+  active: 'active',
+  closed: 'closed',
 } as const;
 
 /**
@@ -1514,23 +1514,24 @@ export interface DelegateChunk {
  */
 export type DelegationType = typeof DelegationType[keyof typeof DelegationType];
 
+
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const DelegationType = {
-  DIRECT: "DIRECT",
-  ADVANCED: "ADVANCED",
+  DIRECT: 'DIRECT',
+  ADVANCED: 'ADVANCED',
 } as const;
 
 /**
  * The amount of voting power delegated; can be full or partial.
  * @summary Amount delegated
  */
-export type DelegationAmount =
-  typeof DelegationAmount[keyof typeof DelegationAmount];
+export type DelegationAmount = typeof DelegationAmount[keyof typeof DelegationAmount];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const DelegationAmount = {
-  FULL: "FULL",
-  PARTIAL: "PARTIAL",
+  FULL: 'FULL',
+  PARTIAL: 'PARTIAL',
 } as const;
 
 /**
@@ -1633,3 +1634,4 @@ export interface AuthToken {
    */
   token_type?: string;
 }
+
