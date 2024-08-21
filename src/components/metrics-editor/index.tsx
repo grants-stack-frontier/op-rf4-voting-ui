@@ -2,6 +2,7 @@
 import { NumericFormat } from "react-number-format";
 import { InfoIcon, Minus, Plus, Trash2 } from "lucide-react";
 import { Heading } from "@/components/ui/headings";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -19,9 +20,11 @@ import { Card } from "../ui/card";
 export function MetricsEditor({
   metrics = [],
   isLoading,
+  onAllocationMethodSelect,
 }: {
   metrics?: Metric[];
   isLoading: boolean;
+  onAllocationMethodSelect: (data: { x: number; y: number }[]) => void;
 }) {
   const { state, inc, dec, set, remove } = useBallotContext();
 
@@ -32,6 +35,8 @@ export function MetricsEditor({
     () => Object.fromEntries(metrics.map((m) => [m["metric_id"], m])),
     [metrics]
   );
+
+  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
 
   // Dummy data for the allocation methods
   const allocationMethods = [
@@ -110,8 +115,17 @@ export function MetricsEditor({
       </div>
       <div className="grid grid-cols-4 sm:grid-cols-1 md:grid-cols-2 gap-2 mb-4">
         {allocationMethods.map((method, index) => (
-          <Card>
-            <DistributionChart key={index} data={method.data} formatChartTick={method.formatChartTick} />
+          <Card
+            key={index}
+            className={cn("cursor-pointer", {
+              "border-2 border-blue-500": selectedMethod === method.method
+            })}
+            onClick={() => {
+              setSelectedMethod(method.method);
+              onAllocationMethodSelect(method.data);
+            }}
+          >
+            <DistributionChart data={method.data} formatChartTick={method.formatChartTick} />
             <div className="mb-2 mx-4 flex flex-row justify-between items-center">
               <p className="font-bold text-sm">{method.method}</p>
               <InfoIcon className="h-4 w-4" />
