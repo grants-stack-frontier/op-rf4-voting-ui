@@ -1,23 +1,23 @@
 "use client";
-import { Project } from "@/__generated__/api/agora.schemas";
+import { Project, ProjectGithubItemOneOf } from "@/__generated__/api/agora.schemas";
 import { Heading } from "@/components/ui/headings";
 import mixpanel from "@/lib/mixpanel";
-import { CircleDollarSign, Clock3, Link2 } from "lucide-react";
+import { CircleDollarSign, Clock3, GitFork, Github, Link2, Star, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "../../../public/logo.png";
 import { Mirror } from "../common/mirror";
 import { Warpcast } from "../common/warpcast";
 import { X } from "../common/x";
+import { CustomAccordion } from "../custom-accordion";
 import { Markdown } from "../markdown";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 
 export function ProjectDetails({ data, isPending }: { data?: Project; isPending: boolean }) {
 	console.log({ data });
-	const { id, profileAvatarUrl, name, projectCoverImageUrl, description, socialLinks, category, github, links, grantsAndFunding } = data ?? {};
+	const { id, profileAvatarUrl, name, projectCoverImageUrl, description, socialLinks, category, github, links, grantsAndFunding, contracts } = data ?? {};
 	console.log({ github });
 	const { twitter, farcaster, mirror, website } = socialLinks ?? {};
 	return (
@@ -106,40 +106,56 @@ export function ProjectDetails({ data, isPending }: { data?: Project; isPending:
 							{category}
 						</Badge>
 						<p className="font-medium">Repos, links and contracts</p>
-						{/* {github && (
+						{github && (
 							<>
 								{
-									github.map((repo, index) => (
-										<Accordion type="single" collapsible key={index}>
-											<AccordionItem value={repo}>
-												<AccordionTrigger>
-													<div className="flex items-center gap-2">
-														<Github className="h-4 w-4" /> {repo}
+									github.map((repo: any, index: number) => {
+										const typedRepo = repo as Record<string, ProjectGithubItemOneOf>;
+										return (
+											<CustomAccordion value={Object.keys(typedRepo)[0]} trigger={<div className="flex items-center gap-2"><Github className="h-4 w-4" />{Object.keys(typedRepo)[0]}</div>} key={index}>
+												<div className="grid grid-cols-3 gap-2 p-2">
+													<div className="bg-slate-100 p-2 rounded-md flex items-center gap-2">
+														<Clock3 className="h-4 w-4" /> {typedRepo[Object.keys(typedRepo)[0]].age_of_project_years} years old
 													</div>
-												</AccordionTrigger>
-												<AccordionContent>
-												</AccordionContent>
-											</AccordionItem>
-										</Accordion>
-									))
+													<div className="bg-slate-100 p-2 rounded-md flex items-center gap-2">
+														<User className="h-4 w-4" /> {typedRepo[Object.keys(typedRepo)[0]].fulltime_developer_average_6_months} full-time devs
+													</div>
+													<div className="bg-slate-100 p-2 rounded-md flex items-center gap-2">
+														<User className="h-4 w-4" /> {typedRepo[Object.keys(typedRepo)[0]].new_contributor_count_6_months} contributors last 6 months
+													</div>
+													<div className="bg-slate-100 p-2 rounded-md flex items-center gap-2">
+														<GitFork className="h-4 w-4" /> {typedRepo[Object.keys(typedRepo)[0]].fork_count} forks
+													</div>
+													<div className="bg-slate-100 p-2 rounded-md flex items-center gap-2">
+														<GitFork className="h-4 w-4" /> {typedRepo[Object.keys(typedRepo)[0]].forked_by_top_devs} forks from top devs
+													</div>
+													<div className="bg-slate-100 p-2 rounded-md flex items-center gap-2">
+														<Star className="h-4 w-4" /> {typedRepo[Object.keys(typedRepo)[0]].star_count} stars
+													</div>
+													<div className="bg-slate-100 p-2 rounded-md flex items-center gap-2">
+														<Star className="h-4 w-4" /> {typedRepo[Object.keys(typedRepo)[0]].starred_by_top_devs} stars from top devs
+													</div>
+												</div>
+											</CustomAccordion>
+										)
+									})
 								}
 							</>
-						)} */}
+						)}
 						{links && (
 							<>
 								{
 									links.map((link, index) => (
-										<Accordion type="single" collapsible key={index}>
-											<AccordionItem value={link}>
-												<AccordionTrigger>
-													<div className="flex items-center gap-2">
-														<Link2 className="h-4 w-4 -rotate-45" /> {link}
-													</div>
-												</AccordionTrigger>
-												<AccordionContent>
-												</AccordionContent>
-											</AccordionItem>
-										</Accordion>
+										<CustomAccordion value={link} trigger={<div className="flex items-center gap-2"><Link2 className="h-4 w-4 -rotate-45" />{link}</div>} key={index} />
+									))
+								}
+							</>
+						)}
+						{contracts && (
+							<>
+								{
+									contracts.map((contract, index) => (
+										<CustomAccordion value={contract.address || ''} trigger={<div className="flex items-center gap-2"><Image src={Logo.src} alt="Logo" width={20} height={20} />{contract.address}</div>} key={index} />
 									))
 								}
 							</>
@@ -151,26 +167,29 @@ export function ProjectDetails({ data, isPending }: { data?: Project; isPending:
 									grantsAndFunding.grants?.map(({ grant, amount, date, details, link }, index) => {
 										const formattedAmount = amount && Number(amount) > 0 ? new Intl.NumberFormat('en-US').format(Number(amount)) : amount;
 										return (
-											<Accordion type="single" collapsible key={index}>
-												<AccordionItem value={grant || ''}>
-													<AccordionTrigger>
+											<CustomAccordion
+												value={grant || ''}
+												trigger={
+													<>
+														<p className="text-ellipsis overflow-hidden">Grant: {grant}</p>
 														<div className="flex items-center gap-2">
-															<p className="font-medium">Grant: {grant}</p>
-															<div className="flex items-center gap-2">
-																<Link2 className="h-4 w-4 -rotate-45" />
-																{link}
-															</div>
-															<div className="flex items-center gap-2">
-																<Image src={Logo.src} alt="Logo" width={20} height={20} />
-																{formattedAmount} OP
-															</div>
+															<Link2 className="h-4 w-4 -rotate-45" /> <p className="text-ellipsis overflow-hidden">{link}</p>
 														</div>
-													</AccordionTrigger>
-													<AccordionContent>
-														<Markdown>{details}</Markdown>
-													</AccordionContent>
-												</AccordionItem>
-											</Accordion>
+														<div className="flex items-center gap-2">
+															<Image src={Logo.src} alt="Logo" width={20} height={20} />
+															{formattedAmount} OP
+														</div>
+														<div className="flex items-center gap-2">
+															<Clock3 className="h-4 w-4" />
+															{date}
+														</div>
+													</>
+												}
+												key={index}>
+												<div className="p-2">
+													{details}
+												</div>
+											</CustomAccordion>
 										);
 									})
 								}
@@ -178,49 +197,36 @@ export function ProjectDetails({ data, isPending }: { data?: Project; isPending:
 									grantsAndFunding.ventureFunding?.map(({ amount, details, year }, index) => {
 										const formattedAmount = amount && Number(amount) > 0 ? new Intl.NumberFormat('en-US').format(Number(amount)) : amount;
 										return (
-											<Accordion type="single" collapsible key={index}>
-												<AccordionItem value={amount || ''}>
-													<AccordionTrigger>
-														<div className="flex items-center gap-2">
-															<p className="font-medium">Funding</p>
-															<div className="flex items-center gap-2">
-																<CircleDollarSign className="h-4 w-4" />
-																{formattedAmount}
-															</div>
-															<div className="flex items-center gap-2">
-																<Clock3 className="h-4 w-4" />
-																{year}
-															</div>
-														</div>
-													</AccordionTrigger>
-													<AccordionContent>
-														<Markdown>{details}</Markdown>
-													</AccordionContent>
-												</AccordionItem>
-											</Accordion>
+											<CustomAccordion value={amount || ''} trigger={
+												<>
+													<span>Funding:</span>
+													<div className="flex items-center gap-2">
+														<CircleDollarSign className="h-4 w-4" /> <p>{amount || ''}</p>
+													</div>
+													<div className="flex items-center gap-2">
+														<Clock3 className="h-4 w-4" /> <p>{year}</p>
+													</div>
+												</>
+											} key={index}>
+											</CustomAccordion>
 										);
 									})
 								}
 								{
 									grantsAndFunding.revenue?.map(({ amount, details }, index) => {
-										const formattedAmount = amount && Number(amount) > 0 ? new Intl.NumberFormat('en-US').format(Number(amount)) : amount;
 										return (
-											<Accordion type="single" collapsible key={index}>
-												<AccordionItem value={amount || ''}>
-													<AccordionTrigger>
-														<div className="flex items-center gap-2">
-															<p className="font-medium">Revenue</p>
-															<div className="flex items-center gap-2">
-																<CircleDollarSign className="h-4 w-4" />
-																{formattedAmount}
-															</div>
-														</div>
-													</AccordionTrigger>
-													<AccordionContent>
-														<Markdown>{details}</Markdown>
-													</AccordionContent>
-												</AccordionItem>
-											</Accordion>
+											<CustomAccordion value={amount || ''} trigger={
+												<>
+													<span>Revenue:</span>
+													<div className="flex items-center gap-2">
+														<CircleDollarSign className="h-4 w-4" /> <p>{amount || ''}</p>
+													</div>
+												</>
+											} key={index}>
+												<div className="p-2">
+													{details}
+												</div>
+											</CustomAccordion>
 										);
 									})
 								}
