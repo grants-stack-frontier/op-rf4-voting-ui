@@ -101,9 +101,9 @@ export function ProjectDetails({ data, isPending }: { data?: Project; isPending:
 						</div>
 						<Badge
 							variant={null}
-							className="cursor-pointer border-0 bg-green-500/25 text-green-600 font-medium"
+							className="cursor-pointer border-0 bg-blue-500/25 text-blue-600 font-medium"
 						>
-							{category}
+							{category?.replace(/_/g, ' ')}
 						</Badge>
 						<p className="font-medium">Repos, links and contracts</p>
 						{github && (
