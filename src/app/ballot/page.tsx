@@ -35,6 +35,23 @@ import { useVotingTimeLeft } from "@/components/voting-ends-in";
 import { SearchInput } from "@/components/common/search-input";
 import Link from "next/link";
 
+export function formatAllocationOPAmount(amount: number) {
+  const value = amount.toString()
+  const pointIndex = value.indexOf(".")
+  const exists = pointIndex !== -1
+  const numWithCommas = value.slice(0, exists ? pointIndex : value.length).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  if (exists) {
+    const cutoffPoint = 3
+    const decimals = value.slice(pointIndex)
+    if (decimals.length <= cutoffPoint) {
+      return numWithCommas + decimals
+    }
+    const float = parseFloat(decimals).toFixed(cutoffPoint)
+    return numWithCommas + float.slice(1)
+  }
+  return numWithCommas
+}
+
 const impactScores: { [key: number]: string } = {
   1: "Very low",
   2: "Low",
@@ -42,6 +59,8 @@ const impactScores: { [key: number]: string } = {
   4: "High",
   5: "Very high",
 }
+
+const totalAllocationAmount = 3_333_333;
 
 const projects: ProjectAllocation[] = [
   {
@@ -133,6 +152,26 @@ function YourBallot() {
     setProjectList(newProjectList);
   };
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredProjects, setFilteredProjects] = useState<ProjectAllocation[]>([]);
+
+  useEffect(() => {
+    if (searchTerm) {
+      const filtered = projectList.filter(project =>
+        project.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredProjects(filtered);
+    } else {
+      setFilteredProjects([]);
+    }
+  }, [searchTerm, projectList]);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const displayProjects = searchTerm ? filteredProjects : projectList;
+
   return (
     <div className="space-y-4">
       {ballot?.status === "SUBMITTED" && (
@@ -169,10 +208,10 @@ function YourBallot() {
           isLoading={metrics.isPending}
           onAllocationMethodSelect={handleAllocationMethodSelect}
         />
-        <SearchInput className="my-2" placeholder="Search projects..." />
+        <SearchInput className="my-2" placeholder="Search projects..." onChange={handleSearch} />
 
         <div>
-          {projectList.map((proj, i) => {
+          {displayProjects.map((proj, i) => {
             return (
               <div key={proj.project_id} className="flex justify-between flex-1 border-b gap-1 py-2" draggable="true">
                 <div className="flex items-start justify-between flex-grow">
@@ -230,19 +269,22 @@ function YourBallot() {
                   <Separator orientation="vertical" className="h-10" />
                 </div>
                 <div className="flex flex-col justify-start items-center gap-1">
-                  <Input
-                    type="number"
-                    placeholder="-- %"
-                    className="text-center"
-                    value={proj.allocation.toFixed(2)}
-                    onChange={(e) => {
-                      const newAllocation = parseFloat(e.target.value);
-                      const newProjectList = [...projectList];
-                      newProjectList[i].allocation = isNaN(newAllocation) ? 0 : newAllocation;
-                      setProjectList(newProjectList);
-                    }}
-                  />
-                  <div className="text-muted-foreground text-xs">-- OP</div>
+                  <div className="relative">
+                    <Input
+                      type="number"
+                      placeholder="-- %"
+                      className="text-center"
+                      value={proj.allocation.toFixed(2)}
+                      onChange={(e) => {
+                        const newAllocation = parseFloat(e.target.value);
+                        const newProjectList = [...projectList];
+                        newProjectList[i].allocation = isNaN(newAllocation) ? 0 : newAllocation;
+                        setProjectList(newProjectList);
+                      }}
+                    />
+                    <span className="absolute right-10 top-1/2 transform -translate-y-1/2 pointer-events-none">%</span>
+                  </div>
+                  <div className="text-muted-foreground text-xs">{formatAllocationOPAmount(totalAllocationAmount * proj.allocation / 100)} OP</div>
                 </div>
               </div>
             );
