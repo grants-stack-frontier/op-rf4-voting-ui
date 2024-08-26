@@ -35,7 +35,7 @@ import { useVotingTimeLeft } from "@/components/voting-ends-in";
 import { SearchInput } from "@/components/common/search-input";
 import Link from "next/link";
 
-export function formatAllocationOPAmount(amount: number) {
+function formatAllocationOPAmount(amount: number) {
   const value = amount.toString()
   const pointIndex = value.indexOf(".")
   const exists = pointIndex !== -1
@@ -118,16 +118,18 @@ function CheckBallotState() {
   const { address, isConnecting } = useAccount();
   const { isPending } = useBallot(address);
   const { state } = useBallotContext();
-  // if (isPending) {
-  //   return <Skeleton className="p-6 h-96" />;
-  // }
-  // if (!address && !isConnecting) {
-  //   return <NonBadgeholder />;
-  // }
-  // const isEmptyBallot = !Object.keys(state).length;
-  // if (isEmptyBallot) {
-  //   return <EmptyBallot />;
-  // }
+  // Comment out for local dev if needed
+  if (isPending) {
+    return <Skeleton className="p-6 h-96" />;
+  }
+  if (!address && !isConnecting) {
+    return <NonBadgeholder />;
+  }
+  const isEmptyBallot = !Object.keys(state).length;
+  if (isEmptyBallot) {
+    return <EmptyBallot />;
+  }
+  // ^^^Comment out for local dev if needed
   return <YourBallot />;
 }
 
