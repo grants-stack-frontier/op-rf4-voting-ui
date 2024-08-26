@@ -14,7 +14,7 @@ import { CategoryType } from "@/data/categories";
 import { useCategories } from "@/hooks/useCategories";
 import Link from "next/link";
 
-export default function CategoryDetailsPage() {
+export default function CategoryDetailsPage({ params: { id = "" } }) {
 	const category = useCategories();
 	return (
 		<>
@@ -34,7 +34,7 @@ export default function CategoryDetailsPage() {
 						</BreadcrumbItem>
 					</BreadcrumbList>
 				</Breadcrumb>
-				<Tabs defaultValue={CategoryType.ETHEREUM_CORE_CONTRIBUTIONS} className="w-full pt-3">
+				<Tabs defaultValue={id} className="w-full pt-3">
 					<TabsList className="grid w-full grid-cols-3">
 						{Object.values(CategoryType).map((categoryType) => (
 							<TabsTrigger key={categoryType} value={categoryType}>
