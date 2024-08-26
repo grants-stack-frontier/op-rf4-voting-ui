@@ -137,7 +137,13 @@ function YourBallot() {
 
   const { ballot } = useBallotContext();
 
-  const [projectList, setProjectList] = useState(projects);
+  console.log({ballot});
+
+  const [projectList, setProjectList] = useState(ballot?.project_allocations || []);
+
+  useEffect(() => {
+    setProjectList(ballot?.project_allocations || []);
+  }, [ballot]);
 
   const updateProjects = (newProjects: ProjectAllocation[]) => {
     setProjectList(newProjects);

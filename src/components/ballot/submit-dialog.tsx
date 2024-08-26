@@ -102,7 +102,7 @@ export function SubmitDialog({
                     Your vote has been received!
                   </Heading>
                   <Text className="text-muted-foreground text-center">
-                    Thank you for your participation in Retro Funding Round 4
+                    Thank you for your participation in Retro Funding Round 5
                     Voting! Your work as a badgeholder is crucial to the
                     improvement of the Superchain.
                   </Text>
