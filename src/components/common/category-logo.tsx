@@ -7,7 +7,7 @@ export function EthCore() {
 				<path d="m48.382 35.976-.172-25.098-27.119 38.43 27.34 36.941.788-27.276z" fill="url(#b)" />
 				<path d="m48.21 10.878.172 25.098.837 22.997-.789 27.276 25.017-35.767z" fill="url(#c)" />
 				<path d="m21.091 49.308 27.296-13.331 24.84 14.156-24.004 8.846-28.127-9.67z" fill="url(#d)" />
-				<path opacity=".84" fill-rule="evenodd" clip-rule="evenodd" d="M77.837 18.4c-.043 2.057-.852 3.47-2.514 4.168 1.467.619 2.872 1.485 4.108 3.032q.411-2.24 2.207-3.941c-1.349-.783-2.626-1.833-3.801-3.26" fill="#FAFBFF" />
+				<path opacity=".84" fillRule="evenodd" clip-rule="evenodd" d="M77.837 18.4c-.043 2.057-.852 3.47-2.514 4.168 1.467.619 2.872 1.485 4.108 3.032q.411-2.24 2.207-3.941c-1.349-.783-2.626-1.833-3.801-3.26" fill="#FAFBFF" />
 				<circle opacity=".64" cx="29" cy="25" r="2" fill="#FAFBFF" />
 				<circle cx="16" cy="37" r="3" fill="#FAFBFF" />
 				<circle opacity=".24" cx="116" cy="108" r="28" fill="#FAFBFF" />
@@ -78,19 +78,19 @@ export function OpTooling() {
 				<path d="M65.17 45.274c2.382 7.65 7.567 13.582 14.3 14.792" stroke="#997500" stroke-width=".746" stroke-miterlimit="3" stroke-linecap="round" stroke-linejoin="round" />
 				<path d="M34.634 36.119c-8.394 5.617-15.007-.604-16.162-3.533" stroke="#A85F00" stroke-width=".175" stroke-miterlimit="3" stroke-linecap="round" stroke-linejoin="round" />
 				<path d="M42.76 20.85c13.723-.558 24.718-4.198 24.558-8.13S55.905 6.052 42.182 6.61s-24.718 4.197-24.558 8.13c.16 3.932 11.414 6.667 25.137 6.11Z" stroke="#FFCB3D" stroke-width="1.057" stroke-miterlimit="24" />
-				<path fill-rule="evenodd" clip-rule="evenodd" d="M12.103 40.11 5.6 33.583l5.786 2.076 7.217-3.02z" fill="#A85F00" />
-				<path fill-rule="evenodd" clip-rule="evenodd" d="m18.605 32.638-7.218 3.02-5.786-2.076 8.228-1.758z" fill="#FA8900" />
+				<path fillRule="evenodd" clip-rule="evenodd" d="M12.103 40.11 5.6 33.583l5.786 2.076 7.217-3.02z" fill="#A85F00" />
+				<path fillRule="evenodd" clip-rule="evenodd" d="m18.605 32.638-7.218 3.02-5.786-2.076 8.228-1.758z" fill="#FA8900" />
 				<path d="M60.8 91.2a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2M62.4 80a.8.8 0 1 0 0-1.6.8.8 0 0 0 0 1.6" fill="#FFF6F0" />
 				<path d="m66.34 24.656-4.132-3.204-3.204 4.132 4.132 3.205z" fill="#FF8847" />
-				<path opacity=".3" fill-rule="evenodd" clip-rule="evenodd" d="M38.4 90.908v24.236l4.28-3.554V88z" fill="#fff" />
-				<path fill-rule="evenodd" clip-rule="evenodd" d="m14.008 80.276-10.373 5.04L-7.2 79.2l6.587-3.651z" fill="#FFCD8F" />
-				<path fill-rule="evenodd" clip-rule="evenodd" d="m-7.198 79.2 8.666 13.26 12.54-12.184-10.372 5.04z" fill="#FA8900" />
-				<path fill-rule="evenodd" clip-rule="evenodd" d="m102.4 59.797-9.237 5.485-14.495-5.485 13.276-3.02z" fill="#FFCD8F" />
-				<path fill-rule="evenodd" clip-rule="evenodd" d="M78.669 59.796 90.533 72.77 102.4 59.796l-9.218 5.485z" fill="#FA8900" />
-				<path opacity=".5" fill-rule="evenodd" clip-rule="evenodd" d="M48 77.128v20.235l5.922 2.117V75.2z" fill="#fff" />
+				<path opacity=".3" fillRule="evenodd" clip-rule="evenodd" d="M38.4 90.908v24.236l4.28-3.554V88z" fill="#fff" />
+				<path fillRule="evenodd" clip-rule="evenodd" d="m14.008 80.276-10.373 5.04L-7.2 79.2l6.587-3.651z" fill="#FFCD8F" />
+				<path fillRule="evenodd" clip-rule="evenodd" d="m-7.198 79.2 8.666 13.26 12.54-12.184-10.372 5.04z" fill="#FA8900" />
+				<path fillRule="evenodd" clip-rule="evenodd" d="m102.4 59.797-9.237 5.485-14.495-5.485 13.276-3.02z" fill="#FFCD8F" />
+				<path fillRule="evenodd" clip-rule="evenodd" d="M78.669 59.796 90.533 72.77 102.4 59.796l-9.218 5.485z" fill="#FA8900" />
+				<path opacity=".5" fillRule="evenodd" clip-rule="evenodd" d="M48 77.128v20.235l5.922 2.117V75.2z" fill="#fff" />
 				<path d="M18.182 47.058c-.118 13.522-1.67 27.054-5.104 33.06" stroke="#997500" stroke-width=".995" stroke-miterlimit="3" stroke-linecap="round" stroke-linejoin="round" />
-				<path fill-rule="evenodd" clip-rule="evenodd" d="M45.003 73.753 17.536 46.822l31.833 8.614 16.856-10.747z" fill="url(#b)" />
-				<path opacity=".24" fill-rule="evenodd" clip-rule="evenodd" d="m45.003 73.753 4.366-18.318 16.856-10.747z" fill="#fff" />
+				<path fillRule="evenodd" clip-rule="evenodd" d="M45.003 73.753 17.536 46.822l31.833 8.614 16.856-10.747z" fill="url(#b)" />
+				<path opacity=".24" fillRule="evenodd" clip-rule="evenodd" d="m45.003 73.753 4.366-18.318 16.856-10.747z" fill="#fff" />
 				<path d="m66.225 44.688-31.833-8.614-16.856 10.747 31.832 8.614z" fill="#FA8900" />
 				<path d="M41.633 38.475c6.713-2.69 11.465-6.594 10.614-8.72-.852-2.127-6.985-1.671-13.699 1.018s-11.465 6.594-10.613 8.72c.851 2.127 6.984 1.671 13.698-1.018Z" stroke="#FFCB3D" stroke-width=".684" stroke-miterlimit="1.5" stroke-linejoin="round" />
 				<path d="M41.357 50.423c6.89.314 12.341-1.565 12.173-4.196-.169-2.631-5.891-5.019-12.783-5.333S28.406 42.46 28.574 45.09s5.891 5.019 12.783 5.333Z" stroke="#FA8900" stroke-width=".808" stroke-miterlimit="24" />

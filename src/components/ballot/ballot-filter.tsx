@@ -1,7 +1,5 @@
 "use client";
-import { NumericFormat } from "react-number-format";
-import { ChevronDown, Lock, LockOpen, Minus, Plus, Trash2 } from "lucide-react";
-import { Heading } from "@/components/ui/headings";
+import {ChevronDown} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,12 +9,12 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { useBallotContext } from "../ballot/provider";
-import { useSortBallot } from "@/hooks/useBallotEditor";
-import { decode, encode, sortLabels } from "@/hooks/useFilter";
-import { ImportBallotDialog, exportBallot } from "./import-ballot";
-import { useState } from "react";
+import {Button} from "@/components/ui/button";
+import {useBallotContext} from "../ballot/provider";
+import {useSortBallot} from "@/hooks/useBallotEditor";
+import {decode, encode, sortLabels} from "@/hooks/useFilter";
+import {exportBallot, ImportBallotDialog} from "./import-ballot";
+import {useState} from "react";
 
 export function BallotFilter() {
   const [isOpen, setOpen] = useState(false);

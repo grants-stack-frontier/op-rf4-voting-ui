@@ -1,0 +1,26 @@
+### Use this file in e.g. Webstorm or VSCode to execute clear HTTP request without and NextJS black boxing
+### For Webstorm, add the API key to http-client.private.env.json based on http-client.private.env.json.template and select the dev environment
+
+### Round 5 projects
+GET https://vote.optimism.io/api/v1/retrofunding/rounds/5/projects
+Accept: application/json
+Authorization: Bearer {{ AGORA_API_KEY }}
+Content-Type: application/json
+
+### Projects (general)
+GET https://vote.optimism.io/api/v1/projects
+Accept: application/json
+Authorization: Bearer {{ AGORA_API_KEY }}
+Content-Type: application/json
+
+### Round 4 impact metrics
+GET https://vote.optimism.io/api/v1/retrofunding/rounds/4/impactMetrics
+Accept: application/json
+Authorization: Bearer {{ AGORA_API_KEY }}
+Content-Type: application/json
+
+### Rounds (genereal)
+GET https://vote.optimism.io/api/v1/retrofunding/rounds
+Accept: application/json
+Authorization: Bearer {{ AGORA_API_KEY }}
+Content-Type: application/json

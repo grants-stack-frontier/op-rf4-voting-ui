@@ -2,7 +2,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import { Allocation } from "./useBallot";
-import { createSortFn, useMetrics } from "./useMetrics";
+import { createSortFn, useMetricsByRound } from "./useMetrics";
 import { useBallotFilter } from "./useFilter";
 import { useBallotContext } from "@/components/ballot/provider";
 import debounce from "lodash.debounce";
@@ -108,13 +108,16 @@ function calculateBalancedAmounts(state: BallotState): BallotState {
 
 export function useSortBallot(initialState: BallotState) {
   const { state } = useBallotContext();
-  const { data: metrics, isPending } = useMetrics();
+  const { data, isPending } = useMetricsByRound(4);
   const [filter, setFilter] = useBallotFilter();
 
+  const metrics = data?.data ?? [];
+
+  // TODO remove forced assertion or metric_id
   const sorted = useMemo(
     () =>
       metrics
-        ?.map((m) => ({ ...m, ...state[m.metric_id] }))
+        ?.map((m) => ({ ...m, ...state[m.metric_id!] }))
         .sort(createSortFn({ order: filter.order, sort: filter.sort }))
         .map((m) => m?.metric_id ?? "")
         .filter(Boolean) ?? [],

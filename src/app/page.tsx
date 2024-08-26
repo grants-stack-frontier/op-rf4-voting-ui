@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import {Heading} from "@/components/ui/headings";
 import {Text} from "@/components/ui/text";
 import {ConnectButton} from "@/components/auth/connect-button";

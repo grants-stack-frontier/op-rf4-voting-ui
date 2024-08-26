@@ -15,7 +15,7 @@ import {
   useIsSavingBallot,
   useOsMultiplier,
 } from "@/hooks/useBallot";
-import { ProjectAllocation, useMetrics } from "@/hooks/useMetrics";
+import { Metric, ProjectAllocation, useMetricsByRound } from "@/hooks/useMetrics";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
@@ -133,7 +133,7 @@ function CheckBallotState() {
 
 function YourBallot() {
   const [isSubmitting, setSubmitting] = useState(false);
-  const metrics = useMetrics();
+  const metrics = useMetricsByRound(4);
 
   const { ballot } = useBallotContext();
 
@@ -210,7 +210,7 @@ function YourBallot() {
       )}
       <Card className="p-6 space-y-8">
         <MetricsEditor
-          metrics={metrics.data}
+          metrics={metrics.data?.data as Metric[]}
           isLoading={metrics.isPending}
           onAllocationMethodSelect={handleAllocationMethodSelect}
         />

@@ -10,6 +10,7 @@ import { Card } from "../ui/card";
 import { Heading } from "../ui/headings";
 import { ScrollArea } from "../ui/scroll-area";
 
+import { Project } from "@/__generated__/api/agora.schemas";
 import {
 	Tooltip,
 	TooltipContent,
@@ -17,7 +18,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Category } from "@/data/categories";
-import { Project, useProjectsByCategory } from "@/hooks/useProjects";
+import { useProjectsByCategory } from "@/hooks/useProjects";
 import Link from "next/link";
 import { ManualDialog } from "../common/manual-dialog";
 import { Skeleton } from "../ui/skeleton";
@@ -30,7 +31,7 @@ export function ProjectsSidebar({
 	data?: Category[];
 }) {
 	const category = data?.find(cat => cat.id === id);
-	const { data: { data: projects = [] } = {}, isPending } = useProjectsByCategory(id);
+	const { data: projects, isPending } = useProjectsByCategory(id);
 	const intersectionRef = useRef(null);
 	const intersection = useIntersection(intersectionRef, {
 		root: null,
@@ -50,7 +51,7 @@ export function ProjectsSidebar({
 						{projects?.length > 1 ? (
 							<Heading variant="h3">There are {projects?.length} projects in this category</Heading>
 						) : (
-							<Heading variant="h3">There is 1 project in this category</Heading>
+							<Heading variant="h3">There are no projects in this category</Heading>
 						)}
 					</>
 				)}
@@ -92,7 +93,7 @@ function ProjectItem({
 	profileAvatarUrl = AvatarPlaceholder.src,
 	isLoading,
 	children,
-}: PropsWithChildren<Partial<Project>> & { isLoading?: boolean }) {
+}: PropsWithChildren<Project> & { isLoading?: boolean }) {
 	const [isOpen, setOpen] = useState(false);
 	return (
 		<>
