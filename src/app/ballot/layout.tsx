@@ -13,9 +13,9 @@ export default function BallotLayout({
 
         {children}
       </div>
-      <aside>
+      {/* <aside>
         <BallotSidebar />
-      </aside>
+      </aside> */}
     </>
   );
 }

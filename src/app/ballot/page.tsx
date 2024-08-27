@@ -116,7 +116,8 @@ export default function BallotPage() {
 
 function CheckBallotState() {
   const { address, isConnecting } = useAccount();
-  const { isPending } = useBallot(address);
+  const { isPending, data: ballot } = useBallot(address);
+  console.log("Ballot Data from new API:", {ballot});
   const { state } = useBallotContext();
   // Comment out for local dev if needed
   if (isPending) {
