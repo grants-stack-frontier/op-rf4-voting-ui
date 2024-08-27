@@ -1,7 +1,8 @@
 "use client";
 import { NumericFormat } from "react-number-format";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { InfoIcon, Minus, Plus, Trash2 } from "lucide-react";
 import { Heading } from "@/components/ui/headings";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -9,17 +10,21 @@ import { useMemo } from "react";
 import { useBallotContext } from "../ballot/provider";
 import { useSortBallot } from "@/hooks/useBallotEditor";
 import { BallotFilter } from "../ballot/ballot-filter";
+import { Metric } from "@/hooks/useMetrics";
 import Link from "next/link";
 import { Skeleton } from "../ui/skeleton";
 import mixpanel from "@/lib/mixpanel";
-import {RetroFundingImpactMetric} from "@/__generated__/api/agora.schemas";
+import { DistributionChart } from "../metrics/distribution-chart";
+import { Card } from "../ui/card";
 
 export function MetricsEditor({
   metrics = [],
   isLoading,
+  onAllocationMethodSelect,
 }: {
-  metrics?: RetroFundingImpactMetric[];
+  metrics?: Metric[];
   isLoading: boolean;
+  onAllocationMethodSelect: (data: { x: number; y: number }[]) => void;
 }) {
   const { state, inc, dec, set, remove } = useBallotContext();
 
@@ -30,6 +35,60 @@ export function MetricsEditor({
     () => Object.fromEntries(metrics.map((m) => [m["metric_id"], m])),
     [metrics]
   );
+
+  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+
+  // Dummy data for the allocation methods
+  const allocationMethods = [
+    {
+      data: [
+        {x: 0, y: 340},
+        {x: 10, y: 340},
+        {x: 10, y: 255},
+        {x: 20, y: 255},
+        {x: 20, y: 170},
+        {x: 30, y: 170},
+        {x: 30, y: 85},
+        {x: 40, y: 85},
+        {x: 40, y: 0},
+        {x: 50, y: 0},
+      ],
+      formatChartTick: (tick: number) => `${tick}k`,
+      method: "Impact groups",
+      description: "blah blah blah",
+    },
+    {
+      data: [
+        {x: 0, y: 340},
+        {x: 10, y: 255},
+        {x: 20, y: 170},
+        {x: 30, y: 85},
+        {x: 40, y: 0},
+      ],
+      formatChartTick: (tick: number) => `${tick}k`,
+      method: "Top to bottom",
+      description: "blah blah blah",
+    },
+    {
+      data: [
+        {x: 0, y: 400},
+        {x: 10, y: 100},
+        {x: 20, y: 50},
+        {x: 30, y: 30},
+        {x: 40, y: 20},
+      ],
+      formatChartTick: (tick: number) => `${tick}k`,
+      method: "Top weighted",
+      description: "blah blah blah",
+    },
+    {
+      data: [],
+      formatChartTick: (tick: number) => `--k`,
+      method: "Custom",
+      description: "blah blah blah",
+    },
+  ]
+  const allocationAmount = "3,333,333";
 
   return (
     <div>
@@ -42,6 +101,39 @@ export function MetricsEditor({
         </div>
         <BallotFilter />
       </div>
+
+      {/* This sections is a work in progress */}
+      <div className=" flex flex-col gap-4 py-4 text-sm">
+        <p>First, review your project rankings in the list below.</p>
+        <p>Then, choose a method to easily allocate rewards across prjects. You can also customize percentages at any time.</p>
+        <p>OP calcilations in this ballot are based on your budget of {allocationAmount} OP</p>
+      </div>
+
+      <div className="flex flex-row justify-between items-end">
+        <p className="font-semibold mb-2">Allocation method</p>
+        <p className="font-semibold mb-2 text-sm">None selected</p>
+      </div>
+      <div className="grid grid-cols-4 sm:grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+        {allocationMethods.map((method, index) => (
+          <Card
+            key={index}
+            className={cn("cursor-pointer", {
+              "border-2 border-blue-500": selectedMethod === method.method
+            })}
+            onClick={() => {
+              setSelectedMethod(method.method);
+              onAllocationMethodSelect(method.data);
+            }}
+          >
+            <DistributionChart data={method.data} formatChartTick={method.formatChartTick} />
+            <div className="mb-2 mx-4 flex flex-row justify-between items-center">
+              <p className="font-bold text-sm">{method.method}</p>
+              <InfoIcon className="h-4 w-4" />
+            </div>
+          </Card>
+        ))}
+      </div>
+      {/* ^^This sections is a work in progress^^ */}
 
       <div className="divide-y border-y">
         {isLoading &&

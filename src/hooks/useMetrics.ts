@@ -9,6 +9,18 @@ import {getImpactMetricsOnRetroFundingRound, recordImpactMetricView} from "@/__g
 
 type SortFields = { [OrderBy.name]?: string; [OrderBy.allocation]?: number };
 
+export type Metric = {
+  metric_id: string;
+  name: string;
+  url: string;
+  description: string;
+  comments: [];
+  commentsCount: number;
+  views: number;
+  added_to_ballot: number;
+  allocations_per_project?: ProjectAllocation[];
+};
+
 export type ProjectAllocation = {
     allocation: number;
     image: string;

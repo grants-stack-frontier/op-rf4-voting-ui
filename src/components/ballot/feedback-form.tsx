@@ -275,104 +275,105 @@ function createQuestions(
         />
       ),
     },
-    {
-      title:
-        "How would you rate your knowledge on the arguments for or against deducting external funding (e.g., VC funding, Optimism grants, or other grants) from Retro Funding rewards?",
-      children: (
-        <SelectForm
-          key="knowledge"
-          name="knowledge"
-          options={Array(7)
-            .fill(0)
-            .map((_, index) => ({
-              label: `${index + 1} ${
-                index === 0
-                  ? "(very low knowledge)"
-                  : index === 3
-                  ? "(some knowledge)"
-                  : index === 6
-                  ? "(very high knowledge)"
-                  : ""
-              }`,
-              value: String(index + 1),
-            }))}
-        />
-      ),
-    },
+    // QUESTION: Are we keeping the rest of these questions?
+    // {
+    //   title:
+    //     "How would you rate your knowledge on the arguments for or against deducting external funding (e.g., VC funding, Optimism grants, or other grants) from Retro Funding rewards?",
+    //   children: (
+    //     <SelectForm
+    //       key="knowledge"
+    //       name="knowledge"
+    //       options={Array(7)
+    //         .fill(0)
+    //         .map((_, index) => ({
+    //           label: `${index + 1} ${
+    //             index === 0
+    //               ? "(very low knowledge)"
+    //               : index === 3
+    //               ? "(some knowledge)"
+    //               : index === 6
+    //               ? "(very high knowledge)"
+    //               : ""
+    //           }`,
+    //           value: String(index + 1),
+    //         }))}
+    //     />
+    //   ),
+    // },
 
-    {
-      title:
-        "How satisfied do you feel with the definition of profit, compared to round 3?",
-      description:
-        "Definition: Impact = Award in OP, no past funding, grants, or revenue are deducted from Projects Retro Funding rewards",
-      children: (
-        <SelectForm
-          key="satisfaction"
-          name="satisfaction"
-          options={Array(7)
-            .fill(0)
-            .map((_, index) => ({
-              label: `${index + 1} ${
-                index === 0
-                  ? "(not satisfied)"
-                  : index === 3
-                  ? "(somewhat satisfied)"
-                  : index === 6
-                  ? "(very satisfied)"
-                  : ""
-              }`,
-              value: String(index + 1),
-            }))}
-        />
-      ),
-    },
-    {
-      title: "How understandable and clear did you find the impact metrics?",
-      children: (
-        <SelectForm
-          key="understandable"
-          name="understandable"
-          options={Array(7)
-            .fill(0)
-            .map((_, index) => ({
-              label: `${index + 1} ${
-                index === 0
-                  ? "(not understandable)"
-                  : index === 3
-                  ? "(somewhat understandable)"
-                  : index === 6
-                  ? "(very clear)"
-                  : ""
-              }`,
-              value: String(index + 1),
-            }))}
-        />
-      ),
-    },
-    {
-      title:
-        "How confident are you in the data sources and trust signals used for the impact metrics?",
-      children: (
-        <SelectForm
-          key="confidence_data"
-          name="confidence_data"
-          options={Array(7)
-            .fill(0)
-            .map((_, index) => ({
-              label: `${index + 1} ${
-                index === 0
-                  ? "(not confident)"
-                  : index === 3
-                  ? "(somewhat confident)"
-                  : index === 6
-                  ? "(very confident)"
-                  : ""
-              }`,
-              value: String(index + 1),
-            }))}
-        />
-      ),
-    },
+    // {
+    //   title:
+    //     "How satisfied do you feel with the definition of profit, compared to round 4?",
+    //   description:
+    //     "Definition: Impact = Award in OP, no past funding, grants, or revenue are deducted from Projects Retro Funding rewards",
+    //   children: (
+    //     <SelectForm
+    //       key="satisfaction"
+    //       name="satisfaction"
+    //       options={Array(7)
+    //         .fill(0)
+    //         .map((_, index) => ({
+    //           label: `${index + 1} ${
+    //             index === 0
+    //               ? "(not satisfied)"
+    //               : index === 3
+    //               ? "(somewhat satisfied)"
+    //               : index === 6
+    //               ? "(very satisfied)"
+    //               : ""
+    //           }`,
+    //           value: String(index + 1),
+    //         }))}
+    //     />
+    //   ),
+    // },
+    // {
+    //   title: "How understandable and clear did you find the impact metrics?",
+    //   children: (
+    //     <SelectForm
+    //       key="understandable"
+    //       name="understandable"
+    //       options={Array(7)
+    //         .fill(0)
+    //         .map((_, index) => ({
+    //           label: `${index + 1} ${
+    //             index === 0
+    //               ? "(not understandable)"
+    //               : index === 3
+    //               ? "(somewhat understandable)"
+    //               : index === 6
+    //               ? "(very clear)"
+    //               : ""
+    //           }`,
+    //           value: String(index + 1),
+    //         }))}
+    //     />
+    //   ),
+    // },
+    // {
+    //   title:
+    //     "How confident are you in the data sources and trust signals used for the impact metrics?",
+    //   children: (
+    //     <SelectForm
+    //       key="confidence_data"
+    //       name="confidence_data"
+    //       options={Array(7)
+    //         .fill(0)
+    //         .map((_, index) => ({
+    //           label: `${index + 1} ${
+    //             index === 0
+    //               ? "(not confident)"
+    //               : index === 3
+    //               ? "(somewhat confident)"
+    //               : index === 6
+    //               ? "(very confident)"
+    //               : ""
+    //           }`,
+    //           value: String(index + 1),
+    //         }))}
+    //     />
+    //   ),
+    // },
   ];
 }
 
