@@ -1,19 +1,13 @@
 "use client";
+import { BudgetTabs } from "@/components/budget/budget-tabs";
 import { PageView } from "@/components/common/page-view";
 import { Badge } from "@/components/ui/badge";
-import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbLink,
-	BreadcrumbList,
-	BreadcrumbSeparator
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useCategories } from "@/hooks/useCategories";
-import { ChevronRight, LockKeyholeOpen, Minus, Plus, RotateCw, Tally1 } from "lucide-react";
+import { ChevronRight, LockKeyholeOpen, Minus, Plus, RotateCw } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -22,23 +16,7 @@ export default function BudgetBallotPage() {
 	return (
 		<>
 			<section className="flex-1 space-y-6">
-				<Breadcrumb className="mb-6">
-					<BreadcrumbList>
-						<BreadcrumbItem>
-							<BreadcrumbLink asChild>
-								<Link href="/budget">Budget</Link>
-							</BreadcrumbLink>
-						</BreadcrumbItem>
-						<BreadcrumbSeparator className="text-gray-400">
-							<Tally1 />
-						</BreadcrumbSeparator>
-						<BreadcrumbItem className="text-gray-400">
-							<BreadcrumbLink asChild>
-								<Link href="/budget/ballot">Ballot</Link>
-							</BreadcrumbLink>
-						</BreadcrumbItem>
-					</BreadcrumbList>
-				</Breadcrumb>
+				<BudgetTabs />
 				<p>Decide how much of the overall budget (10M OP) should go to each category. </p>
 				<Card>
 					<CardHeader>
@@ -57,7 +35,7 @@ export default function BudgetBallotPage() {
 									<Image src={category.image} alt={category.name} width={80} height={80} />
 									<div className="flex-1">
 										<Button variant="link" asChild>
-											<Link href={`/budget/category/${category.id}`} className="flex items-center gap-2">
+											<Link href={`/home/category/${category.id}`} className="flex items-center gap-2">
 												<span className="font-medium">{category.name}</span>
 												<ChevronRight className="h-4 w-4" />
 											</Link>

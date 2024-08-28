@@ -24,11 +24,11 @@ Live and stable.
 - **proposals**: Proposal data
 - **votes**: Vote data
 - **contracts**: Data for the current onchain contracts
+- **projects** Round 5 Projects with mock data
+- **RetroFundingBallots** Round 5 Ballots with mock data
 
 Not Live.
 - **Round 5**: Data related to Retro Funding for Optimism Round 5
-- 0.2.0: **projects** Round 5 Projects with mock data
-- 0.2.1: **RetroFundingBallots** Round 5 Ballots with mock data
 - 0.2.2: **DistributionStrategies** Round 5 Distribution strategies with mock data
 - 0.2.3: Round 5 Production release with real data
 
@@ -42,10 +42,10 @@ Not Live.
 | OP 0.1.3 | LIVE   | July 31th |
 |----------|---------|---------------|
 | OP 0.2.0 | LIVE   | Aug 10th |
-| OP 0.2.1 | ON TRACK   | Aug 23th |
+| OP 0.2.1 | LIVE   | Aug 26th |
 | OP 0.2.2 | ON TRACK   | Aug 30th |
 | OP 0.2.3 | ON TRACK   | Sep 20th |
- * OpenAPI spec version: 0.1.3
+ * OpenAPI spec version: 0.2.1
  */
 export type PutImactMetricCommentVoteBody = {
   vote?: number;
@@ -99,26 +99,20 @@ export type UpdateRetroFundingBallotDistributionMethodBody = {
   distribution_method?: string;
 };
 
-export type UpdateRetroFundingRoundCategoryAllocationBodyImpact = typeof UpdateRetroFundingRoundCategoryAllocationBodyImpact[keyof typeof UpdateRetroFundingRoundCategoryAllocationBodyImpact];
+export type UpdateRetroFundingRoundCategoryAllocationBodyCategorySlug = typeof UpdateRetroFundingRoundCategoryAllocationBodyCategorySlug[keyof typeof UpdateRetroFundingRoundCategoryAllocationBodyCategorySlug];
 
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const UpdateRetroFundingRoundCategoryAllocationBodyImpact = {
-  VERY_HIGH: 'VERY_HIGH',
-  HIGH: 'HIGH',
-  MEDIUM: 'MEDIUM',
-  LOW: 'LOW',
-  VERY_LOW: 'VERY_LOW',
+export const UpdateRetroFundingRoundCategoryAllocationBodyCategorySlug = {
+  ETHEREUM_CORE_CONTRIBUTIONS: 'ETHEREUM_CORE_CONTRIBUTIONS',
+  OP_STACK_RESEARCH_AND_DEVELOPMENT: 'OP_STACK_RESEARCH_AND_DEVELOPMENT',
+  OP_STACK_TOOLING: 'OP_STACK_TOOLING',
 } as const;
 
 export type UpdateRetroFundingRoundCategoryAllocationBody = {
   allocation?: string;
-  impact?: UpdateRetroFundingRoundCategoryAllocationBodyImpact;
-  rank?: number;
-};
-
-export type UpdateRetroFundingRoundProjectByIdBody = {
-  allocation?: string;
+  category_slug?: UpdateRetroFundingRoundCategoryAllocationBodyCategorySlug;
+  locked?: boolean;
 };
 
 export type AddImpactMetricToRetroFundingBallotBody = {
@@ -143,32 +137,21 @@ export const GetRetroFundingRoundProjectsCategory = {
   op_rnd: 'op_rnd',
 } as const;
 
-export type GetRetroFundingRoundProjectsParams = {
-/**
- * Limits the number of returned results.
- */
-limit?: LimitParamParameter;
-/**
- * Offset from which start returned results.
- */
-offset?: OffsetParamParameter;
-/**
- * The desired method by which returned votes will be filtered. Supported values are: 'all', 'eth_core', "op_tooling", "op_rnd"
-
- */
-category?: GetRetroFundingRoundProjectsCategory;
+export type SubmitRetroFundingBallot200 = {
+  address?: string;
+  created_at?: string;
+  payload?: string;
+  round?: number;
+  signature?: string;
+  updated_at?: string;
 };
-
-export type SubmitRetroFundingBallot200 = Round4Ballot | Round5Ballot;
 
 export type SubmitRetroFundingBallotBody = RetroFunding4BallotSubmission | RetroFunding5BallotSubmission;
 
-export type GetRetroFundingRoundBallotById200 = Round4Ballot | Round5Ballot;
-
-export type GetRetroFundingRoundBallots200BallotsItem = Round4Ballot | Round5Ballot;
+export type GetRetroFundingRoundBallotById200 = Round5Ballot | Round4Ballot;
 
 export type GetRetroFundingRoundBallots200 = {
-  ballots?: GetRetroFundingRoundBallots200BallotsItem[];
+  ballots?: Round4Ballot[];
   metadata?: PageMetadata;
 };
 
@@ -234,6 +217,22 @@ export const GetProposalVotesSort = {
   block_number: 'block_number',
 } as const;
 
+export type GetProposalVotesParams = {
+/**
+ * Limits the number of returned results.
+ */
+limit?: LimitParamParameter;
+/**
+ * Offset from which start returned results.
+ */
+offset?: OffsetParamParameter;
+/**
+ * The desired method by which returned delegates will be sorted. Supported values are: 'weight' for descending voting weight, or 'block' for descending block number
+
+ */
+sort?: GetProposalVotesSort;
+};
+
 export type GetProposals200 = {
   metadata?: PageMetadata;
   proposals?: Proposal[];
@@ -251,6 +250,17 @@ export const GetProposalsFilter = {
 export type GetDelegateVotes200 = {
   metadata?: PageMetadata;
   votes?: Vote[];
+};
+
+export type GetDelegateVotesParams = {
+/**
+ * Limits the number of returned results.
+ */
+limit?: LimitParamParameter;
+/**
+ * Offset from which start returned results.
+ */
+offset?: OffsetParamParameter;
 };
 
 export type GetDelegates200 = {
@@ -298,7 +308,7 @@ export type OffsetParamParameter = number;
  */
 export type LimitParamParameter = number;
 
-export type GetProposalVotesParams = {
+export type GetRetroFundingRoundProjectsParams = {
 /**
  * Limits the number of returned results.
  */
@@ -308,10 +318,10 @@ limit?: LimitParamParameter;
  */
 offset?: OffsetParamParameter;
 /**
- * The desired method by which returned delegates will be sorted. Supported values are: 'weight' for descending voting weight, or 'block' for descending block number
+ * The desired method by which returned votes will be filtered. Supported values are: 'all', 'eth_core', "op_tooling", "op_rnd"
 
  */
-sort?: GetProposalVotesSort;
+category?: GetRetroFundingRoundProjectsCategory;
 };
 
 export type GetProposalsParams = {
@@ -328,17 +338,6 @@ offset?: OffsetParamParameter;
 
  */
 filter?: GetProposalsFilter;
-};
-
-export type GetDelegateVotesParams = {
-/**
- * Limits the number of returned results.
- */
-limit?: LimitParamParameter;
-/**
- * Offset from which start returned results.
- */
-offset?: OffsetParamParameter;
 };
 
 export type GetDelegatesParams = {
@@ -419,7 +418,9 @@ export type Round5BallotStatus = typeof Round5BallotStatus[keyof typeof Round5Ba
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const Round5BallotStatus = {
-  PENDING: 'PENDING',
+  NOT_STARTED: 'NOT STARTED',
+  RANKED: 'RANKED',
+  PENDING_SUBMISSION: 'PENDING SUBMISSION',
   SUBMITTED: 'SUBMITTED',
 } as const;
 
@@ -432,25 +433,15 @@ export const Round4BallotStatus = {
   SUBMITTED: 'SUBMITTED',
 } as const;
 
-/**
- * A ballot for RetroFunding Round 4, including information about the ballot.
+export type RetroFundingBallotCategoriesAllocationCategorySlug = typeof RetroFundingBallotCategoriesAllocationCategorySlug[keyof typeof RetroFundingBallotCategoriesAllocationCategorySlug];
 
- * @summary A ballot for RetroFunding Round 4
- */
-export interface Round4Ballot {
-  /**
-   * Address of the voter
-   * @summary Address of the voter
-   */
-  address?: string;
-  allocations?: RetroFundingBallotMetricsAllocation[];
-  created_at?: string;
-  projects_allocation?: RetroFundingBallot4ProjectsAllocation[];
-  published_at?: string;
-  round_id?: number;
-  status?: Round4BallotStatus;
-  updated_at?: string;
-}
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const RetroFundingBallotCategoriesAllocationCategorySlug = {
+  ETHEREUM_CORE_CONTRIBUTIONS: 'ETHEREUM_CORE_CONTRIBUTIONS',
+  OP_STACK_RESEARCH_AND_DEVELOPMENT: 'OP_STACK_RESEARCH_AND_DEVELOPMENT',
+  OP_STACK_TOOLING: 'OP_STACK_TOOLING',
+} as const;
 
 /**
  * Categories allocation distribution based on the vote out of total 10M OP
@@ -459,20 +450,9 @@ export interface Round4Ballot {
  */
 export interface RetroFundingBallotCategoriesAllocation {
   allocation?: string;
-  category_id?: number;
+  category_slug?: RetroFundingBallotCategoriesAllocationCategorySlug;
+  locked?: boolean;
 }
-
-export type RetroFundingBallot5ProjectsAllocationImpact = typeof RetroFundingBallot5ProjectsAllocationImpact[keyof typeof RetroFundingBallot5ProjectsAllocationImpact];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const RetroFundingBallot5ProjectsAllocationImpact = {
-  VERY_HIGH: 'VERY_HIGH',
-  HIGH: 'HIGH',
-  MEDIUM: 'MEDIUM',
-  LOW: 'LOW',
-  VERY_LOW: 'VERY_LOW',
-} as const;
 
 /**
  * Projects allocation distribution based on the vote out of total 10M OP
@@ -482,9 +462,11 @@ export const RetroFundingBallot5ProjectsAllocationImpact = {
 export interface RetroFundingBallot5ProjectsAllocation {
   allocation?: number;
   image?: string;
-  impact?: RetroFundingBallot5ProjectsAllocationImpact;
-  is_os?: boolean;
+  /** The impact of the project on the ecosystem. This is a number between 0 and 5.  0 - Conflict of interest. 1 - Very low impact. 2 - Low impact. 3 - Medium impact. 4 - High impact. 5 - Very high impact.
+ */
+  impact?: number;
   name?: string;
+  position?: number;
   project_id?: string;
 }
 
@@ -499,15 +481,20 @@ export interface Round5Ballot {
    * @summary Address of the voter
    */
   address?: string;
-  catgory_allocation?: RetroFundingBallotCategoriesAllocation[];
+  category_allocations?: RetroFundingBallotCategoriesAllocation[];
   created_at?: string;
   distribution_method?: string;
-  projects_allocation?: RetroFundingBallot5ProjectsAllocation[];
+  projects_allocations?: RetroFundingBallot5ProjectsAllocation[];
+  /** Projects that haven't been evaluated by the voter. This is a list of project IDs.
+ */
+  projects_to_be_evaluated?: string[];
   published_at?: string;
   round_id?: number;
   status?: Round5BallotStatus;
+  /** Total number of projects that the voter has to evaluate. This is the length of the projects_to_be_evaluated array.
+ */
+  total_projects?: number;
   updated_at?: string;
-  voting_step?: number;
 }
 
 export type RetroFundingBallot4ProjectsAllocationAllocationsPerMetricItem = {
@@ -541,6 +528,26 @@ export interface RetroFundingBallotMetricsAllocation {
 }
 
 /**
+ * A ballot for RetroFunding Round 4, including information about the ballot.
+
+ * @summary A ballot for RetroFunding Round 4
+ */
+export interface Round4Ballot {
+  /**
+   * Address of the voter
+   * @summary Address of the voter
+   */
+  address?: string;
+  allocations?: RetroFundingBallotMetricsAllocation[];
+  created_at?: string;
+  projects_allocation?: RetroFundingBallot4ProjectsAllocation[];
+  published_at?: string;
+  round_id?: number;
+  status?: Round4BallotStatus;
+  updated_at?: string;
+}
+
+/**
  * Information about the organization behind a project, including name and avatar.
 
  * @summary Organization information for a project
@@ -560,6 +567,33 @@ export interface SocialLinks {
   mirror?: string;
   twitter?: string;
   website?: string;
+}
+
+/**
+ * Information about a project submitted for Retroactive Public Goods Funding on Agora.
+
+ * @summary A project submitted for RetroFunding
+ */
+export interface Project {
+  category?: string;
+  /**
+   * Information about the contracts deployed by the project, including the contract address, chain ID, deployer, and creation block.
+
+   * @summary Deployed contracts for the project
+   */
+  contracts?: ProjectContractsItem[];
+  description?: string;
+  github?: ProjectGithubItem[];
+  grantsAndFunding?: ProjectGrantsAndFunding;
+  id?: string;
+  links?: string[];
+  name?: string;
+  organization?: Organization;
+  packages?: string[];
+  profileAvatarUrl?: string;
+  projectCoverImageUrl?: string;
+  socialLinks?: SocialLinks;
+  team?: string[];
 }
 
 export type ProjectGrantsAndFundingVentureFundingItem = {
@@ -626,33 +660,6 @@ export type ProjectContractsItemAllOf = {
 };
 
 export type ProjectContractsItem = Contract & ProjectContractsItemAllOf;
-
-/**
- * Information about a project submitted for Retroactive Public Goods Funding on Agora.
-
- * @summary A project submitted for RetroFunding
- */
-export interface Project {
-  category?: string;
-  /**
-   * Information about the contracts deployed by the project, including the contract address, chain ID, deployer, and creation block.
-
-   * @summary Deployed contracts for the project
-   */
-  contracts?: ProjectContractsItem[];
-  description?: string;
-  github?: ProjectGithubItem[];
-  grantsAndFunding?: ProjectGrantsAndFunding;
-  id?: string;
-  links?: string[];
-  name?: string;
-  organization?: Organization;
-  packages?: string[];
-  profileAvatarUrl?: string;
-  projectCoverImageUrl?: string;
-  socialLinks?: SocialLinks;
-  team?: string[];
-}
 
 /**
  * A category for a RetroFunding project, including information about the category.
