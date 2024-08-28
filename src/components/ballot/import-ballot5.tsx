@@ -10,10 +10,13 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { format, parse } from "@/lib/csv";
-import { Round4Allocation, useSaveAllocation } from "@/hooks/useBallot";
+import { Round5Ballot, useSaveRound5Allocation } from "@/hooks/useBallotRound5";
 import { useBallotContext } from "./provider";
 import { useMetricIds } from "@/hooks/useMetrics";
 import mixpanel from "@/lib/mixpanel";
+import { CategoryId, Round5Allocation } from "@/hooks/useBallot";
+import { useBallotRound5Context } from "./provider5";
+import { categoryIds } from "@/app/ballot/page";
 
 export function ImportBallotDialog({
   isOpen,
@@ -39,9 +42,9 @@ export function ImportBallotDialog({
 }
 
 function ImportBallotButton() {
-  const save = useSaveAllocation();
-  const editor = useBallotContext();
-  const { data: metricIds } = useMetricIds();
+  const save = useSaveRound5Allocation();
+  const editor = useBallotRound5Context();
+  // const { data: metricIds } = useMetricIds();
 
   const ref = useRef<HTMLInputElement>(null);
 
@@ -49,15 +52,15 @@ function ImportBallotButton() {
     (csvString: string) => {
       console.log("import csv");
       // Parse CSV and build the ballot data (remove name column)
-      const { data } = parse<Round4Allocation>(csvString);
+      const { data } = parse<Round5Allocation>(csvString);
       const allocations = data
-        .map(({ metric_id, allocation, locked }) => ({
-          metric_id,
+        .map(({ category_slug, allocation, locked }) => ({
+          category_slug,
           allocation: Number(allocation),
           // Only the string "true" and "1" will be matched as locked
           locked: ["true", "1"].includes(String(locked)) ? true : false,
         }))
-        .filter((m) => metricIds?.includes(m.metric_id));
+        // .filter((m) => metricIds?.includes(m.category_slug));
 
       if (allocations.length !== data.length) {
         alert(
@@ -71,7 +74,7 @@ function ImportBallotButton() {
 
       allocations.forEach((allocation) => save.mutate(allocation));
     },
-    [metricIds, editor]
+    [editor]
   );
 
   return (
@@ -99,21 +102,21 @@ function ImportBallotButton() {
 }
 
 function ExportBallotButton() {
-  const emptyBallot = [
-    { metric_id: "trusted_daily_active_users", allocation: 0, locked: false },
+  const emptyBallot: Round5Allocation[] = [
+    { category_slug: 'ETHEREUM_CORE_CONTRIBUTIONS', allocation: 0, locked: false },
   ];
 
   return (
-    <Button variant="outline" onClick={() => exportBallot(emptyBallot)}>
+    <Button variant="outline" onClick={() => exportRound5Ballot(emptyBallot)}>
       Download ballot template
     </Button>
   );
 }
 
-export function exportBallot(ballot: Round4Allocation[]) {
+export function exportRound5Ballot(ballot: Round5Allocation[]) {
   const csv = format(
     ballot.map((alloc) => ({
-      metric_id: alloc.metric_id,
+      category_slug: alloc.category_slug,
       allocation: alloc.allocation,
       locked: alloc.locked,
     })),

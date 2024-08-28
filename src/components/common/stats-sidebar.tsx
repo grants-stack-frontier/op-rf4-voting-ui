@@ -18,7 +18,7 @@ import {ProjectAllocation} from "@/hooks/useMetrics";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from "@/components/ui/tooltip";
 import {Button} from "../ui/button";
 import {Separator} from "../ui/separator";
-import {Allocation} from "@/hooks/useBallot";
+import {Round4Allocation} from "@/hooks/useBallot";
 import {MetricNameFromId} from "../metrics/metric-name-from-id";
 import {Skeleton} from "../ui/skeleton";
 import {ManualDialog} from "./manual-dialog";
@@ -145,7 +145,7 @@ function MetricPopover({
                            onOpenManual,
                        }: {
     is_os: boolean;
-    list?: Allocation[];
+    list?: Round4Allocation[];
     onOpenManual: () => void;
 }) {
     if (!list?.length) return null;

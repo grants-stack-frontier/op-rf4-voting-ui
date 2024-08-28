@@ -99,7 +99,7 @@ export function useBallot(address?: string) {
   });
 }
 
-export function useSaveAllocation() {
+export function useSaveRound5Allocation() {
   const { toast } = useToast();
   const { address } = useAccount();
 
@@ -115,10 +115,10 @@ export function useSaveAllocation() {
 
   return useMutation({
     mutationKey: ["save-ballot"],
-    mutationFn: async (allocation: Round4Allocation) => {
+    mutationFn: async (allocation: Round5Allocation) => {
       return request
-        .post(`${agoraRoundsAPI}/ballots/${address}/impactMetrics`, {
-          json: { ...allocation, metric_id: allocation["metric_id"] },
+        .post(`${agoraRoundsAPI}/ballots/${address}/categories`, {
+          json: { ...allocation, category_slug: allocation["category_slug"] },
         })
         .json<Round4Ballot[]>()
         .then((r) => {
@@ -129,64 +129,6 @@ export function useSaveAllocation() {
     // onSuccess: debounceToast,
     onError: () =>
       toast({ variant: "destructive", title: "Error saving ballot" }),
-  });
-}
-
-export function useRemoveAllocation() {
-  const { toast } = useToast();
-  const { address } = useAccount();
-
-  const queryClient = useQueryClient();
-
-  const debounceToast = useRef(
-    debounce(
-      () => toast({ title: "Your ballot is saved automatically" }),
-      2000,
-      { leading: true, trailing: false }
-    )
-  ).current;
-  return useMutation({
-    mutationKey: ["save-ballot", "remove"],
-    mutationFn: async (id: string) => {
-      return request
-        .delete(`${agoraRoundsAPI}/ballots/${address}/impactMetrics/${id}`)
-        .json()
-        .then(() =>
-          queryClient.invalidateQueries({ queryKey: ["ballot", address] })
-        );
-    },
-    onSuccess: debounceToast,
-    onError: () =>
-      toast({ variant: "destructive", title: "Error saving ballot" }),
-  });
-}
-
-export const MAX_MULTIPLIER_VALUE = 3.0;
-export function useOsMultiplier() {
-  const { toast } = useToast();
-  const { address } = useAccount();
-  const queryClient = useQueryClient();
-  const debouncedCall = useRef(
-    debounce(
-      (amount: number) =>
-        request
-          .post(
-            `${agoraRoundsAPI}/ballots/${address}/osMultiplier/${amount}`,
-            {}
-          )
-          .json<Round4Ballot[]>()
-          .then(([ballot]) =>
-            queryClient.setQueryData(["ballot", address], ballot)
-          ),
-
-      2000,
-      { leading: false, trailing: true }
-    )
-  ).current;
-  return useMutation({
-    mutationFn: async (amount: number) => debouncedCall(amount),
-    onError: () =>
-      toast({ variant: "destructive", title: "Error updating multiplier" }),
   });
 }
 
@@ -226,11 +168,24 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
   });
 }
 
-export function useIsSavingBallot() {
+export function useDistributionMethod(params: { distribution_method: string }) {
+  const { distribution_method } = params;
+  const { address } = useAccount();
+  return useQuery({
+    enabled: Boolean(address),
+    queryKey: ["distribution-method", address],
+    queryFn: async () =>
+      request.post(`${agoraRoundsAPI}/ballots/${address}/distribution_method`, {
+        json: { distribution_method },
+      }).json(),
+  });
+}
+
+export function useIsSavingRound5Ballot() {
   return Boolean(useIsMutating({ mutationKey: ["save-ballot"] }));
 }
 
-export function useBallotWeightSum() {
+export function useRound5BallotWeightSum() {
   const { ballot } = useBallotContext();
   return Math.round(
     ballot?.allocations.reduce((sum, x) => (sum += Number(x.allocation)), 0) ??

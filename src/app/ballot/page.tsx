@@ -9,11 +9,15 @@ import { ComponentProps, useEffect, useState } from "react";
 import { SubmitDialog, downloadImage } from "@/components/ballot/submit-dialog";
 import { MetricsEditor } from "../../components/metrics-editor";
 import {
+  CategoryId,
   MAX_MULTIPLIER_VALUE,
+  Round5Allocation,
+  Round5ProjectAllocation,
   useBallot,
   useBallotWeightSum,
   useIsSavingBallot,
   useOsMultiplier,
+  useRound5Ballot,
 } from "@/hooks/useBallot";
 import { Metric, ProjectAllocation, useMetricsByRound } from "@/hooks/useMetrics";
 import { Separator } from "@/components/ui/separator";
@@ -34,6 +38,10 @@ import { votingEndDate } from "@/config";
 import { useVotingTimeLeft } from "@/components/voting-ends-in";
 import { SearchInput } from "@/components/common/search-input";
 import Link from "next/link";
+import { useProjects, useProjectsByCategory } from "@/hooks/useProjects";
+import { useBallotRound5Context } from "@/components/ballot/provider5";
+import { SubmitRound5Dialog } from "@/components/ballot/submit-dialog5";
+import { useIsSavingRound5Ballot, useRound5BallotWeightSum } from "@/hooks/useBallotRound5";
 
 function formatAllocationOPAmount(amount: number) {
   const value = amount.toString()
@@ -62,46 +70,46 @@ const impactScores: { [key: number]: string } = {
 
 const totalAllocationAmount = 3_333_333;
 
-const projects: ProjectAllocation[] = [
+const projects: Round5ProjectAllocation[] = [
   {
+    position: 0,
     allocation: 0,
+    impact: 0,
     image: "https://via.placeholder.com/150",
     name: "Project name 1",
-    is_os: true,
     project_id: "1",
-    allocations_per_metric: undefined,
   },
   {
+    position: 0,
     allocation: 0,
+    impact: 0,
     image: "https://via.placeholder.com/150",
     name: "Project name 2",
-    is_os: true,
     project_id: "1",
-    allocations_per_metric: undefined,
   },
   {
+    position: 0,
     allocation: 0,
+    impact: 0,
     image: "https://via.placeholder.com/150",
     name: "Project name 3",
-    is_os: true,
     project_id: "1",
-    allocations_per_metric: undefined,
   },
   {
+    position: 0,
     allocation: 0,
+    impact: 0,
     image: "https://via.placeholder.com/150",
     name: "Project name 4",
-    is_os: true,
     project_id: "1",
-    allocations_per_metric: undefined,
   },
   {
+    position: 0,
     allocation: 0,
+    impact: 0,
     image: "https://via.placeholder.com/150",
     name: "Project name 5",
-    is_os: true,
     project_id: "1",
-    allocations_per_metric: undefined,
   },
 ]
 
@@ -120,35 +128,47 @@ function CheckBallotState() {
   console.log("Ballot Data from new API:", {ballot});
   const { state } = useBallotContext();
   // Comment out for local dev if needed
-  if (isPending) {
-    return <Skeleton className="p-6 h-96" />;
-  }
-  if (!address && !isConnecting) {
-    return <NonBadgeholder />;
-  }
-  const isEmptyBallot = !Object.keys(state).length;
-  if (isEmptyBallot) {
-    return <EmptyBallot />;
-  }
+  // if (isPending) {
+  //   return <Skeleton className="p-6 h-96" />;
+  // }
+  // if (!address && !isConnecting) {
+  //   return <NonBadgeholder />;
+  // }
+  // const isEmptyBallot = !Object.keys(state).length;
+  // if (isEmptyBallot) {
+  //   return <EmptyBallot />;
+  // }
   // ^^^Comment out for local dev if needed
   return <YourBallot />;
+}
+
+export const categoryIds: CategoryId[] = [
+  'ETHEREUM_CORE_CONTRIBUTIONS',
+  'OP_STACK_RESEARCH_AND_DEVELOPMENT',
+  'OP_STACK_TOOLING'
+]
+
+const categoryNames: { [key: string]: string } = {
+  ETHEREUM_CORE_CONTRIBUTIONS: 'Ethereum Core Contributions',
+  OP_STACK_RESEARCH_AND_DEVELOPMENT: 'OP Stack Research and Development',
+  OP_STACK_TOOLING: 'OP Stack Tooling'
 }
 
 function YourBallot() {
   const [isSubmitting, setSubmitting] = useState(false);
   const metrics = useMetricsByRound(4);
-
-  const { ballot } = useBallotContext();
+  
+  const { ballot } = useBallotRound5Context();
 
   console.log({ballot});
 
-  const [projectList, setProjectList] = useState(ballot?.project_allocations || []);
+  const [projectList, setProjectList] = useState(projects || []);
 
   useEffect(() => {
-    setProjectList(ballot?.project_allocations || []);
+    setProjectList(projects || []);
   }, [ballot]);
 
-  const updateProjects = (newProjects: ProjectAllocation[]) => {
+  const updateProjects = (newProjects: Round5ProjectAllocation[]) => {
     setProjectList(newProjects);
   };
 
@@ -162,7 +182,7 @@ function YourBallot() {
   };
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredProjects, setFilteredProjects] = useState<ProjectAllocation[]>([]);
+  const [filteredProjects, setFilteredProjects] = useState<Round5ProjectAllocation[]>([]);
 
   useEffect(() => {
     if (searchTerm) {
@@ -211,6 +231,7 @@ function YourBallot() {
           </div>
         </Alert>
       )}
+      <p>Your voting category is <a href={`/budget/category/${categoryIds[0]}`} className="underline">{categoryNames[categoryIds[0]]}</a> ({projects.length} projects)</p>
       <Card className="p-6 space-y-8">
         <MetricsEditor
           metrics={metrics.data?.data as Metric[]}
@@ -300,7 +321,7 @@ function YourBallot() {
           })}
         </div>
 
-        <OpenSourceMultiplier initialValue={ballot?.os_multiplier} />
+        {/* <OpenSourceMultiplier initialValue={ballot?.os_multiplier} /> */}
 
         <div className="flex items-center gap-4">
           <BallotSubmitButton onClick={() => setSubmitting(true)} />
@@ -310,7 +331,12 @@ function YourBallot() {
         </div>
 
         {ballot?.address && (
-          <SubmitDialog
+          // <SubmitDialog
+          //   ballot={ballot!}
+          //   open={isSubmitting}
+          //   onOpenChange={() => setSubmitting(false)}
+          // />
+          <SubmitRound5Dialog
             ballot={ballot!}
             open={isSubmitting}
             onOpenChange={() => setSubmitting(false)}
@@ -412,7 +438,7 @@ function OpenSourceInput(props: ComponentProps<typeof Input>) {
 }
 
 function WeightsError() {
-  const allocationSum = useBallotWeightSum();
+  const allocationSum = useRound5BallotWeightSum();
 
   if (allocationSum === 100) return null;
 
@@ -424,7 +450,7 @@ function WeightsError() {
 }
 
 function IsSavingBallot() {
-  const isSavingBallot = useIsSavingBallot();
+  const isSavingBallot = useIsSavingRound5Ballot();
 
   return isSavingBallot ? (
     <span className="flex gap-2">

@@ -1,30 +1,28 @@
 "use client";
 import { useCallback, useMemo, useRef, useState } from "react";
 
-import { Round4Allocation } from "./useBallot";
+import { CategoryId, Round4Allocation, Round5Allocation } from "./useBallot";
 import { createSortFn, useMetricsByRound } from "./useMetrics";
 import { useBallotFilter } from "./useFilter";
 import { useBallotContext } from "@/components/ballot/provider";
 import debounce from "lodash.debounce";
 
-export type BallotState = Record<
+export type BallotRound5State = Record<
   string,
   { allocation: number; locked: boolean }
 >;
 
-export function useBallotEditor({
-  onRemove,
+export function useBallotRound5Editor({
   onUpdate,
 }: {
-  onRemove?: (id: string) => void;
-  onUpdate?: (allocation: Round4Allocation) => void;
+  onUpdate?: (allocation: Round5Allocation) => void;
 }) {
-  const [state, setState] = useState<BallotState>({});
+  const [state, setState] = useState<BallotRound5State>({});
 
   const debouncedUpdate = useRef(
     debounce(
-      (id: string, state: BallotState) =>
-        onUpdate?.({ ...state[id], metric_id: id }),
+      (id: CategoryId, state: BallotRound5State) =>
+        onUpdate?.({ ...state[id], category_slug: id }),
       200,
       {
         leading: false,
@@ -33,10 +31,10 @@ export function useBallotEditor({
     )
   ).current;
   const setInitialState = useCallback(
-    (allocations: Round4Allocation[] = []) => {
-      const ballot: BallotState = Object.fromEntries(
+    (allocations: Round5Allocation[] = []) => {
+      const ballot: BallotRound5State = Object.fromEntries(
         allocations.map((m) => [
-          m.metric_id,
+          m.category_slug,
           { allocation: m.allocation, locked: Boolean(m.locked) },
         ])
       );
@@ -45,7 +43,7 @@ export function useBallotEditor({
     [setState]
   );
 
-  const set = (id: string, amount: number, unlock: boolean = false) => {
+  const set = (id: CategoryId, amount: number, unlock: boolean = false) => {
     setState((s) => {
       // Must be between 0 - 100
       const allocation = Math.max(Math.min(amount || 0, 100), 0);
@@ -60,11 +58,11 @@ export function useBallotEditor({
       return _state;
     });
   };
-  const inc = (id: string) =>
+  const inc = (id: CategoryId) =>
     set(id, Math.floor((state[id]?.allocation ?? 0) + 1));
-  const dec = (id: string) =>
+  const dec = (id: CategoryId) =>
     set(id, Math.ceil((state[id]?.allocation ?? 0) - 1));
-  const add = (id: string, allocation = 0) => {
+  const add = (id: CategoryId, allocation = 0) => {
     const _state = calculateBalancedAmounts({
       ...state,
       [id]: { ...state[id], allocation, locked: false },
@@ -72,18 +70,12 @@ export function useBallotEditor({
 
     set(id, _state[id].allocation, true);
   };
-  const remove = (id: string) =>
-    setState((s) => {
-      const { [id]: _remove, ..._state } = s;
-      onRemove?.(id);
-      return calculateBalancedAmounts(_state);
-    });
   const reset = setInitialState;
 
-  return { set, inc, dec, add, remove, reset, state };
+  return { set, inc, dec, add, reset, state };
 }
 
-function calculateBalancedAmounts(state: BallotState): BallotState {
+function calculateBalancedAmounts(state: BallotRound5State): BallotRound5State {
   // Autobalance non-locked fields
   const locked = Object.entries(state).filter(([_, m]) => m.locked);
   const nonLocked = Object.entries(state).filter(([_, m]) => !m.locked);
@@ -106,7 +98,7 @@ function calculateBalancedAmounts(state: BallotState): BallotState {
   );
 }
 
-export function useSortBallot(initialState: BallotState) {
+export function useSortBallot(initialState: BallotRound5State) {
   const { state } = useBallotContext();
   const { data, isPending } = useMetricsByRound(4);
   const [filter, setFilter] = useBallotFilter();
