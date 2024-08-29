@@ -24,11 +24,11 @@ Live and stable.
 - **proposals**: Proposal data
 - **votes**: Vote data
 - **contracts**: Data for the current onchain contracts
+- **projects** Round 5 Projects with mock data
+- **RetroFundingBallots** Round 5 Ballots with mock data
 
 Not Live.
 - **Round 5**: Data related to Retro Funding for Optimism Round 5
-- 0.2.0: **projects** Round 5 Projects with mock data
-- 0.2.1: **RetroFundingBallots** Round 5 Ballots with mock data
 - 0.2.2: **DistributionStrategies** Round 5 Distribution strategies with mock data
 - 0.2.3: Round 5 Production release with real data
 
@@ -42,10 +42,10 @@ Not Live.
 | OP 0.1.3 | LIVE   | July 31th |
 |----------|---------|---------------|
 | OP 0.2.0 | LIVE   | Aug 10th |
-| OP 0.2.1 | ON TRACK   | Aug 23th |
+| OP 0.2.1 | LIVE   | Aug 26th |
 | OP 0.2.2 | ON TRACK   | Aug 30th |
 | OP 0.2.3 | ON TRACK   | Sep 20th |
- * OpenAPI spec version: 0.1.3
+ * OpenAPI spec version: 0.2.1
  */
 import type {
   AddImpactMetricToRetroFundingBallotBody,
@@ -90,7 +90,6 @@ import type {
   UpdateImpactMetricCommentBody,
   UpdateRetroFundingBallotDistributionMethodBody,
   UpdateRetroFundingRoundCategoryAllocationBody,
-  UpdateRetroFundingRoundProjectByIdBody,
   VotingToken
 } from './agora.schemas'
 import { customFetch } from '../../lib/custom-fetch';
@@ -695,16 +694,16 @@ export type getRetroFundingRoundBallotByIdResponse = {
 }
 
 export const getGetRetroFundingRoundBallotByIdUrl = (roundId: number,
-    ballotCasterAddressOrEns: string,) => {
+    addressOrEnsName: string,) => {
 
 
-  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}`
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}`
 }
 
 export const getRetroFundingRoundBallotById = async (roundId: number,
-    ballotCasterAddressOrEns: string, options?: RequestInit): Promise<getRetroFundingRoundBallotByIdResponse> => {
+    addressOrEnsName: string, options?: RequestInit): Promise<getRetroFundingRoundBallotByIdResponse> => {
   
-  return customFetch<Promise<getRetroFundingRoundBallotByIdResponse>>(getGetRetroFundingRoundBallotByIdUrl(roundId,ballotCasterAddressOrEns),
+  return customFetch<Promise<getRetroFundingRoundBallotByIdResponse>>(getGetRetroFundingRoundBallotByIdUrl(roundId,addressOrEnsName),
   {      
     ...options,
     method: 'GET'
@@ -726,18 +725,18 @@ export type updateRetroFundingBallotOSOnlyResponse = {
 }
 
 export const getUpdateRetroFundingBallotOSOnlyUrl = (roundId: number,
-    ballotCasterAddressOrEns: string,
+    addressOrEnsName: string,
     osOnly: boolean,) => {
 
 
-  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}/osOnly/${osOnly}`
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/osOnly/${osOnly}`
 }
 
 export const updateRetroFundingBallotOSOnly = async (roundId: number,
-    ballotCasterAddressOrEns: string,
+    addressOrEnsName: string,
     osOnly: boolean, options?: RequestInit): Promise<updateRetroFundingBallotOSOnlyResponse> => {
   
-  return customFetch<Promise<updateRetroFundingBallotOSOnlyResponse>>(getUpdateRetroFundingBallotOSOnlyUrl(roundId,ballotCasterAddressOrEns,osOnly),
+  return customFetch<Promise<updateRetroFundingBallotOSOnlyResponse>>(getUpdateRetroFundingBallotOSOnlyUrl(roundId,addressOrEnsName,osOnly),
   {      
     ...options,
     method: 'POST'
@@ -758,17 +757,17 @@ export type submitRetroFundingBallotResponse = {
 }
 
 export const getSubmitRetroFundingBallotUrl = (roundId: number,
-    ballotCasterAddressOrEns: string,) => {
+    addressOrEnsName: string,) => {
 
 
-  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}/submit`
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/submit`
 }
 
 export const submitRetroFundingBallot = async (roundId: number,
-    ballotCasterAddressOrEns: string,
+    addressOrEnsName: string,
     submitRetroFundingBallotBody: SubmitRetroFundingBallotBody, options?: RequestInit): Promise<submitRetroFundingBallotResponse> => {
   
-  return customFetch<Promise<submitRetroFundingBallotResponse>>(getSubmitRetroFundingBallotUrl(roundId,ballotCasterAddressOrEns),
+  return customFetch<Promise<submitRetroFundingBallotResponse>>(getSubmitRetroFundingBallotUrl(roundId,addressOrEnsName),
   {      
     ...options,
     method: 'POST',
@@ -862,17 +861,17 @@ export type addImpactMetricToRetroFundingBallotResponse = {
 }
 
 export const getAddImpactMetricToRetroFundingBallotUrl = (roundId: number,
-    ballotCasterAddressOrEns: string,) => {
+    addressOrEnsName: string,) => {
 
 
-  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}/impactMetrics`
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/impactMetrics`
 }
 
 export const addImpactMetricToRetroFundingBallot = async (roundId: number,
-    ballotCasterAddressOrEns: string,
+    addressOrEnsName: string,
     addImpactMetricToRetroFundingBallotBody: AddImpactMetricToRetroFundingBallotBody, options?: RequestInit): Promise<addImpactMetricToRetroFundingBallotResponse> => {
   
-  return customFetch<Promise<addImpactMetricToRetroFundingBallotResponse>>(getAddImpactMetricToRetroFundingBallotUrl(roundId,ballotCasterAddressOrEns),
+  return customFetch<Promise<addImpactMetricToRetroFundingBallotResponse>>(getAddImpactMetricToRetroFundingBallotUrl(roundId,addressOrEnsName),
   {      
     ...options,
     method: 'POST',
@@ -885,44 +884,114 @@ export const addImpactMetricToRetroFundingBallot = async (roundId: number,
 
 
 /**
- * Updates a specific project for a specific RetroFunding round.
+ * Updates a specific project for a specific RetroFunding round on Agora. Allocation is a percentage of total allocation for the round.
 
- * @summary Updates a specific project in ballot for a RetroFunding round
+ * @summary Updates allocation for a specific project for a RetroFunding round
  */
-export type updateRetroFundingRoundProjectByIdResponse = {
+export type updateRetroFundingRoundProjectAllocationResponse = {
   data: Round5Ballot;
   status: number;
 }
 
-export const getUpdateRetroFundingRoundProjectByIdUrl = (roundId: number,
-    addressOrEnsName: string,
-    projectId: string,) => {
-
-
-  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/projects/${projectId}`
-}
-
-export const updateRetroFundingRoundProjectById = async (roundId: number,
+export const getUpdateRetroFundingRoundProjectAllocationUrl = (roundId: number,
     addressOrEnsName: string,
     projectId: string,
-    updateRetroFundingRoundProjectByIdBody: UpdateRetroFundingRoundProjectByIdBody, options?: RequestInit): Promise<updateRetroFundingRoundProjectByIdResponse> => {
+    allocation: string,) => {
+
+
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/projects/${projectId}/allocation/${allocation}`
+}
+
+export const updateRetroFundingRoundProjectAllocation = async (roundId: number,
+    addressOrEnsName: string,
+    projectId: string,
+    allocation: string, options?: RequestInit): Promise<updateRetroFundingRoundProjectAllocationResponse> => {
   
-  return customFetch<Promise<updateRetroFundingRoundProjectByIdResponse>>(getUpdateRetroFundingRoundProjectByIdUrl(roundId,addressOrEnsName,projectId),
+  return customFetch<Promise<updateRetroFundingRoundProjectAllocationResponse>>(getUpdateRetroFundingRoundProjectAllocationUrl(roundId,addressOrEnsName,projectId,allocation),
   {      
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(
-      updateRetroFundingRoundProjectByIdBody,)
+    method: 'POST'
+    
+    
   }
 );}
 
 
 
 /**
- * Updates a specific project for a specific RetroFunding round on Agora.
+ * Updates a specific project for a specific RetroFunding round on Agora. Impact is a number from 0 to 5. 0 - Conflict of Interest 1 - Very Low 2 - Low 3 - Medium 4 - High 5 - Very High
 
- * @summary Updates a specific allocation for a RetroFunding round
+ * @summary Updates impact for a specific project for a RetroFunding round
+ */
+export type updateRetroFundingRoundProjectImpactResponse = {
+  data: Round5Ballot;
+  status: number;
+}
+
+export const getUpdateRetroFundingRoundProjectImpactUrl = (roundId: number,
+    addressOrEnsName: string,
+    projectId: string,
+    impact: number,) => {
+
+
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/projects/${projectId}/impact/${impact}`
+}
+
+export const updateRetroFundingRoundProjectImpact = async (roundId: number,
+    addressOrEnsName: string,
+    projectId: string,
+    impact: number, options?: RequestInit): Promise<updateRetroFundingRoundProjectImpactResponse> => {
+  
+  return customFetch<Promise<updateRetroFundingRoundProjectImpactResponse>>(getUpdateRetroFundingRoundProjectImpactUrl(roundId,addressOrEnsName,projectId,impact),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+/**
+ * Updates a specific project for a specific RetroFunding round on Agora. Postion is an integer of the project's rank.
+
+ * @summary Updates position for a specific project for a RetroFunding round
+ */
+export type updateRetroFundingRoundProjectPositionResponse = {
+  data: Round5Ballot;
+  status: number;
+}
+
+export const getUpdateRetroFundingRoundProjectPositionUrl = (roundId: number,
+    addressOrEnsName: string,
+    projectId: string,
+    position: number,) => {
+
+
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/projects/${projectId}/position/${position}`
+}
+
+export const updateRetroFundingRoundProjectPosition = async (roundId: number,
+    addressOrEnsName: string,
+    projectId: string,
+    position: number, options?: RequestInit): Promise<updateRetroFundingRoundProjectPositionResponse> => {
+  
+  return customFetch<Promise<updateRetroFundingRoundProjectPositionResponse>>(getUpdateRetroFundingRoundProjectPositionUrl(roundId,addressOrEnsName,projectId,position),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+/**
+ * Updates a category allocation and lock status for a specific ballot for a RetroFunding round on Agora.
+
+ * @summary Updates a category allocation for a specific RetroFunding ballot
  */
 export type updateRetroFundingRoundCategoryAllocationResponse = {
   data: Round5Ballot;
@@ -930,19 +999,17 @@ export type updateRetroFundingRoundCategoryAllocationResponse = {
 }
 
 export const getUpdateRetroFundingRoundCategoryAllocationUrl = (roundId: number,
-    addressOrEnsName: string,
-    categoryId: string,) => {
+    addressOrEnsName: string,) => {
 
 
-  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/categories/${categoryId}`
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/categories`
 }
 
 export const updateRetroFundingRoundCategoryAllocation = async (roundId: number,
     addressOrEnsName: string,
-    categoryId: string,
     updateRetroFundingRoundCategoryAllocationBody: UpdateRetroFundingRoundCategoryAllocationBody, options?: RequestInit): Promise<updateRetroFundingRoundCategoryAllocationResponse> => {
   
-  return customFetch<Promise<updateRetroFundingRoundCategoryAllocationResponse>>(getUpdateRetroFundingRoundCategoryAllocationUrl(roundId,addressOrEnsName,categoryId),
+  return customFetch<Promise<updateRetroFundingRoundCategoryAllocationResponse>>(getUpdateRetroFundingRoundCategoryAllocationUrl(roundId,addressOrEnsName),
   {      
     ...options,
     method: 'POST',
@@ -998,18 +1065,18 @@ export type removeImpactMetricFromRetroFundingBallotResponse = {
 }
 
 export const getRemoveImpactMetricFromRetroFundingBallotUrl = (roundId: number,
-    ballotCasterAddressOrEns: string,
+    addressOrEnsName: string,
     impactMetricId: string,) => {
 
 
-  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${ballotCasterAddressOrEns}/impactMetrics/${impactMetricId}`
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/impactMetrics/${impactMetricId}`
 }
 
 export const removeImpactMetricFromRetroFundingBallot = async (roundId: number,
-    ballotCasterAddressOrEns: string,
+    addressOrEnsName: string,
     impactMetricId: string, options?: RequestInit): Promise<removeImpactMetricFromRetroFundingBallotResponse> => {
   
-  return customFetch<Promise<removeImpactMetricFromRetroFundingBallotResponse>>(getRemoveImpactMetricFromRetroFundingBallotUrl(roundId,ballotCasterAddressOrEns,impactMetricId),
+  return customFetch<Promise<removeImpactMetricFromRetroFundingBallotResponse>>(getRemoveImpactMetricFromRetroFundingBallotUrl(roundId,addressOrEnsName,impactMetricId),
   {      
     ...options,
     method: 'DELETE'

@@ -1,18 +1,17 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { Card } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { Heading } from "../ui/headings";
-import { Button } from "../ui/button";
-import Link from "next/link";
-import Image from "next/image";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "../ui/button";
+import { Heading } from "../ui/headings";
 
 export function WelcomeCarousel({
   slides,
@@ -66,7 +65,7 @@ export function WelcomeCarousel({
       />
 
       {current === count ? (
-        <Link href={"/ballot/metrics"}>
+        <Link href={"/home/budget"}>
           <Button variant={"destructive"}>Let&apos;s go!</Button>
         </Link>
       ) : (

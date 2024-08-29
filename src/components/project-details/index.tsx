@@ -6,6 +6,7 @@ import { CircleDollarSign, Clock3, GitFork, Github, Link2, Star, User } from "lu
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "../../../public/logo.png";
+import { AvatarCarousel } from "../common/avatar-carousel";
 import { Mirror } from "../common/mirror";
 import { Warpcast } from "../common/warpcast";
 import { X } from "../common/x";
@@ -16,9 +17,7 @@ import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
 
 export function ProjectDetails({ data, isPending }: { data?: Project; isPending: boolean }) {
-	console.log({ data });
-	const { id, profileAvatarUrl, name, projectCoverImageUrl, description, socialLinks, category, github, links, grantsAndFunding, contracts } = data ?? {};
-	console.log({ github });
+	const { id, profileAvatarUrl, name, projectCoverImageUrl, description, socialLinks, category, github, links, grantsAndFunding, contracts, team } = data ?? {};
 	const { twitter, farcaster, mirror, website } = socialLinks ?? {};
 	return (
 		<section className="space-y-16">
@@ -38,6 +37,11 @@ export function ProjectDetails({ data, isPending }: { data?: Project; isPending:
 							<div className="w-full h-56">
 								<Image className="rounded-md" src={projectCoverImageUrl} alt={name || ''} width={720} height={180} />
 								<Image className="rounded-md -mt-10 ml-6" src={profileAvatarUrl} alt={name || ''} width={80} height={80} />
+							</div>
+						)}
+						{profileAvatarUrl && (
+							<div className="w-full">
+								<Image className="rounded-md" src={profileAvatarUrl} alt={name || ''} width={80} height={80} />
 							</div>
 						)}
 						<Heading variant="h2">{name}</Heading>
@@ -99,12 +103,15 @@ export function ProjectDetails({ data, isPending }: { data?: Project; isPending:
 								</Link>
 							)}
 						</div>
-						<Badge
-							variant={null}
-							className="cursor-pointer border-0 bg-blue-500/25 text-blue-600 font-medium"
-						>
-							{category?.replace(/_/g, ' ')}
-						</Badge>
+						<div className="flex items-center gap-2">
+							<Badge
+								variant={null}
+								className="cursor-pointer border-0 bg-blue-500/25 text-blue-600 font-medium"
+							>
+								{category?.replace(/_/g, ' ')}
+							</Badge>
+							<AvatarCarousel images={team?.map((member: any) => member.pfp_url) ?? []} name={name ?? ''} />
+						</div>
 						<p className="font-medium">Repos, links and contracts</p>
 						{github && (
 							<>

@@ -47,7 +47,19 @@ const nextConfig = {
 			},
 			{
 				protocol: 'https',
-				hostname: 'storage.googleapis.com',
+				hostname: 'content.optimism.io',
+				port: '',
+				pathname: '/**',
+			},
+			{
+				protocol: 'https',
+				hostname: 'i.imgur.com',
+				port: '',
+				pathname: '/**',
+			},
+			{
+				protocol: 'https',
+				hostname: 'imagedelivery.net',
 				port: '',
 				pathname: '/**',
 			},
