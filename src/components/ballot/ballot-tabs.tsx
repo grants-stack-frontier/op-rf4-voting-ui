@@ -3,16 +3,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Separator } from "../ui/separator";
 
 const tabs = [
+  {
+    children: "Budget",
+    href: "/budget",
+  },
   {
     children: "Ballot",
     href: "/ballot",
   },
-  {
-    children: "Metrics",
-    href: "/ballot/metrics",
-  },
+  // {
+  //   children: "Metrics",
+  //   href: "/ballot/metrics",
+  // },
 ];
 
 export function BallotTabs() {
@@ -21,6 +26,8 @@ export function BallotTabs() {
   return (
     <section className="flex gap-6 text-2xl">
       {tabs.map((tab, i) => (
+        <>
+        {i != 0 && <Separator orientation="vertical" className="h-8 text-gray-400 w-[2px]" />}
         <Link
           key={i}
           className={cn("text-gray-400 font-semibold", {
@@ -28,6 +35,7 @@ export function BallotTabs() {
           })}
           {...tab}
         />
+        </>
       ))}
     </section>
   );
