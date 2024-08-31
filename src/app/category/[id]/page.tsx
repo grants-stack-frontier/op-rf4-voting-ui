@@ -29,7 +29,7 @@ export default function CategoryDetailsPage({ params: { id = "" } }) {
 						<BreadcrumbSeparator />
 						<BreadcrumbItem>
 							<BreadcrumbLink asChild>
-								<Link href="/budget/category">Category</Link>
+								<Link href={`/category/${id}`}>Category</Link>
 							</BreadcrumbLink>
 						</BreadcrumbItem>
 					</BreadcrumbList>

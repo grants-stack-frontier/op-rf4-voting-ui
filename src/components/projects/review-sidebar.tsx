@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button"
 import {
 	Card,
@@ -8,11 +7,30 @@ import {
 	CardTitle
 } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import React from "react"
 import { Progress } from "../ui/progress"
 
 type CardProps = React.ComponentProps<typeof Card>
 
-export function ReviewSidebar({ className, ...props }: CardProps) {
+type Score = 0 | 1 | 2 | 3 | 4 | 5 | "Skip"
+
+interface ReviewSidebarProps extends CardProps {
+	onScoreSelect: (score: Score) => void
+	projectsScored: number
+	totalProjects: number
+}
+
+export function ReviewSidebar({ className, onScoreSelect, projectsScored, totalProjects, ...props }: ReviewSidebarProps) {
+	const scores: [Score, string][] = [
+		[5, "Very High"],
+		[4, "High"],
+		[3, "Medium"],
+		[2, "Low"],
+		[1, "Very Low"],
+		[0, "Conflict of interest"],
+		["Skip", "Skip"]
+	]
+
 	return (
 		<Card className={cn("w-[304px] h-[560px]", className)} {...props}>
 			<CardHeader>
@@ -20,18 +38,20 @@ export function ReviewSidebar({ className, ...props }: CardProps) {
 			</CardHeader>
 			<CardContent className="grid gap-4">
 				<div className="flex flex-col gap-2">
-					<Button variant="outline">Very High</Button>
-					<Button variant="outline">High</Button>
-					<Button variant="outline">Medium</Button>
-					<Button variant="outline">Low</Button>
-					<Button variant="outline">Very Low</Button>
-					<Button variant="outline">Conflict of interest</Button>
-					<Button variant="ghost">Skip</Button>
+					{scores.map(([score, label]) => (
+						<Button
+							key={label}
+							variant={score === "Skip" ? "link" : "outline"}
+							onClick={() => onScoreSelect(score)}
+						>
+							{label}
+						</Button>
+					))}
 				</div>
 			</CardContent>
 			<CardFooter className="flex flex-col gap-3">
-				<Progress value={0} />
-				<p className="text-sm text-muted-foreground">You&apos;ve scored 0 out of 20 projects</p>
+				<Progress value={(projectsScored / totalProjects) * 100} />
+				<p className="text-sm text-muted-foreground">You&apos;ve scored {projectsScored} out of {totalProjects} projects</p>
 			</CardFooter>
 		</Card>
 	)

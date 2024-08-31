@@ -1,29 +1,28 @@
 "use client";
-import { BallotTabs } from "@/components/ballot/ballot-tabs";
+import { BudgetTabs } from "@/components/budget/budget-tabs";
 import { PageView } from "@/components/common/page-view";
 import { Badge } from "@/components/ui/badge";
-import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbLink,
-	BreadcrumbList,
-	BreadcrumbSeparator
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useCategories } from "@/hooks/useCategories";
-import { ChevronRight, LockKeyholeOpen, Minus, Plus, RotateCw, Tally1 } from "lucide-react";
+import { useProjects } from "@/hooks/useProjects";
+import { ChevronRight, LockKeyholeOpen, Minus, Plus, RotateCw } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function BudgetBallotPage() {
 	const categories = useCategories();
+	const { data: projects, isPending } = useProjects();
+	const projectCountByCategory = categories.data?.map(category => ({
+		type: category.id,
+		projectCount: projects?.filter(project => project.category === category.id).length
+	}));
 	return (
 		<>
 			<section className="flex-1 space-y-6">
-				<BallotTabs />
+				<BudgetTabs />
 				<p>Decide how much of the overall budget (10M OP) should go to each category. </p>
 				<Card>
 					<CardHeader>
@@ -42,7 +41,7 @@ export default function BudgetBallotPage() {
 									<Image src={category.image} alt={category.name} width={80} height={80} />
 									<div className="flex-1">
 										<Button variant="link" asChild>
-											<Link href={`/budget/category/${category.id}`} className="flex items-center gap-2">
+											<Link href={`/category/${category.id}`} className="flex items-center gap-2">
 												<span className="font-medium">{category.name}</span>
 												<ChevronRight className="h-4 w-4" />
 											</Link>
@@ -52,7 +51,7 @@ export default function BudgetBallotPage() {
 											variant="secondary"
 											className="cursor-pointer font-medium"
 										>
-											{category.projects?.length} project(s)
+											{projectCountByCategory?.find(project => project.type === category.id)?.projectCount} project(s)
 										</Badge>
 									</div>
 									<div className="flex flex-col items-center">

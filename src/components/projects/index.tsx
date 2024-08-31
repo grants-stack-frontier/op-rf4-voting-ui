@@ -110,7 +110,7 @@ export function ProjectDetails({ data, isPending }: { data?: Project; isPending:
 							>
 								{category?.replace(/_/g, ' ')}
 							</Badge>
-							<AvatarCarousel images={team?.map((member: any) => member.pfp_url) ?? []} name={name ?? ''} />
+							<AvatarCarousel images={team?.map((member: any) => ({ url: member.pfp_url, name: member.display_name })) ?? []} />
 						</div>
 						<p className="font-medium">Repos, links and contracts</p>
 						{github && (
