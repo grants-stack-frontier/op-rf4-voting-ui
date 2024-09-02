@@ -12,6 +12,7 @@ import {
 	BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import { useProjectsByCategory } from "@/hooks/useProjects";
+import { ProjectsScored, addScoredProject, clearProjectsScored, getProjectsScored } from "@/utils/localStorage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -24,9 +25,13 @@ export default function ProjectDetailsPage({ params, searchParams }: { params: {
 	const router = useRouter();
 	const { data: projects, isPending: isProjectsLoading } = useProjectsByCategory(category);
 	const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
-	const [projectsScored, setProjectsScored] = useState(0);
+	const [projectsScored, setProjectsScored] = useState<ProjectsScored>({ category, count: 0, votedIds: [] });
 	const [isUnlocked, setIsUnlocked] = useState(false);
 	const [isNextProjectLoading, setIsNextProjectLoading] = useState(false);
+	useEffect(() => {
+		setProjectsScored(getProjectsScored(category));
+	}, [category]);
+
 	useEffect(() => {
 		if (projects) {
 			const index = projects.findIndex(project => project.id === id);
@@ -38,16 +43,27 @@ export default function ProjectDetailsPage({ params, searchParams }: { params: {
 
 	const handleScoreSelect = (score: Score) => {
 		setIsNextProjectLoading(true);
-		if (score !== "Skip") {
-			setProjectsScored(prev => prev + 1);
+		let updatedProjectsScored = projectsScored;
+
+		if (score !== "Skip" && !projectsScored.votedIds.includes(id)) {
+			updatedProjectsScored = addScoredProject(category, id);
+			setProjectsScored(updatedProjectsScored);
 		}
-		const nextIndex = currentProjectIndex + 1;
-		if (projects && nextIndex < projects.length) {
-			const nextProjectId = projects[nextIndex].id;
-			router.push(`/project/${nextProjectId}?category=${category}`);
+
+		const totalProjects = projects?.length || 0;
+		const allProjectsScored = updatedProjectsScored.count === totalProjects;
+
+		if (allProjectsScored) {
+			setIsUnlocked(true);
+			clearProjectsScored(category);
+			setProjectsScored({ category, count: 0, votedIds: [] });
 			setIsNextProjectLoading(false);
 		} else {
-			setIsUnlocked(true);
+			const nextIndex = (currentProjectIndex + 1) % totalProjects;
+			const nextProjectId = projects?.[nextIndex].id;
+			if (nextProjectId) {
+				router.push(`/project/${nextProjectId}?category=${category}`);
+			}
 			setIsNextProjectLoading(false);
 		}
 	};
@@ -81,8 +97,9 @@ export default function ProjectDetailsPage({ params, searchParams }: { params: {
 			<aside>
 				<ReviewSidebar
 					onScoreSelect={handleScoreSelect}
-					projectsScored={projectsScored}
+					projectsScored={projectsScored.count}
 					totalProjects={projects?.length || 0}
+					isVoted={projectsScored.votedIds.includes(id)}
 				/>
 			</aside>
 		</>
