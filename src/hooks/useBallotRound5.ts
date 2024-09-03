@@ -16,22 +16,6 @@ import debounce from "lodash.debounce";
 import { useRef } from "react";
 import { useBallotContext } from "@/components/ballot/provider";
 
-export type Round4Ballot = {
-  address: string;
-  allocations: Round4Allocation[];
-  project_allocations: ProjectAllocation[];
-  updated_at: string;
-  published_at: string;
-  os_multiplier: number;
-  os_only: boolean;
-  status: "SUBMITTED";
-};
-export type Round4Allocation = {
-  metric_id: string;
-  allocation: number;
-  locked?: boolean;
-};
-
 export type CategoryId =
   | "ETHEREUM_CORE_CONTRIBUTIONS"
   | "OP_STACK_RESEARCH_AND_DEVELOPMENT"
@@ -58,44 +42,25 @@ export type Round5Ballot = {
   address: string;
   round_id: number;
   status: Round5BallotStatus;
-  created_at: string;
-  updated_at: string;
-  published_at: string;
-  catgory_allocation: Round5Allocation[];
-  projects_allocation: Round5ProjectAllocation[];
+  created_at?: string;
+  updated_at?: string;
+  published_at?: string;
+  category_allocations: Round5Allocation[];
+  projects_allocations: Round5ProjectAllocation[];
   projects_to_be_evaluated: string[];
   total_projects: number;
-  distribution_method: string;
+  distribution_method?: string;
 }
-
-export type Ballot<T extends 4 | 5> = T extends 4 ? Round4Ballot : Round5Ballot;
 
 export function useRound5Ballot(address?: string) {
   return useQuery({
     enabled: Boolean(address),
-    queryKey: ["ballot", address],
+    queryKey: ["ballot-round5", address],
     queryFn: async () =>
       request
         .get(`${agoraRoundsAPI}/ballots/${address}`)
-        .json<Round5Ballot[]>()
-        .then((r) => r?.[0] ?? null),
-  });
-}
-
-export function useBallot(address?: string) {
-  const { toast } = useToast();
-  return useQuery({
-    enabled: Boolean(address),
-    queryKey: ["ballot", address],
-    queryFn: async () =>
-      request
-        .get(`${agoraRoundsAPI}/ballots/${address}`)
-        .json<Round4Ballot[]>()
-        .then((r) => r?.[0] ?? null),
-    // .catch(() => {
-    //   toast({ variant: "destructive", title: "Error loading ballot" });
-    //   return null;
-    // }),
+        .json<Round5Ballot>()
+        .then((r) => r ?? null),
   });
 }
 
@@ -120,9 +85,9 @@ export function useSaveRound5Allocation() {
         .post(`${agoraRoundsAPI}/ballots/${address}/categories`, {
           json: { ...allocation, category_slug: allocation["category_slug"] },
         })
-        .json<Round4Ballot[]>()
+        .json<Round5Ballot[]>()
         .then((r) => {
-          queryClient.setQueryData(["ballot", address], r?.[0]);
+          queryClient.setQueryData(["ballot-round5", address], r?.[0]);
           return r;
         });
     },
@@ -135,18 +100,16 @@ export function useSaveRound5Allocation() {
 export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
   const { toast } = useToast();
   const { address } = useAccount();
-  const { refetch } = useBallot(address);
+  const { refetch } = useRound5Ballot(address);
   const { signMessageAsync } = useSignMessage();
   return useMutation({
     mutationFn: async () => {
       const { data: ballot } = await refetch();
-      const allocations = ballot?.allocations.map((alloc) => ({
-        [alloc.metric_id]: alloc.allocation,
+      const allocations = ballot?.category_allocations.map((alloc: any) => ({
+        [alloc.category_slug]: alloc.allocation,
       }));
       const ballot_content = {
         allocations,
-        os_only: ballot?.os_only,
-        os_multiplier: ballot?.os_multiplier,
       };
       const signature = await signMessageAsync({
         message: JSON.stringify(ballot_content),

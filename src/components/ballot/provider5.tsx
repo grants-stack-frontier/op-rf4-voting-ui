@@ -1,14 +1,9 @@
 "use client";
 import { PropsWithChildren, createContext, useContext, useEffect } from "react";
 import {
-  Round4Ballot,
   Round5Ballot,
-  useBallot,
-  useRemoveAllocation,
   useRound5Ballot,
-  useSaveAllocation,
-} from "@/hooks/useBallot";
-import { useBallotEditor } from "@/hooks/useBallotEditor";
+} from "@/hooks/useBallotRound5";
 import { useAccount } from "wagmi";
 import { useBallotRound5Editor } from "@/hooks/useBallotRound5Editor";
 import { useSaveRound5Allocation } from "@/hooks/useBallotRound5";
@@ -31,7 +26,7 @@ export function BallotRound5Provider({ children }: PropsWithChildren) {
   });
 
   useEffect(() => {
-    isFetched && editor.reset(ballot?.catgory_allocation);
+    isFetched && editor.reset(ballot?.category_allocations);
   }, [isFetched]); // Only trigger when isFetched is changed
 
   const value = { ballot, isPending, ...editor };

@@ -5,7 +5,7 @@ import { Heading } from "../ui/headings";
 import { Button } from "../ui/button";
 import { Text } from "../ui/text";
 import { votingEndDate } from "@/config";
-import { Round4Ballot, Round5Ballot, useSubmitBallot } from "@/hooks/useBallot";
+import { Round5Ballot, useSubmitBallot } from "@/hooks/useBallotRound5";
 import { formatDate } from "@/lib/utils";
 import { exportBallot } from "./import-ballot";
 import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
@@ -121,7 +121,9 @@ export function SubmitRound5Dialog({
                     variant="outline"
                     isLoading={submit.isPending}
                     disabled={submit.isPending}
-                    onClick={() => exportRound5Ballot(ballot?.catgory_allocation ?? [])}
+                    onClick={() =>
+                      exportRound5Ballot(ballot?.category_allocations ?? [])
+                    }
                   >
                     Export your ballot
                   </Button>
