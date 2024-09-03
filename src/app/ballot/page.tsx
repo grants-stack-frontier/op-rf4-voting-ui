@@ -42,6 +42,7 @@ import { useProjects, useProjectsByCategory } from "@/hooks/useProjects";
 import { useBallotRound5Context } from "@/components/ballot/provider5";
 import { SubmitRound5Dialog } from "@/components/ballot/submit-dialog5";
 import { useDistributionMethod, useIsSavingRound5Ballot, useRound5BallotWeightSum } from "@/hooks/useBallotRound5";
+import { ImpactScore, useSaveProjectImpact } from "@/hooks/useProjectImpact";
 
 function formatAllocationOPAmount(amount: number) {
   const value = amount.toString()
@@ -199,6 +200,13 @@ function YourBallot() {
   };
 
   const displayProjects = searchTerm ? filteredProjects : projectList;
+
+  // For dev purposes only
+  // const { mutate: saveImpact } = useSaveProjectImpact();
+
+  // const handleImpactChange = (projectId: string, impact: ImpactScore) => {
+  //   saveImpact({projectId, impact});
+  // };
 
   return (
     <div className="space-y-4">
