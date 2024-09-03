@@ -81,7 +81,7 @@ export function useSaveRound5Allocation() {
 
   return useMutation({
     mutationKey: ["save-round5-ballot"],
-    mutationFn: async (allocation: Round5ProjectAllocation) => {
+    mutationFn: async (allocation: {project_id: string, allocation: number}) => {
       return request
         .post(`${agoraRoundsAPI}/ballots/${address}/projects/${allocation.project_id}/allocation/${allocation.allocation}`, {})
         .json<Round5Ballot>()
@@ -127,6 +127,37 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
     onSuccess,
     onError: () =>
       toast({ variant: "destructive", title: "Error publishing ballot" }),
+  });
+}
+
+export function useSaveRound5Position() {
+  const { toast } = useToast();
+  const { address } = useAccount();
+
+  const queryClient = useQueryClient();
+
+  const debounceToast = useRef(
+    debounce(
+      () => toast({ title: "Your ballot is saved automatically" }),
+      2000,
+      { leading: true, trailing: false }
+    )
+  ).current;
+
+  return useMutation({
+    mutationKey: ["save-round5-position"],
+    mutationFn: async (project: {id: string, position: number}) => {
+      return request
+        .post(`${agoraRoundsAPI}/ballots/${address}/projects/${project.id}/position/${project.position}`, {})
+        .json<Round5Ballot>()
+        .then((r) => {
+          queryClient.setQueryData(["ballot-round5", address], r);
+          return r;
+        });
+    },
+    // onSuccess: debounceToast,
+    onError: () =>
+      toast({ variant: "destructive", title: "Error saving ballot" }),
   });
 }
 

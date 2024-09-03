@@ -32,11 +32,11 @@ export function useBallotRound5Editor({
   //   )
   // ).current;
   const setInitialState = useCallback(
-    (allocations: Round5Allocation[] = []) => {
+    (allocations: Round5ProjectAllocation[] = []) => {
       const ballot: BallotRound5State = Object.fromEntries(
         allocations.map((m) => [
-          m.category_slug,
-          { allocation: m.allocation, locked: Boolean(m.locked) },
+          m.project_id,
+          { allocation: m.allocation, locked: false },
         ])
       );
       setState(ballot);

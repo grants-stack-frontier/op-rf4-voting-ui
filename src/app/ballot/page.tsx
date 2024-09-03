@@ -41,7 +41,7 @@ import Link from "next/link";
 import { useProjects, useProjectsByCategory } from "@/hooks/useProjects";
 import { useBallotRound5Context } from "@/components/ballot/provider5";
 import { SubmitRound5Dialog } from "@/components/ballot/submit-dialog5";
-import { useDistributionMethod, useIsSavingRound5Ballot, useRound5BallotWeightSum } from "@/hooks/useBallotRound5";
+import { useDistributionMethod, useIsSavingRound5Ballot, useRound5BallotWeightSum, useSaveRound5Allocation, useSaveRound5Position } from "@/hooks/useBallotRound5";
 import { ImpactScore, useSaveProjectImpact } from "@/hooks/useProjectImpact";
 
 function formatAllocationOPAmount(amount: number) {
@@ -159,6 +159,8 @@ function YourBallot() {
   const [isSubmitting, setSubmitting] = useState(false);
   
   const { ballot } = useBallotRound5Context();
+  const { mutate: saveAllocation } = useSaveRound5Allocation();
+  const { mutate: savePosition } = useSaveRound5Position();
 
   console.log({ballot});
 
@@ -293,6 +295,7 @@ function YourBallot() {
                           const [removed] = newProjects.splice(draggedIndex, 1);
                           newProjects.splice(newIndex, 0, removed);
                           updateProjects(newProjects);
+                          savePosition({id: proj.project_id, position: newIndex})
                         }
                       }}
                     >
@@ -315,6 +318,7 @@ function YourBallot() {
                         const newProjectList = [...projectList];
                         newProjectList[i].allocation = isNaN(newAllocation) ? 0 : newAllocation;
                         setProjectList(newProjectList);
+                        saveAllocation({project_id: proj.project_id, allocation: newAllocation})
                       }}
                     />
                     <span className="absolute right-10 top-1/2 transform -translate-y-1/2 pointer-events-none">%</span>
