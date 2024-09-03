@@ -5,19 +5,20 @@ import { Heading } from "../ui/headings";
 import { Button } from "../ui/button";
 import { Text } from "../ui/text";
 import { votingEndDate } from "@/config";
-import { Round4Ballot, useSubmitBallot } from "@/hooks/useBallot";
+import { Round5Ballot, useSubmitBallot } from "@/hooks/useBallotRound5";
 import { formatDate } from "@/lib/utils";
 import { exportBallot } from "./import-ballot";
 import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
 import Image from "next/image";
 import { ArrowDownToLineIcon } from "lucide-react";
 import mixpanel from "mixpanel-browser";
+import { exportRound5Ballot } from "./import-ballot5";
 
-export function SubmitDialog({
+export function SubmitRound5Dialog({
   open,
   ballot,
   onOpenChange,
-}: ComponentProps<typeof Dialog> & { ballot?: Round4Ballot }) {
+}: ComponentProps<typeof Dialog> & { ballot?: Round5Ballot }) {
   const [feedbackProgress, setFeedbackProgress] = useState<
     "init" | "in_progress" | "submit" | "done"
   >(ballot?.status === "SUBMITTED" ? "submit" : "init");
@@ -120,7 +121,9 @@ export function SubmitDialog({
                     variant="outline"
                     isLoading={submit.isPending}
                     disabled={submit.isPending}
-                    onClick={() => exportBallot(ballot?.allocations ?? [])}
+                    onClick={() =>
+                      exportRound5Ballot(ballot?.category_allocations ?? [])
+                    }
                   >
                     Export your ballot
                   </Button>

@@ -16,27 +16,57 @@ import { Skeleton } from "../ui/skeleton";
 import mixpanel from "@/lib/mixpanel";
 import { DistributionChart } from "../metrics/distribution-chart";
 import { Card } from "../ui/card";
+import { Separator } from "@radix-ui/react-dropdown-menu";
 
 export function MetricsEditor({
-  metrics = [],
-  isLoading,
   onAllocationMethodSelect,
 }: {
-  metrics?: Metric[];
-  isLoading: boolean;
   onAllocationMethodSelect: (data: { x: number; y: number }[]) => void;
 }) {
   const { state, inc, dec, set, remove } = useBallotContext();
 
   const { sorted } = useSortBallot(state);
 
-  const count = useMemo(() => Object.keys(state).length, [state]);
-  const metricById = useMemo(
-    () => Object.fromEntries(metrics.map((m) => [m["metric_id"], m])),
-    [metrics]
-  );
-
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+
+  const exponentialDecay = (x: number, initialValue: number = 100, decayRate: number = 0.1): number => {
+    return initialValue * Math.exp(-decayRate * x);
+  };
+
+  const distributeTopWeighted = (numPoints: number = 40): { x: number; y: number }[] => {
+    return Array.from({ length: numPoints }, (_, i) => ({
+      x: i,
+      y: Math.round(exponentialDecay(i))
+    }));
+  };
+
+  const linearDecline = (x: number, initialValue: number = 100, slope: number = 2.5): number => {
+    const y = initialValue - slope * x;
+    return Math.max(y, 0); // Ensure y doesn't go below 0
+  };
+
+  const distributeTopToBottomLinear = (numPoints: number = 40): { x: number; y: number }[] => {
+    return Array.from({ length: numPoints }, (_, i) => ({
+      x: i,
+      y: Math.round(linearDecline(i))
+    }));
+  };
+
+  // const distributeImpactGroups = (numPoints: number = 40): { x: number; y: number }[] => {
+  //   const initialValue = 100;
+  //   const numOfGroups = 5;
+  //   let group = 0;
+  //   return Array.from({ length: numPoints }, (_, i) => {
+  //     const mod = i % numOfGroups;
+  //     if (mod === 0) {
+  //       group++;
+  //     }
+  //     return {
+  //       x: i,
+  //       y: Math.round(linearDecline(i, initialValue))
+  //     }
+  //   });
+  // };
 
   // Dummy data for the allocation methods
   const allocationMethods = [
@@ -53,30 +83,33 @@ export function MetricsEditor({
         {x: 40, y: 0},
         {x: 50, y: 0},
       ],
+      // data: distributeImpactGroups(),
       formatChartTick: (tick: number) => `${tick}k`,
       method: "Impact groups",
       description: "blah blah blah",
     },
     {
-      data: [
-        {x: 0, y: 340},
-        {x: 10, y: 255},
-        {x: 20, y: 170},
-        {x: 30, y: 85},
-        {x: 40, y: 0},
-      ],
+      // data: [
+      //   {x: 0, y: 340},
+      //   {x: 10, y: 255},
+      //   {x: 20, y: 170},
+      //   {x: 30, y: 85},
+      //   {x: 40, y: 0},
+      // ],
+      data: distributeTopToBottomLinear(),
       formatChartTick: (tick: number) => `${tick}k`,
       method: "Top to bottom",
       description: "blah blah blah",
     },
     {
-      data: [
-        {x: 0, y: 400},
-        {x: 10, y: 100},
-        {x: 20, y: 50},
-        {x: 30, y: 30},
-        {x: 40, y: 20},
-      ],
+      // data: [
+      //   {x: 0, y: 400},
+      //   {x: 10, y: 100},
+      //   {x: 20, y: 50},
+      //   {x: 30, y: 30},
+      //   {x: 40, y: 20},
+      // ],
+      data: distributeTopWeighted(),
       formatChartTick: (tick: number) => `${tick}k`,
       method: "Top weighted",
       description: "blah blah blah",
@@ -95,9 +128,9 @@ export function MetricsEditor({
       <div className="flex items-center justify-between">
         <div className="mb-4">
           <Heading variant={"h3"}>Your ballot</Heading>
-          <div className="text-sm">
+          {/* <div className="text-sm">
             You&apos;ve added {count} of {metrics.length} metrics
-          </div>
+          </div> */}
         </div>
         <BallotFilter />
       </div>
@@ -106,14 +139,14 @@ export function MetricsEditor({
       <div className=" flex flex-col gap-4 py-4 text-sm">
         <p>First, review your project rankings in the list below.</p>
         <p>Then, choose a method to easily allocate rewards across prjects. You can also customize percentages at any time.</p>
-        <p>OP calcilations in this ballot are based on your budget of {allocationAmount} OP</p>
+        <p>OP calculations in this ballot are based on your budget of {allocationAmount} OP</p>
       </div>
 
       <div className="flex flex-row justify-between items-end">
         <p className="font-semibold mb-2">Allocation method</p>
         <p className="font-semibold mb-2 text-sm">None selected</p>
       </div>
-      <div className="grid grid-cols-4 sm:grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+      <div className="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-4">
         {allocationMethods.map((method, index) => (
           <Card
             key={index}
@@ -134,110 +167,6 @@ export function MetricsEditor({
         ))}
       </div>
       {/* ^^This sections is a work in progress^^ */}
-
-      <div className="divide-y border-y">
-        {isLoading &&
-          Array(3)
-            .fill(0)
-            .map((_, i) => (
-              <div className="py-4" key={i}>
-                <Skeleton key={i} className="h-10" />
-              </div>
-            ))}
-        {sorted
-          .filter((id) => state[id])
-          .map((id) => {
-            const { allocation, locked } = state[id];
-            const { name } = metricById[id] ?? {};
-
-            console.log(id, allocation);
-            return (
-              <div key={id} className="py-4 flex justify-between items-center">
-                <h3 className="font-medium text-sm hover:underline underline-offset-4">
-                  <Link href={`/metrics/${id}`}>{name}</Link>
-                </h3>
-                <div className="flex gap-2">
-                  <Button
-                    size={"icon"}
-                    variant={locked ? "secondary" : "ghost"}
-                    icon={locked ? LockFillLocked : LockFillUnlocked}
-                    className={cn({ ["opacity-50"]: !locked })}
-                    tabIndex={-1}
-                    onClick={() => {
-                      set(id, allocation, locked);
-                      mixpanel.track("Lock Metric", { id, allocation });
-                    }}
-                  />
-                  <div className="flex border rounded-lg">
-                    <Button
-                      size={"icon"}
-                      variant="ghost"
-                      icon={Minus}
-                      tabIndex={-1}
-                      disabled={allocation <= 0}
-                      onClick={() => {
-                        dec(id);
-                        mixpanel.track("Decrease Metric", { id, allocation });
-                      }}
-                    />
-                    <NumericFormat
-                      min={0}
-                      max={100}
-                      suffix={"%"}
-                      allowNegative={false}
-                      allowLeadingZeros={false}
-                      isAllowed={(values) => (values?.floatValue ?? 0) <= 100}
-                      customInput={(p) => (
-                        <input
-                          className="w-16 text-center"
-                          {...p}
-                          max={100}
-                          min={0}
-                        />
-                      )}
-                      placeholder="--%"
-                      value={
-                        allocation !== undefined
-                          ? allocation.toFixed(2)
-                          : undefined
-                      }
-                      onBlur={(e) => {
-                        e.preventDefault();
-                        const updated = parseFloat(e.target.value);
-                        allocation !== updated && set(id, updated);
-                        mixpanel.track("Update Metric", {
-                          id,
-                          allocation: updated,
-                        });
-                      }}
-                    />
-                    <Button
-                      size={"icon"}
-                      variant="ghost"
-                      icon={Plus}
-                      tabIndex={-1}
-                      disabled={allocation >= 100}
-                      onClick={() => {
-                        inc(id);
-                        mixpanel.track("Increase Metric", { id, allocation });
-                      }}
-                    />
-                  </div>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    icon={Trash2}
-                    tabIndex={-1}
-                    onClick={() => {
-                      remove(id);
-                      mixpanel.track("Remove Metric", { id });
-                    }}
-                  />
-                </div>
-              </div>
-            );
-          })}
-      </div>
     </div>
   );
 }

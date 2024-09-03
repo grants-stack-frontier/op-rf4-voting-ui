@@ -1,7 +1,7 @@
 "use client";
 import { PropsWithChildren, createContext, useContext, useEffect } from "react";
 import {
-  Ballot,
+  Round4Ballot,
   useBallot,
   useRemoveAllocation,
   useSaveAllocation,
@@ -13,7 +13,7 @@ type BallotContext = ReturnType<typeof useBallotEditor>;
 const BallotContext = createContext(
   {} as BallotContext & {
     isPending: boolean;
-    ballot?: Ballot | null;
+    ballot?: Round4Ballot | null;
   }
 );
 
