@@ -41,7 +41,7 @@ import Link from "next/link";
 import { useProjects, useProjectsByCategory } from "@/hooks/useProjects";
 import { useBallotRound5Context } from "@/components/ballot/provider5";
 import { SubmitRound5Dialog } from "@/components/ballot/submit-dialog5";
-import { useIsSavingRound5Ballot, useRound5BallotWeightSum } from "@/hooks/useBallotRound5";
+import { useDistributionMethod, useIsSavingRound5Ballot, useRound5BallotWeightSum } from "@/hooks/useBallotRound5";
 
 function formatAllocationOPAmount(amount: number) {
   const value = amount.toString()
@@ -126,14 +126,14 @@ function CheckBallotState() {
   const { address, isConnecting } = useAccount();
   const { isPending, data: ballot } = useBallot(address);
   console.log("Ballot Data from new API:", {ballot});
-  const { state } = useBallotContext();
+  const { state } = useBallotRound5Context();
   // Comment out for local dev if needed
-  // if (isPending) {
-  //   return <Skeleton className="p-6 h-96" />;
-  // }
-  // if (!address && !isConnecting) {
-  //   return <NonBadgeholder />;
-  // }
+  if (isPending) {
+    return <Skeleton className="p-6 h-96" />;
+  }
+  if (!address && !isConnecting) {
+    return <NonBadgeholder />;
+  }
   // const isEmptyBallot = !Object.keys(state).length;
   // if (isEmptyBallot) {
   //   return <EmptyBallot />;
@@ -156,16 +156,15 @@ const categoryNames: { [key: string]: string } = {
 
 function YourBallot() {
   const [isSubmitting, setSubmitting] = useState(false);
-  const metrics = useMetricsByRound(4);
   
   const { ballot } = useBallotRound5Context();
 
   console.log({ballot});
 
-  const [projectList, setProjectList] = useState(projects || []);
+  const [projectList, setProjectList] = useState(ballot?.projects_allocations || []);
 
   useEffect(() => {
-    setProjectList(projects || []);
+    setProjectList(ballot?.projects_allocations || []);
   }, [ballot]);
 
   const updateProjects = (newProjects: Round5ProjectAllocation[]) => {
@@ -234,8 +233,6 @@ function YourBallot() {
       <p>Your voting category is <a href={`/budget/category/${categoryIds[0]}`} className="underline">{categoryNames[categoryIds[0]]}</a> ({projects.length} projects)</p>
       <Card className="p-6 space-y-8">
         <MetricsEditor
-          metrics={metrics.data?.data as Metric[]}
-          isLoading={metrics.isPending}
           onAllocationMethodSelect={handleAllocationMethodSelect}
         />
         <SearchInput className="my-2" placeholder="Search projects..." onChange={handleSearch} />

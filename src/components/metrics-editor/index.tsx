@@ -19,23 +19,13 @@ import { Card } from "../ui/card";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 
 export function MetricsEditor({
-  metrics = [],
-  isLoading,
   onAllocationMethodSelect,
 }: {
-  metrics?: Metric[];
-  isLoading: boolean;
   onAllocationMethodSelect: (data: { x: number; y: number }[]) => void;
 }) {
   const { state, inc, dec, set, remove } = useBallotContext();
 
   const { sorted } = useSortBallot(state);
-
-  const count = useMemo(() => Object.keys(state).length, [state]);
-  const metricById = useMemo(
-    () => Object.fromEntries(metrics.map((m) => [m["metric_id"], m])),
-    [metrics]
-  );
 
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
 

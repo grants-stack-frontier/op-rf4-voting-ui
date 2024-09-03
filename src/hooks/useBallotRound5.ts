@@ -15,13 +15,14 @@ import { ProjectAllocation } from "./useMetrics";
 import debounce from "lodash.debounce";
 import { useRef } from "react";
 import { useBallotContext } from "@/components/ballot/provider";
+import { useBallotRound5Context } from "@/components/ballot/provider5";
 
 export type CategoryId =
   | "ETHEREUM_CORE_CONTRIBUTIONS"
   | "OP_STACK_RESEARCH_AND_DEVELOPMENT"
   | "OP_STACK_TOOLING";
 
-export type Round5Allocation = {
+export type Round5CategoryAllocation = {
   category_slug: CategoryId;
   allocation: number;
   locked: boolean;
@@ -45,7 +46,7 @@ export type Round5Ballot = {
   created_at?: string;
   updated_at?: string;
   published_at?: string;
-  category_allocations: Round5Allocation[];
+  category_allocations: Round5CategoryAllocation[];
   projects_allocations: Round5ProjectAllocation[];
   projects_to_be_evaluated: string[];
   total_projects: number;
@@ -79,15 +80,13 @@ export function useSaveRound5Allocation() {
   ).current;
 
   return useMutation({
-    mutationKey: ["save-ballot"],
-    mutationFn: async (allocation: Round5Allocation) => {
+    mutationKey: ["save-round5-ballot"],
+    mutationFn: async (allocation: Round5ProjectAllocation) => {
       return request
-        .post(`${agoraRoundsAPI}/ballots/${address}/categories`, {
-          json: { ...allocation, category_slug: allocation["category_slug"] },
-        })
-        .json<Round5Ballot[]>()
+        .post(`${agoraRoundsAPI}/ballots/${address}/projects/${allocation.project_id}/allocation/${allocation.allocation}`, {})
+        .json<Round5Ballot>()
         .then((r) => {
-          queryClient.setQueryData(["ballot-round5", address], r?.[0]);
+          queryClient.setQueryData(["ballot-round5", address], r);
           return r;
         });
     },
@@ -145,13 +144,13 @@ export function useDistributionMethod(params: { distribution_method: string }) {
 }
 
 export function useIsSavingRound5Ballot() {
-  return Boolean(useIsMutating({ mutationKey: ["save-ballot"] }));
+  return Boolean(useIsMutating({ mutationKey: ["save-round5-ballot"] }));
 }
 
 export function useRound5BallotWeightSum() {
-  const { ballot } = useBallotContext();
+  const { ballot } = useBallotRound5Context();
   return Math.round(
-    ballot?.allocations.reduce((sum, x) => (sum += Number(x.allocation)), 0) ??
+    ballot?.projects_allocations?.reduce((sum, x) => (sum += Number(x.allocation)), 0) ??
       0
   );
 }
