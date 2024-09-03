@@ -1,6 +1,7 @@
 "use client";
 import { Project, ProjectGithubItemOneOf } from "@/__generated__/api/agora.schemas";
 import { Heading } from "@/components/ui/headings";
+import { CategoryType } from "@/data/categories";
 import mixpanel from "@/lib/mixpanel";
 import { CircleDollarSign, Clock3, GitFork, Github, Link2, Star, User } from "lucide-react";
 import Image from "next/image";
@@ -15,6 +16,19 @@ import { Markdown } from "../markdown";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
+
+function getBadgeClassName(category: CategoryType | undefined): string {
+	switch (category) {
+		case CategoryType.ETHEREUM_CORE_CONTRIBUTIONS:
+			return 'bg-blue-500/25 text-blue-600';
+		case CategoryType.OP_STACK_RESEARCH_AND_DEVELOPMENT:
+			return 'bg-purple-500/25 text-purple-600';
+		case CategoryType.OP_STACK_TOOLING:
+			return 'bg-orange-500/25 text-orange-600';
+		default:
+			return 'bg-blue-500/25 text-blue-600';
+	}
+}
 
 export function ProjectDetails({ data, isPending }: { data?: Project; isPending: boolean }) {
 	const { id, profileAvatarUrl, name, projectCoverImageUrl, description, socialLinks, category, github, links, grantsAndFunding, contracts, team } = data ?? {};
@@ -33,13 +47,12 @@ export function ProjectDetails({ data, isPending }: { data?: Project; isPending:
 					</>
 				) : (
 					<>
-						{projectCoverImageUrl && profileAvatarUrl && (
+						{projectCoverImageUrl && profileAvatarUrl ? (
 							<div className="w-full h-56">
 								<Image className="rounded-md" src={projectCoverImageUrl} alt={name || ''} width={720} height={180} />
 								<Image className="rounded-md -mt-10 ml-6" src={profileAvatarUrl} alt={name || ''} width={80} height={80} />
 							</div>
-						)}
-						{profileAvatarUrl && (
+						) : profileAvatarUrl && (
 							<div className="w-full">
 								<Image className="rounded-md" src={profileAvatarUrl} alt={name || ''} width={80} height={80} />
 							</div>
@@ -55,62 +68,71 @@ export function ProjectDetails({ data, isPending }: { data?: Project; isPending:
 						<Markdown className="dark:text-white line-clamp-3">{description}</Markdown>
 						<div className="flex flex-wrap items-center gap-2">
 							{website && (
-								<Link href={website} target="_blank">
-									<Button
-										variant="link"
-										className="gap-1"
-										onClick={() => mixpanel.track("Open Website", { external: true })}
-									>
-										<Link2 className="-rotate-45 h-4 w-4" />
-										{website}
-									</Button>
-								</Link>
+								<Button
+									variant="link"
+									className="gap-1"
+									onClick={() => mixpanel.track("Open Website", { external: true })}
+									asChild
+								>
+									<Link2 className="-rotate-45 h-4 w-4" />
+									<Link href={website[0]} target="_blank">
+										{website[0]}
+									</Link>
+								</Button>
 							)}
 							{farcaster && (
-								<Link href={farcaster} target="_blank">
-									<Button
-										variant="link"
-										className="gap-1"
-										onClick={() => mixpanel.track("Open Farcaster", { external: true })}
-									>
-										<Warpcast />
-										{farcaster}
-									</Button>
-								</Link>
+								<Button
+									variant="link"
+									className="gap-1"
+									onClick={() => mixpanel.track("Open Farcaster", { external: true })}
+									asChild
+								>
+									<Warpcast />
+									<Link href={farcaster[0]} target="_blank">
+										{farcaster[0]}
+									</Link>
+								</Button>
 							)}
 							{twitter && (
-								<Link href={twitter} target="_blank">
-									<Button
-										variant="link"
-										className="gap-1"
-										onClick={() => mixpanel.track("Open Twitter", { external: true })}
-									>
-										<X />
+								<Button
+									variant="link"
+									className="gap-1"
+									onClick={() => mixpanel.track("Open Twitter", { external: true })}
+									asChild
+								>
+									<X />
+									<Link href={twitter} target="_blank">
 										{twitter}
-									</Button>
-								</Link>
+									</Link>
+								</Button>
 							)}
 							{mirror && (
-								<Link href={mirror} target="_blank">
-									<Button
-										variant="link"
-										className="gap-1"
-										onClick={() => mixpanel.track("Open Mirror", { external: true })}
-									>
-										<Mirror />
+								<Button
+									variant="link"
+									className="gap-1"
+									onClick={() => mixpanel.track("Open Mirror", { external: true })}
+									asChild
+								>
+									<Mirror />
+									<Link href={mirror} target="_blank">
 										{mirror}
-									</Button>
-								</Link>
+									</Link>
+								</Button>
 							)}
 						</div>
 						<div className="flex items-center gap-2">
 							<Badge
 								variant={null}
-								className="cursor-pointer border-0 bg-blue-500/25 text-blue-600 font-medium"
+								className={`cursor-pointer border-0 font-medium ${getBadgeClassName(category as CategoryType)}`}
 							>
 								{category?.replace(/_/g, ' ')}
 							</Badge>
-							<AvatarCarousel images={team?.map((member: any) => ({ url: member.pfp_url, name: member.display_name })) ?? []} />
+							<AvatarCarousel
+								images={team?.map((member: any) => ({
+									url: member.pfp_url,
+									name: member.display_name
+								})) ?? []}
+							/>
 						</div>
 						<p className="font-medium">Repos, links and contracts</p>
 						{github && (
@@ -202,7 +224,6 @@ export function ProjectDetails({ data, isPending }: { data?: Project; isPending:
 								}
 								{
 									grantsAndFunding.ventureFunding?.map(({ amount, details, year }, index) => {
-										const formattedAmount = amount && Number(amount) > 0 ? new Intl.NumberFormat('en-US').format(Number(amount)) : amount;
 										return (
 											<CustomAccordion value={amount || ''} trigger={
 												<>
@@ -215,6 +236,9 @@ export function ProjectDetails({ data, isPending }: { data?: Project; isPending:
 													</div>
 												</>
 											} key={index}>
+												<div className="p-2">
+													{details}
+												</div>
 											</CustomAccordion>
 										);
 									})

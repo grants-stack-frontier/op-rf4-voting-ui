@@ -21,17 +21,17 @@ interface ReviewSidebarProps extends CardProps {
 	isVoted: boolean
 }
 
-export function ReviewSidebar({ className, onScoreSelect, totalProjects, projectsScored, isVoted, ...props }: ReviewSidebarProps) {
-	const scores: [Score, string][] = [
-		[5, "Very High"],
-		[4, "High"],
-		[3, "Medium"],
-		[2, "Low"],
-		[1, "Very Low"],
-		[0, "Conflict of interest"],
-		["Skip", "Skip"]
-	]
+const scoreLabels: Record<Score, string> = {
+	5: "Very High",
+	4: "High",
+	3: "Medium",
+	2: "Low",
+	1: "Very Low",
+	0: "Conflict of interest",
+	"Skip": "Skip"
+}
 
+export function ReviewSidebar({ className, onScoreSelect, totalProjects, projectsScored, isVoted, ...props }: ReviewSidebarProps) {
 	return (
 		<Card className={cn("w-[304px] h-[560px]", className)} {...props}>
 			<CardHeader>
@@ -41,9 +41,9 @@ export function ReviewSidebar({ className, onScoreSelect, totalProjects, project
 			</CardHeader>
 			<CardContent className="grid gap-4">
 				<div className="flex flex-col gap-2">
-					{scores.map(([score, label]) => (
+					{(Object.entries(scoreLabels) as [Score, string][]).map(([score, label]) => (
 						<Button
-							key={label}
+							key={score}
 							variant={score === "Skip" ? "link" : "outline"}
 							onClick={() => onScoreSelect(score)}
 							disabled={isVoted && score !== "Skip"}
