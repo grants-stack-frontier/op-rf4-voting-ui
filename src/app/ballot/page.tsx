@@ -125,7 +125,7 @@ export default function BallotPage() {
 
 function CheckBallotState() {
   const { address, isConnecting } = useAccount();
-  const { isPending, data: ballot } = useBallot(address);
+  const { isPending, data: ballot } = useRound5Ballot(address);
   console.log("Ballot Data from new API:", {ballot});
   const { state } = useBallotRound5Context();
   // Comment out for local dev if needed
@@ -164,10 +164,10 @@ function YourBallot() {
 
   console.log({ballot});
 
-  const [projectList, setProjectList] = useState(ballot?.projects_allocations || []);
+  const [projectList, setProjectList] = useState(ballot?.project_allocations || []);
 
   useEffect(() => {
-    setProjectList(ballot?.projects_allocations || []);
+    setProjectList(ballot?.project_allocations || []);
   }, [ballot]);
 
   const updateProjects = (newProjects: Round5ProjectAllocation[]) => {
@@ -310,9 +310,9 @@ function YourBallot() {
                   <div className="relative">
                     <Input
                       type="number"
-                      placeholder="-- %"
+                      placeholder="--"
                       className="text-center"
-                      value={proj.allocation.toFixed(2)}
+                      value={proj.allocation}
                       onChange={(e) => {
                         const newAllocation = parseFloat(e.target.value);
                         const newProjectList = [...projectList];
@@ -331,6 +331,7 @@ function YourBallot() {
         </div>
 
         {/* <OpenSourceMultiplier initialValue={ballot?.os_multiplier} /> */}
+        {/* <Button onClick={() => handleImpactChange(ballot?.projects_to_be_evaluated[0] ?? "", 5)}>Score Impact</Button> */}
 
         <div className="flex items-center gap-4">
           <BallotSubmitButton onClick={() => setSubmitting(true)} />

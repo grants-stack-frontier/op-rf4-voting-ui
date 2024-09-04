@@ -122,7 +122,7 @@ export function SubmitRound5Dialog({
                     isLoading={submit.isPending}
                     disabled={submit.isPending}
                     onClick={() =>
-                      exportRound5Ballot(ballot?.projects_allocations ?? [])
+                      exportRound5Ballot(ballot?.project_allocations ?? [])
                     }
                   >
                     Export your ballot

@@ -47,7 +47,7 @@ export type Round5Ballot = {
   updated_at?: string;
   published_at?: string;
   category_allocations: Round5CategoryAllocation[];
-  projects_allocations: Round5ProjectAllocation[];
+  project_allocations: Round5ProjectAllocation[];
   projects_to_be_evaluated: string[];
   total_projects: number;
   distribution_method?: string;
@@ -181,7 +181,7 @@ export function useIsSavingRound5Ballot() {
 export function useRound5BallotWeightSum() {
   const { ballot } = useBallotRound5Context();
   return Math.round(
-    ballot?.projects_allocations?.reduce((sum, x) => (sum += Number(x.allocation)), 0) ??
+    ballot?.project_allocations?.reduce((sum, x) => (sum += Number(x.allocation)), 0) ??
       0
   );
 }

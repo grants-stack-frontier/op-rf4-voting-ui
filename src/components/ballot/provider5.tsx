@@ -26,7 +26,7 @@ export function BallotRound5Provider({ children }: PropsWithChildren) {
   });
 
   useEffect(() => {
-    isFetched && editor.reset(ballot?.projects_allocations);
+    isFetched && editor.reset(ballot?.project_allocations);
   }, [isFetched]); // Only trigger when isFetched is changed
 
   const value = { ballot, isPending, ...editor };
