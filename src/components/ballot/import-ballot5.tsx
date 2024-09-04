@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { format, parse } from "@/lib/csv";
-import { Round5Ballot, useSaveRound5Allocation } from "@/hooks/useBallotRound5";
+import { Round5Ballot, Round5ProjectAllocation, useSaveRound5Allocation } from "@/hooks/useBallotRound5";
 import { useBallotContext } from "./provider";
 import { useMetricIds } from "@/hooks/useMetrics";
 import mixpanel from "@/lib/mixpanel";
@@ -52,14 +52,14 @@ function ImportBallotButton() {
     (csvString: string) => {
       console.log("import csv");
       // Parse CSV and build the ballot data (remove name column)
-      const { data } = parse<Round5Allocation>(csvString);
+      const { data } = parse<Round5ProjectAllocation>(csvString);
       const allocations = data
-        .map(({ category_slug, allocation, locked }) => ({
-          category_slug,
-          allocation: Number(allocation),
-          // Only the string "true" and "1" will be matched as locked
-          locked: ["true", "1"].includes(String(locked)) ? true : false,
-        }))
+        // .map(({ category_slug, allocation, locked }) => ({
+        //   category_slug,
+        //   allocation: Number(allocation),
+        //   // Only the string "true" and "1" will be matched as locked
+        //   locked: ["true", "1"].includes(String(locked)) ? true : false,
+        // }))
         // .filter((m) => metricIds?.includes(m.category_slug));
 
       if (allocations.length !== data.length) {
@@ -102,9 +102,10 @@ function ImportBallotButton() {
 }
 
 function ExportBallotButton() {
-  const emptyBallot: Round5Allocation[] = [
-    { category_slug: 'ETHEREUM_CORE_CONTRIBUTIONS', allocation: 0, locked: false },
-  ];
+  // const emptyBallot: Round5Allocation[] = [
+  //   { category_slug: 'ETHEREUM_CORE_CONTRIBUTIONS', allocation: 0, locked: false },
+  // ];
+  const emptyBallot: Round5ProjectAllocation[] = [];
 
   return (
     <Button variant="outline" onClick={() => exportRound5Ballot(emptyBallot)}>
@@ -113,13 +114,14 @@ function ExportBallotButton() {
   );
 }
 
-export function exportRound5Ballot(ballot: Round5Allocation[]) {
+export function exportRound5Ballot(ballot: Round5ProjectAllocation[]) {
   const csv = format(
-    ballot.map((alloc) => ({
-      category_slug: alloc.category_slug,
-      allocation: alloc.allocation,
-      locked: alloc.locked,
-    })),
+    ballot,
+    // ballot.map((alloc) => ({
+    //   category_slug: alloc.category_slug,
+    //   allocation: alloc.allocation,
+    //   locked: alloc.locked,
+    // })),
     {}
   );
   console.log(csv);
