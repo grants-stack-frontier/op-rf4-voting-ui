@@ -44,7 +44,7 @@ export default function BudgetBallotPage() {
                                     <Image src={category.image} alt={category.name} width={80} height={80}/>
                                     <div className="flex-1">
                                         <Button variant="link" asChild>
-                                            <Link href={`/budget/category/${category.id}`}
+                                            <Link href={`/home/budget/category/${category.id}`}
                                                   className="flex items-center gap-2">
                                                 <span className="font-medium">{category.name}</span>
                                                 <ChevronRight className="h-4 w-4"/>
@@ -55,7 +55,7 @@ export default function BudgetBallotPage() {
                                             variant="secondary"
                                             className="cursor-pointer font-medium"
                                         >
-                                            {countPerCategory[category.id]} project(s)
+                                            {countPerCategory ? countPerCategory[category.id] : 0} project(s) in this category
                                         </Badge>
                                     </div>
                                     <div className="flex flex-col items-center">
