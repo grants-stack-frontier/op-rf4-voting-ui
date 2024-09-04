@@ -21,7 +21,7 @@ export function CategoryDetails({
 	const { data: session } = useSession();
 
 	const userCategory = session?.category;
-	const isUserCategory = userCategory && category && userCategory === category.id;
+	const isUserCategory = !!userCategory && !!category && userCategory === category.id;
 
 	return (
 		<section className="space-y-16">
