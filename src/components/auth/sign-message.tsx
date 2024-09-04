@@ -135,6 +135,7 @@ export function useSession() {
     queryKey: ["session"],
     queryFn: async () => {
       const accessToken = getToken();
+
       const user = accessToken
         ? decodeJwt<{ siwe: { address: Address }; isBadgeholder?: boolean }>(
             accessToken
@@ -149,8 +150,13 @@ export function useSession() {
         });
       }
       console.log(user);
+      // TODO: Remove hardcoded category once it's implemented in token
+      return {
+        category: "ETHEREUM_CORE_CONTRIBUTIONS",
+        ...user,
+      }
 
-      return user;
+      // return user;
     },
   });
 }
