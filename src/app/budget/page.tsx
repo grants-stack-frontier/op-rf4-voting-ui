@@ -28,12 +28,16 @@ const BudgetSchema = z.object({
     path: ["budget"]
 });
 
+interface FormData {
+    categories: Record<string, number>; // Categories with percentage values as numbers
+}
+
 export default function BudgetBallotPage() {
 
     const categories = useCategories();
     const projects = useProjects();
     // Initialize the form with Zod validation using the resolver
-    const {register, handleSubmit, control, formState: {errors}, setValue, getValues, reset} = useForm({
+    const {register, handleSubmit, control, formState: {errors}, setValue, getValues, reset} = useForm<FormData>({
         resolver: zodResolver(BudgetSchema),
         defaultValues: {
             categories: {} // Initially empty, we'll populate this once categories data is loaded
@@ -71,8 +75,7 @@ export default function BudgetBallotPage() {
         return {...acc, [category.id]: (acc[category.id] ?? 0) + 1};
     }, {} as Record<string, number>);
 
-    const onSubmit = (data) => {
-        console.log('Form Data:', data);
+    const onSubmit = (data: FormData) => {
 
         const totalPercentage = Object.values(data.categories).reduce((acc, percentage) => acc + percentage, 0);
 
