@@ -8,11 +8,11 @@ import {Input} from "@/components/ui/input";
 import {Separator} from "@/components/ui/separator";
 import {useCategories} from "@/hooks/useCategories";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {ChevronRight, LockKeyholeOpen, Minus, Plus, RotateCw, Tally1} from "lucide-react";
+import {ChevronRight, LockKeyholeOpen, Minus, Plus, RotateCw} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import {useProjects} from "@/hooks/useProjects";
-import {useForm, Controller} from 'react-hook-form';
+import {Controller, useForm} from 'react-hook-form';
 import {useEffect} from "react";
 import {z} from "zod";
 
@@ -29,7 +29,8 @@ const BudgetSchema = z.object({
 });
 
 interface FormData {
-    categories: Record<string, number>; // Categories with percentage values as numbers
+    categories: Record<string, number>;
+    budget?: undefined// Categories with percentage values as numbers
 }
 
 export default function BudgetBallotPage() {
@@ -179,7 +180,7 @@ export default function BudgetBallotPage() {
                             </div>
                         ))}
                         {errors.budget && (
-                            <p className="text-red-500">{errors.budget?.message}</p>
+                            <p className="text-red-500">{errors.budget.message}</p>
                         )}
                     </CardContent>
                     <CardFooter className="gap-2">
