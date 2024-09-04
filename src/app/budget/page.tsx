@@ -18,7 +18,7 @@ import {z} from "zod";
 
 const BudgetSchema = z.object({
     categories: z.record(
-        z.number().min(0, "Budget must be at least 0").max(100, "Budget cannot exceed 100")
+        z.number().min(0, "Budget must be at least 0").max(100, "Budget cannot exceed 100%")
     )
 }).refine((data) => {
     const total = Object.values(data.categories).reduce((sum, val) => sum + val, 0);
@@ -69,6 +69,8 @@ export default function BudgetBallotPage() {
         }
     }, [categories.data, reset]);
 
+    // TODO: fix iffy typings
+    // @ts-ignore
     const countPerCategory = projects.data?.data.data?.reduce((acc, project) => {
         const category = categories.data?.find(cat => cat.id === project.category);
         if (!category) return acc;
@@ -85,6 +87,15 @@ export default function BudgetBallotPage() {
             // Process the submitted budget allocations
             console.log('Valid Budget:', data);
         }
+    };
+
+    // Utility function to format input value as a percentage
+    const formatPercentage = (value: number) => `${value}%`;
+
+    // Utility function to parse percentage input back to a number
+    const parsePercentage = (value: string) => {
+        const parsed = parseFloat(value.replace('%', '').trim());
+        return isNaN(parsed) ? 0 : parsed;
     };
 
     return (
@@ -136,9 +147,12 @@ export default function BudgetBallotPage() {
                                                 name={`categories.${category.id}`}
                                                 control={control}
                                                 render={({field}) => (
-                                                    <Input type="text"
-                                                           className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-center"
-                                                           {...field} />
+                                                    <Input
+                                                        type="text"
+                                                        value={formatPercentage(field.value)} // Display as percentage
+                                                        onChange={(e) => field.onChange(parsePercentage(e.target.value))} // Parse percentage on change
+                                                        className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-center"
+                                                    />
                                                 )}
                                             />
                                             <Button size="icon" type="button" variant="ghost"
