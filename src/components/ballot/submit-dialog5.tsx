@@ -8,7 +8,7 @@ import { votingEndDate } from "@/config";
 import { Round5Ballot, useSubmitBallot } from "@/hooks/useBallotRound5";
 import { formatDate } from "@/lib/utils";
 import { exportBallot } from "./import-ballot";
-import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
+import VotingSuccess_OPStack from "../../../public/RetroFunding_R5_IVoted_16x9.png";
 import Image from "next/image";
 import { ArrowDownToLineIcon } from "lucide-react";
 import mixpanel from "mixpanel-browser";
@@ -94,7 +94,7 @@ export function SubmitRound5Dialog({
                   <div className="flex justify-center">
                     <Image
                       id="download"
-                      {...VotingSuccess}
+                      {...VotingSuccess_OPStack} // Should differ based on category (?)
                       alt="Success!"
                       className="rounded-xl mb-2"
                     />
