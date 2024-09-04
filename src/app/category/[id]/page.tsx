@@ -16,6 +16,7 @@ import Link from "next/link";
 
 export default function CategoryDetailsPage({ params: { id = "" } }) {
 	const category = useCategories();
+
 	return (
 		<>
 			<section className="flex-1 space-y-6">

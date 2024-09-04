@@ -36,4 +36,6 @@ jobs:
       - name: Build Next.js app
         env:
           NEXT_PUBLIC_WALLETCONNECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_ID }}
+          AGORA_API_URL: ${{ vars.AGORA_API_URL }}
+          AGORA_API_KEY: ${{ secrets.AGORA_API_KEY }}
         run: pnpm build
