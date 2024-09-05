@@ -13,9 +13,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CategoryType } from "@/data/categories";
 import { useCategories } from "@/hooks/useCategories";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function CategoryDetailsPage({ params: { id = "" } }) {
 	const category = useCategories();
+	const router = useRouter();
 
 	return (
 		<>
@@ -38,7 +40,7 @@ export default function CategoryDetailsPage({ params: { id = "" } }) {
 				<Tabs defaultValue={id} className="w-full pt-3">
 					<TabsList className="grid w-full grid-cols-3">
 						{Object.values(CategoryType).map((categoryType) => (
-							<TabsTrigger key={categoryType} value={categoryType}>
+							<TabsTrigger onClick={() => router.push(`/category/${categoryType}`)} key={categoryType} value={categoryType}>
 								{categoryType.replace(/_/g, ' ')}
 							</TabsTrigger>
 						))}

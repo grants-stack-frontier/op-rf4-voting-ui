@@ -36,7 +36,7 @@ export function UnlockBallotDialog({
 						<DialogTitle><LockKeyholeOpen className="w-16 h-16 text-black" /></DialogTitle>
 						<DialogDescription className="text-xl font-medium">Nice work! You&apos;re ready to unlock your ballot and allocate rewards</DialogDescription>
 						<p className="text-sm text-muted-foreground">We&apos;ll use your scores to position projects in your unlocked ballot.</p>
-						<Button className="w-full" variant="destructive" onClick={handleUnlock}>Unlock ballot</Button>
+						<Button className="w-full" variant="destructive" onClick={handleUnlock} disabled={isUnlockedLoading}>Unlock ballot</Button>
 					</DialogHeader>
 				</DialogContent>
 			</Dialog>

@@ -4,9 +4,13 @@ import {
 	getProjectsResponse,
 	getRetroFundingRoundProjects,
 	getRetroFundingRoundProjectsResponse,
+	updateRetroFundingRoundProjectImpact,
 } from '@/__generated__/api/agora';
 import { PageMetadata, Project } from '@/__generated__/api/agora.schemas';
-import { useQuery } from '@tanstack/react-query';
+import { toast } from '@/components/ui/use-toast';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useAccount } from 'wagmi';
+import { ImpactScore } from './useProjectScoring';
 
 export type ProjectsResponse = {
 	metadata?: PageMetadata;
@@ -21,6 +25,17 @@ export function useProjects() {
 				const res: ProjectsResponse = results.data;
 				return res.data;
 			}),
+	});
+}
+
+export function useSaveProjectImpact() {
+	const { address } = useAccount();
+	return useMutation({
+		mutationKey: ['save-impact'],
+		mutationFn: async ({ projectId, impact }: { projectId: string; impact: ImpactScore }) => {
+			return updateRetroFundingRoundProjectImpact(5, address as string, projectId, impact as number);
+		},
+		onError: () => toast({ variant: 'destructive', title: 'Error saving ballot' }),
 	});
 }
 

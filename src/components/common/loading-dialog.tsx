@@ -1,9 +1,9 @@
 "use client";
 import { ComponentProps } from "react";
 import {
-	Dialog,
-	DialogContent
-} from "../ui/dialog";
+	AlertDialog,
+	AlertDialogContent
+} from "../ui/alert-dialog";
 
 export function LoadingDialog({
 	isOpen,
@@ -11,12 +11,12 @@ export function LoadingDialog({
 	message = "Loading",
 }: {
 	isOpen: boolean;
-	setOpen: ComponentProps<typeof Dialog>["onOpenChange"];
+	setOpen: ComponentProps<typeof AlertDialog>["onOpenChange"];
 	message?: string;
 }) {
 	return (
-		<Dialog open={isOpen} onOpenChange={setOpen}>
-			<DialogContent>
+		<AlertDialog open={isOpen} onOpenChange={setOpen}>
+			<AlertDialogContent>
 				<div className="flex flex-col items-center gap-2">
 					<div
 						className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
@@ -28,7 +28,7 @@ export function LoadingDialog({
 					</div>
 					<p className="font-medium">{message}...</p>
 				</div>
-			</DialogContent>
-		</Dialog>
+			</AlertDialogContent>
+		</AlertDialog>
 	);
 }

@@ -1,20 +1,20 @@
 "use client";
-import {BallotTabs} from "@/components/ballot/ballot-tabs";
-import {PageView} from "@/components/common/page-view";
-import {Badge} from "@/components/ui/badge";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
-import {Separator} from "@/components/ui/separator";
-import {useCategories} from "@/hooks/useCategories";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {ChevronRight, LockKeyholeOpen, Minus, Plus, RotateCw} from "lucide-react";
+import { BallotTabs } from "@/components/ballot/ballot-tabs";
+import { PageView } from "@/components/common/page-view";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { useCategories } from "@/hooks/useCategories";
+import { useProjects } from "@/hooks/useProjects";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ChevronRight, LockKeyholeOpen, Minus, Plus, RotateCw } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import {useProjects} from "@/hooks/useProjects";
-import {Controller, useForm} from 'react-hook-form';
-import {useEffect} from "react";
-import {z} from "zod";
+import { useEffect } from "react";
+import { Controller, useForm } from 'react-hook-form';
+import { z } from "zod";
 
 const BudgetSchema = z.object({
     categories: z.record(
@@ -72,7 +72,7 @@ export default function BudgetBallotPage() {
 
     // TODO: fix iffy typings
     // @ts-ignore
-    const countPerCategory = projects.data?.data.data?.reduce((acc, project) => {
+    const countPerCategory = projects.data?.data?.data?.reduce((acc, project) => {
         const category = categories.data?.find(cat => cat.id === project.category);
         if (!category) return acc;
         return {...acc, [category.id]: (acc[category.id] ?? 0) + 1};
@@ -121,7 +121,7 @@ export default function BudgetBallotPage() {
                                     <Image src={category.image} alt={category.name} width={80} height={80}/>
                                     <div className="flex-1">
                                         <Button variant="link" asChild>
-                                            <Link href={`/home/budget/category/${category.id}`}
+                                            <Link href={`/category/${category.id}`}
                                                   className="flex items-center gap-2">
                                                 <span className="font-medium">{category.name}</span>
                                                 <ChevronRight className="h-4 w-4"/>

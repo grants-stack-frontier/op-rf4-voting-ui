@@ -6,32 +6,38 @@ import {
 	CardHeader,
 	CardTitle
 } from "@/components/ui/card"
+import { ImpactScore, scoreLabels } from "@/hooks/useProjectScoring"
 import { cn } from "@/lib/utils"
-import React from "react"
+import { useCallback } from "react"
 import { Progress } from "../ui/progress"
 
 type CardProps = React.ComponentProps<typeof Card>
 
-type Score = 0 | 1 | 2 | 3 | 4 | 5 | "Skip"
-
 interface ReviewSidebarProps extends CardProps {
-	onScoreSelect: (score: Score) => void
+	onScoreSelect: (score: ImpactScore) => void
+	onConflictOfInterest: () => void
 	totalProjects: number
 	projectsScored: number
 	isVoted: boolean
 }
 
-const scoreLabels: Record<Score, string> = {
-	5: "Very High",
-	4: "High",
-	3: "Medium",
-	2: "Low",
-	1: "Very Low",
-	0: "Conflict of interest",
-	"Skip": "Skip"
-}
+export function ReviewSidebar({
+	className,
+	onScoreSelect,
+	onConflictOfInterest,
+	totalProjects,
+	projectsScored,
+	isVoted,
+	...props
+}: ReviewSidebarProps) {
+	const handleScore = useCallback((score: ImpactScore) => {
+		if (Number(score) === 0) {
+			onConflictOfInterest();
+		} else {
+			onScoreSelect(score);
+		}
+	}, [onConflictOfInterest, onScoreSelect]);
 
-export function ReviewSidebar({ className, onScoreSelect, totalProjects, projectsScored, isVoted, ...props }: ReviewSidebarProps) {
 	return (
 		<Card className={cn("w-[304px] h-[560px]", className)} {...props}>
 			<CardHeader>
@@ -41,11 +47,11 @@ export function ReviewSidebar({ className, onScoreSelect, totalProjects, project
 			</CardHeader>
 			<CardContent className="grid gap-4">
 				<div className="flex flex-col gap-2">
-					{(Object.entries(scoreLabels) as [Score, string][]).map(([score, label]) => (
+					{(Object.entries(scoreLabels) as [ImpactScore, string][]).map(([score, label]) => (
 						<Button
 							key={score}
 							variant={score === "Skip" ? "link" : "outline"}
-							onClick={() => onScoreSelect(score)}
+							onClick={() => handleScore(score)}
 							disabled={isVoted && score !== "Skip"}
 						>
 							{label}
