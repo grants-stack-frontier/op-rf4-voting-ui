@@ -44,7 +44,7 @@ export const useProjectScoring = (category: string, id: string) => {
 
 			return allProjectsScored;
 		},
-		[category, id, projectsScored]
+		[category, id, projectsScored, saveProjectImpact]
 	);
 
 	return { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect };
