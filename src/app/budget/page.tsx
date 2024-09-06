@@ -22,7 +22,7 @@ const BudgetSchema = z.object({
     )
 }).superRefine((data, ctx) => {
     const total = Object.values(data.categories).reduce((sum, val) => sum + val, 0);
-    if(total === 100) return true;
+    if (total === 100) return true;
 
     ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -46,7 +46,8 @@ export default function BudgetBallotPage() {
         resolver: zodResolver(BudgetSchema),
         defaultValues: {
             categories: {} // Initially empty, we'll populate this once categories data is loaded
-        }
+        },
+        mode: 'onBlur'
     });
 
     useEffect(() => {
@@ -89,7 +90,7 @@ export default function BudgetBallotPage() {
     };
 
     // Utility function to format input value as a percentage
-    const formatPercentage = (value: number) => `${value ? value.toFixed(2) : 0}%`;
+    const formatPercentage = (value: number) => `${value ? value.toFixed(2) : ""}%`;
 
     // Utility function to parse percentage input back to a number
     const parsePercentage = (value: string) => {
@@ -148,8 +149,17 @@ export default function BudgetBallotPage() {
                                                 render={({field}) => (
                                                     <Input
                                                         type="text"
-                                                        value={formatPercentage(field.value)} // Display as percentage with 2 decimals
-                                                        onChange={(e) => field.onChange(parsePercentage(e.target.value))} // Parse percentage on change
+                                                        value={field.value ? `${field.value}%` : '%'} // Always display the value with the % symbol
+                                                        onChange={(e) => {
+                                                            // Remove '%' and let the user type the value freely
+                                                            const inputValue = e.target.value.replace('%', '');
+                                                            field.onChange(inputValue); // Set the raw value without %
+                                                        }}
+                                                        onBlur={() => {
+                                                            // Parse the raw value (which might have had the '%' removed) and re-apply the % symbol
+                                                            const parsedValue = parsePercentage(field.value);
+                                                            field.onChange(parsedValue); // Update the field with the parsed value (as number)
+                                                        }}
                                                         className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-center"
                                                     />
                                                 )}
