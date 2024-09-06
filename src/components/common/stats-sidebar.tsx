@@ -15,14 +15,14 @@ import { ScrollArea } from "../ui/scroll-area";
 import { Text } from "../ui/text";
 import { OpenSourceIcon } from "./opensource-icon";
 
-import { RetroFundingImpactMetric } from "@/__generated__/api/agora.schemas";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
-import { Allocation } from "@/hooks/useBallot";
-import { MetricNameFromId } from "../metrics/metric-name-from-id";
-import { Button } from "../ui/button";
-import { Separator } from "../ui/separator";
-import { Skeleton } from "../ui/skeleton";
-import { ManualDialog } from "./manual-dialog";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from "@/components/ui/tooltip";
+import {Button} from "../ui/button";
+import {Separator} from "../ui/separator";
+import {Round4Allocation} from "@/hooks/useBallot";
+import {MetricNameFromId} from "../metrics/metric-name-from-id";
+import {Skeleton} from "../ui/skeleton";
+import {ManualDialog} from "./manual-dialog";
+import {RetroFundingImpactMetric} from "@/__generated__/api/agora.schemas";
 
 export function StatsSidebar({
     title,
@@ -145,7 +145,7 @@ function MetricPopover({
     onOpenManual,
 }: {
     is_os: boolean;
-    list?: Allocation[];
+    list?: Round4Allocation[];
     onOpenManual: () => void;
 }) {
     if (!list?.length) return null;

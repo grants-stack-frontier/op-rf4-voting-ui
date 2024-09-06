@@ -10,27 +10,47 @@ import {
   ComponentProps,
   ComponentType,
   PropsWithChildren,
+  useMemo,
   useState,
 } from "react";
 import { useDisconnect } from "../auth/sign-message";
 import { ImportBallotDialog } from "./import-ballot";
+import { Progress } from "../ui/progress";
+import { useBallotRound5Context } from "./provider5";
 
 export function EmptyBallot() {
   const [isOpen, setOpen] = useState(false);
+  const { ballot } = useBallotRound5Context();
+  const quantities = useMemo(() => {
+    if (ballot) {
+      return {
+        total: ballot.total_projects,
+        toBeEvaluated: ballot.projects_to_be_evaluated.length,
+      }
+    }
+    return {
+      total: 0,
+      toBeEvaluated: 0,
+    }
+  }, [ballot])
   return (
     <EmptyCard
-      icon={BallotSvg}
-      title="Your ballot is empty"
-      description="Review and add the metrics you believe should be used to reward projects in this round."
+      icon={BallotSvg} // TO DO: Change to lock
+      title="Score projects to unlock your ballot"
+      description=""
     >
+      <Progress value={0/20} className="w-60" />
+      <Text className="text-center max-w-lg mx-auto">
+        You&apos;ve scored {quantities.total - quantities.toBeEvaluated} of {quantities.total} projects
+      </Text>
       <div className="flex gap-2">
-        <Link href="/ballot/metrics">
-          <Button variant="destructive">Review metrics</Button>
+        <Link href="/ballot/projects">
+          <Button variant="destructive">Score projects</Button>
         </Link>
-        <Button variant="outline" onClick={() => setOpen(true)}>
+        {/* <Button variant="outline" onClick={() => setOpen(true)}>
           Import ballot
-        </Button>
-        <ImportBallotDialog isOpen={isOpen} onOpenChange={setOpen} />
+        </Button> */}
+        {/* <ImportBallotDialog isOpen={isOpen} onOpenChange={setOpen} /> */}
       </div>
     </EmptyCard>
   );

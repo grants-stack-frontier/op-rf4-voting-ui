@@ -4,7 +4,7 @@ import {useQuery} from "@tanstack/react-query";
 
 import {OrderBy, SortOrder } from "./useFilter";
 import {useAccount} from "wagmi";
-import {Allocation} from "./useBallot";
+import {Round4Allocation} from "./useBallot";
 import {getImpactMetricsOnRetroFundingRound, recordImpactMetricView} from "@/__generated__/api/agora";
 
 type SortFields = { [OrderBy.name]?: string; [OrderBy.allocation]?: number };
@@ -27,7 +27,7 @@ export type ProjectAllocation = {
     name: string;
     is_os: boolean;
     project_id: string;
-    allocations_per_metric?: Allocation[];
+    allocations_per_metric?: Round4Allocation[];
 };
 
 export function createSortFn(filter: { order: OrderBy; sort: SortOrder }) {

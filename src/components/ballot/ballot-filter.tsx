@@ -23,7 +23,7 @@ export function BallotFilter() {
 
   return (
     <div className="flex gap-2">
-      <DropdownMenu>
+      {/* <DropdownMenu>
         <DropdownMenuTrigger>
           <Button variant="secondary" iconRight={ChevronDown}>
             {sortLabels[encode(filter)]}
@@ -53,7 +53,7 @@ export function BallotFilter() {
             ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
-      </DropdownMenu>
+      </DropdownMenu> */}
       <DropdownMenu>
         <DropdownMenuTrigger>
           <Button variant={"secondary"}>...</Button>
