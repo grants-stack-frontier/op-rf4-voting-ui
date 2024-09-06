@@ -1,31 +1,34 @@
 "use client";
-import { BallotTabs } from "@/components/ballot/ballot-tabs";
-import { PageView } from "@/components/common/page-view";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { useCategories } from "@/hooks/useCategories";
-import { useProjects } from "@/hooks/useProjects";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ChevronRight, LockKeyholeOpen, Minus, Plus, RotateCw } from "lucide-react";
+import {BallotTabs} from "@/components/ballot/ballot-tabs";
+import {PageView} from "@/components/common/page-view";
+import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {Input} from "@/components/ui/input";
+import {Separator} from "@/components/ui/separator";
+import {useCategories} from "@/hooks/useCategories";
+import {useProjects} from "@/hooks/useProjects";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {ChevronRight, LockKeyholeOpen, Minus, Plus, RotateCw} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
-import { Controller, useForm } from 'react-hook-form';
-import { z } from "zod";
+import {useEffect} from "react";
+import {Controller, useForm} from 'react-hook-form';
+import {z} from "zod";
 
 const BudgetSchema = z.object({
     categories: z.record(
         z.number().min(0, "Budget must be at least 0").max(100, "Budget cannot exceed 100%")
     )
-}).refine((data) => {
+}).superRefine((data, ctx) => {
     const total = Object.values(data.categories).reduce((sum, val) => sum + val, 0);
-    return total === 100;
-}, {
-    message: "The total budget allocation must add up to 100%",
-    path: ["budget"]
+    if(total === 100) return true;
+
+    ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Allocated ${total}%. The total allocation must add up to 100%`,
+        path: ["budget"]
+    });
 });
 
 interface FormData {
@@ -37,6 +40,7 @@ export default function BudgetBallotPage() {
 
     const categories = useCategories();
     const projects = useProjects();
+
     // Initialize the form with Zod validation using the resolver
     const {register, handleSubmit, control, formState: {errors}, setValue, getValues, reset} = useForm<FormData>({
         resolver: zodResolver(BudgetSchema),
@@ -52,16 +56,12 @@ export default function BudgetBallotPage() {
 
             // Calculate the initial values, except for the last category
             const initialCategoryValues = categories.data.reduce((acc, category, index) => {
-                if (index === categories.data.length - 1) return acc; // Skip the last one for now
-                const value = Math.floor(totalInitialBudget / categories.data.length);
+
+                const value = Math.round(((totalInitialBudget / categories.data.length) + Number.EPSILON) * 100) / 100;
                 totalAssigned += value;
                 acc[category.id] = value;
                 return acc;
             }, {} as Record<string, number>);
-
-            // Assign the remaining budget to the last category to ensure the sum is exactly 100
-            const lastCategory = categories.data[categories.data.length - 1];
-            initialCategoryValues[lastCategory.id] = totalInitialBudget - totalAssigned;
 
             // Reset form with calculated default values
             reset({
@@ -70,9 +70,7 @@ export default function BudgetBallotPage() {
         }
     }, [categories.data, reset]);
 
-    // TODO: fix iffy typings
-    // @ts-ignore
-    const countPerCategory = projects.data?.data?.data?.reduce((acc, project) => {
+    const countPerCategory = projects.data?.reduce((acc, project) => {
         const category = categories.data?.find(cat => cat.id === project.category);
         if (!category) return acc;
         return {...acc, [category.id]: (acc[category.id] ?? 0) + 1};
@@ -83,7 +81,7 @@ export default function BudgetBallotPage() {
         const totalPercentage = Object.values(data.categories).reduce((acc, percentage) => acc + percentage, 0);
 
         if (totalPercentage !== 100) {
-            alert('The total allocation must equal 100%');
+            alert(`${totalPercentage}% allocated. The total allocation must equal 100%`);
         } else {
             // Process the submitted budget allocations
             console.log('Valid Budget:', data);
@@ -91,7 +89,7 @@ export default function BudgetBallotPage() {
     };
 
     // Utility function to format input value as a percentage
-    const formatPercentage = (value: number) => `${value}%`;
+    const formatPercentage = (value: number) => `${value ? value.toFixed(2) : 0}%`;
 
     // Utility function to parse percentage input back to a number
     const parsePercentage = (value: string) => {
@@ -150,7 +148,7 @@ export default function BudgetBallotPage() {
                                                 render={({field}) => (
                                                     <Input
                                                         type="text"
-                                                        value={formatPercentage(field.value)} // Display as percentage
+                                                        value={formatPercentage(field.value)} // Display as percentage with 2 decimals
                                                         onChange={(e) => field.onChange(parsePercentage(e.target.value))} // Parse percentage on change
                                                         className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-center"
                                                     />
