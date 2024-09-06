@@ -110,11 +110,26 @@ function useVerify() {
       setToken(access_token);
       // Trigger a refetch of the session
       await client.invalidateQueries({ queryKey: ["session"] });
+      
+      setVoterConfirmationView();
 
       return { access_token };
     },
   });
 }
+
+export function setVoterConfirmationView() {
+  localStorage.setItem("voter-confirmation-view", "true");
+}
+export function getVoterConfirmationView() {
+  const view = localStorage.getItem("voter-confirmation-view");
+  return !!view
+}
+export function removeVoterConfirmationView() {
+  const view = localStorage.getItem("voter-confirmation-view");
+  if (view) localStorage.removeItem("voter-confirmation-view");
+}
+
 export function useDisconnect() {
   const client = useQueryClient();
   const router = useRouter();
