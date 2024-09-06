@@ -16,7 +16,6 @@ import { useMetricIds } from "@/hooks/useMetrics";
 import mixpanel from "@/lib/mixpanel";
 import { CategoryId, Round5Allocation } from "@/hooks/useBallot";
 import { useBallotRound5Context } from "./provider5";
-import { categoryIds } from "@/app/ballot/page";
 
 export function ImportBallotDialog({
   isOpen,

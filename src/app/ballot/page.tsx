@@ -143,7 +143,7 @@ function CheckBallotState() {
   return <YourBallot />;
 }
 
-export const categoryIds: CategoryId[] = [
+const categoryIds: CategoryId[] = [
   'ETHEREUM_CORE_CONTRIBUTIONS',
   'OP_STACK_RESEARCH_AND_DEVELOPMENT',
   'OP_STACK_TOOLING'

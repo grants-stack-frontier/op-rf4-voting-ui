@@ -41,7 +41,7 @@ export function EmptyBallot() {
     >
       <Progress value={0/20} className="w-60" />
       <Text className="text-center max-w-lg mx-auto">
-        You've scored {quantities.total - quantities.toBeEvaluated} of {quantities.total} projects
+        You&apos;ve scored {quantities.total - quantities.toBeEvaluated} of {quantities.total} projects
       </Text>
       <div className="flex gap-2">
         <Link href="/ballot/projects">
