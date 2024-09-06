@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 const tabs = [
   {
     children: "Budget",
-    href: "/home/budget",
+    href: "/budget",
   },
   {
     children: "Ballot",

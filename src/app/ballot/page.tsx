@@ -9,11 +9,15 @@ import { ComponentProps, useEffect, useState } from "react";
 import { SubmitDialog, downloadImage } from "@/components/ballot/submit-dialog";
 import { MetricsEditor } from "../../components/metrics-editor";
 import {
+  CategoryId,
   MAX_MULTIPLIER_VALUE,
+  Round5Allocation,
+  Round5ProjectAllocation,
   useBallot,
   useBallotWeightSum,
   useIsSavingBallot,
   useOsMultiplier,
+  useRound5Ballot,
 } from "@/hooks/useBallot";
 import { Metric, ProjectAllocation, useMetricsByRound } from "@/hooks/useMetrics";
 import { Separator } from "@/components/ui/separator";
@@ -34,6 +38,11 @@ import { votingEndDate } from "@/config";
 import { useVotingTimeLeft } from "@/components/voting-ends-in";
 import { SearchInput } from "@/components/common/search-input";
 import Link from "next/link";
+import { useProjects, useProjectsByCategory } from "@/hooks/useProjects";
+import { useBallotRound5Context } from "@/components/ballot/provider5";
+import { SubmitRound5Dialog } from "@/components/ballot/submit-dialog5";
+import { useDistributionMethod, useIsSavingRound5Ballot, useRound5BallotWeightSum, useSaveRound5Allocation, useSaveRound5Position } from "@/hooks/useBallotRound5";
+import { ImpactScore, useSaveProjectImpact } from "@/hooks/useProjectImpact";
 
 function formatAllocationOPAmount(amount: number) {
   const value = amount.toString()
@@ -62,46 +71,46 @@ const impactScores: { [key: number]: string } = {
 
 const totalAllocationAmount = 3_333_333;
 
-const projects: ProjectAllocation[] = [
+const projects: Round5ProjectAllocation[] = [
   {
+    position: 0,
     allocation: 0,
+    impact: 0,
     image: "https://via.placeholder.com/150",
     name: "Project name 1",
-    is_os: true,
     project_id: "1",
-    allocations_per_metric: undefined,
   },
   {
+    position: 0,
     allocation: 0,
+    impact: 0,
     image: "https://via.placeholder.com/150",
     name: "Project name 2",
-    is_os: true,
     project_id: "1",
-    allocations_per_metric: undefined,
   },
   {
+    position: 0,
     allocation: 0,
+    impact: 0,
     image: "https://via.placeholder.com/150",
     name: "Project name 3",
-    is_os: true,
     project_id: "1",
-    allocations_per_metric: undefined,
   },
   {
+    position: 0,
     allocation: 0,
+    impact: 0,
     image: "https://via.placeholder.com/150",
     name: "Project name 4",
-    is_os: true,
     project_id: "1",
-    allocations_per_metric: undefined,
   },
   {
+    position: 0,
     allocation: 0,
+    impact: 0,
     image: "https://via.placeholder.com/150",
     name: "Project name 5",
-    is_os: true,
     project_id: "1",
-    allocations_per_metric: undefined,
   },
 ]
 
@@ -116,9 +125,9 @@ export default function BallotPage() {
 
 function CheckBallotState() {
   const { address, isConnecting } = useAccount();
-  const { isPending, data: ballot } = useBallot(address);
+  const { isPending, data: ballot } = useRound5Ballot(address);
   console.log("Ballot Data from new API:", {ballot});
-  const { state } = useBallotContext();
+  const { state } = useBallotRound5Context();
   // Comment out for local dev if needed
   if (isPending) {
     return <Skeleton className="p-6 h-96" />;
@@ -126,19 +135,32 @@ function CheckBallotState() {
   if (!address && !isConnecting) {
     return <NonBadgeholder />;
   }
-  const isEmptyBallot = !Object.keys(state).length;
-  if (isEmptyBallot) {
-    return <EmptyBallot />;
-  }
+  // const isEmptyBallot = !Object.keys(state).length;
+  // if (isEmptyBallot) {
+  //   return <EmptyBallot />;
+  // }
   // ^^^Comment out for local dev if needed
   return <YourBallot />;
 }
 
+const categoryIds: CategoryId[] = [
+  'ETHEREUM_CORE_CONTRIBUTIONS',
+  'OP_STACK_RESEARCH_AND_DEVELOPMENT',
+  'OP_STACK_TOOLING'
+]
+
+const categoryNames: { [key: string]: string } = {
+  ETHEREUM_CORE_CONTRIBUTIONS: 'Ethereum Core Contributions',
+  OP_STACK_RESEARCH_AND_DEVELOPMENT: 'OP Stack Research and Development',
+  OP_STACK_TOOLING: 'OP Stack Tooling'
+}
+
 function YourBallot() {
   const [isSubmitting, setSubmitting] = useState(false);
-  const metrics = useMetricsByRound(4);
-
-  const { ballot } = useBallotContext();
+  
+  const { ballot } = useBallotRound5Context();
+  const { mutate: saveAllocation } = useSaveRound5Allocation();
+  const { mutate: savePosition } = useSaveRound5Position();
 
   console.log({ballot});
 
@@ -148,7 +170,7 @@ function YourBallot() {
     setProjectList(ballot?.project_allocations || []);
   }, [ballot]);
 
-  const updateProjects = (newProjects: ProjectAllocation[]) => {
+  const updateProjects = (newProjects: Round5ProjectAllocation[]) => {
     setProjectList(newProjects);
   };
 
@@ -162,7 +184,7 @@ function YourBallot() {
   };
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredProjects, setFilteredProjects] = useState<ProjectAllocation[]>([]);
+  const [filteredProjects, setFilteredProjects] = useState<Round5ProjectAllocation[]>([]);
 
   useEffect(() => {
     if (searchTerm) {
@@ -180,6 +202,13 @@ function YourBallot() {
   };
 
   const displayProjects = searchTerm ? filteredProjects : projectList;
+
+  // For dev purposes only
+  // const { mutate: saveImpact } = useSaveProjectImpact();
+
+  // const handleImpactChange = (projectId: string, impact: ImpactScore) => {
+  //   saveImpact({projectId, impact});
+  // };
 
   return (
     <div className="space-y-4">
@@ -211,10 +240,9 @@ function YourBallot() {
           </div>
         </Alert>
       )}
+      <p>Your voting category is <a href={`/budget/category/${categoryIds[0]}`} className="underline">{categoryNames[categoryIds[0]]}</a> ({projects.length} projects)</p>
       <Card className="p-6 space-y-8">
         <MetricsEditor
-          metrics={metrics.data?.data as Metric[]}
-          isLoading={metrics.isPending}
           onAllocationMethodSelect={handleAllocationMethodSelect}
         />
         <SearchInput className="my-2" placeholder="Search projects..." onChange={handleSearch} />
@@ -267,6 +295,7 @@ function YourBallot() {
                           const [removed] = newProjects.splice(draggedIndex, 1);
                           newProjects.splice(newIndex, 0, removed);
                           updateProjects(newProjects);
+                          savePosition({id: proj.project_id, position: newIndex})
                         }
                       }}
                     >
@@ -281,14 +310,15 @@ function YourBallot() {
                   <div className="relative">
                     <Input
                       type="number"
-                      placeholder="-- %"
+                      placeholder="--"
                       className="text-center"
-                      value={proj.allocation.toFixed(2)}
+                      value={proj.allocation}
                       onChange={(e) => {
                         const newAllocation = parseFloat(e.target.value);
                         const newProjectList = [...projectList];
                         newProjectList[i].allocation = isNaN(newAllocation) ? 0 : newAllocation;
                         setProjectList(newProjectList);
+                        saveAllocation({project_id: proj.project_id, allocation: newAllocation})
                       }}
                     />
                     <span className="absolute right-10 top-1/2 transform -translate-y-1/2 pointer-events-none">%</span>
@@ -300,7 +330,8 @@ function YourBallot() {
           })}
         </div>
 
-        <OpenSourceMultiplier initialValue={ballot?.os_multiplier} />
+        {/* <OpenSourceMultiplier initialValue={ballot?.os_multiplier} /> */}
+        {/* <Button onClick={() => handleImpactChange(ballot?.projects_to_be_evaluated[0] ?? "", 5)}>Score Impact</Button> */}
 
         <div className="flex items-center gap-4">
           <BallotSubmitButton onClick={() => setSubmitting(true)} />
@@ -310,7 +341,12 @@ function YourBallot() {
         </div>
 
         {ballot?.address && (
-          <SubmitDialog
+          // <SubmitDialog
+          //   ballot={ballot!}
+          //   open={isSubmitting}
+          //   onOpenChange={() => setSubmitting(false)}
+          // />
+          <SubmitRound5Dialog
             ballot={ballot!}
             open={isSubmitting}
             onOpenChange={() => setSubmitting(false)}
@@ -412,7 +448,7 @@ function OpenSourceInput(props: ComponentProps<typeof Input>) {
 }
 
 function WeightsError() {
-  const allocationSum = useBallotWeightSum();
+  const allocationSum = useRound5BallotWeightSum();
 
   if (allocationSum === 100) return null;
 
@@ -424,7 +460,7 @@ function WeightsError() {
 }
 
 function IsSavingBallot() {
-  const isSavingBallot = useIsSavingBallot();
+  const isSavingBallot = useIsSavingRound5Ballot();
 
   return isSavingBallot ? (
     <span className="flex gap-2">

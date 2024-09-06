@@ -65,7 +65,7 @@ export function WelcomeCarousel({
       />
 
       {current === count ? (
-        <Link href={"/home/budget"}>
+        <Link href={"/budget"}>
           <Button variant={"destructive"}>Let&apos;s go!</Button>
         </Link>
       ) : (

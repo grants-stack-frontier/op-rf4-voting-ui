@@ -1,39 +1,39 @@
 "use client";
-import {PropsWithChildren, ReactNode, useMemo, useRef, useState} from "react";
+import { PropsWithChildren, ReactNode, useMemo, useRef, useState } from "react";
 
-import {Card} from "../ui/card";
-import {Heading} from "../ui/headings";
-import {ScrollArea} from "../ui/scroll-area";
-import {Text} from "../ui/text";
-import DistributionChart from "../metrics/distribution-chart";
-import {OpenSourceIcon} from "./opensource-icon";
-import {ArrowDown, ChevronRight} from "lucide-react";
-import {MetricSort} from "../metrics/metric-sort";
-import {Badge} from "../ui/badge";
+import { ProjectAllocation } from "@/hooks/useMetrics";
+import { cn } from "@/lib/utils";
+import { ArrowDown, ChevronRight } from "lucide-react";
+import { useIntersection } from "react-use";
 import AvatarPlaceholder from "../../../public/avatar-placeholder.svg";
-import {useIntersection} from "react-use";
-import {cn} from "@/lib/utils";
-import {ProjectAllocation} from "@/hooks/useMetrics";
+import DistributionChart from "../metrics/distribution-chart";
+import { MetricSort } from "../metrics/metric-sort";
+import { Badge } from "../ui/badge";
+import { Card } from "../ui/card";
+import { Heading } from "../ui/headings";
+import { ScrollArea } from "../ui/scroll-area";
+import { Text } from "../ui/text";
+import { OpenSourceIcon } from "./opensource-icon";
 
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from "@/components/ui/tooltip";
 import {Button} from "../ui/button";
 import {Separator} from "../ui/separator";
-import {Allocation} from "@/hooks/useBallot";
+import {Round4Allocation} from "@/hooks/useBallot";
 import {MetricNameFromId} from "../metrics/metric-name-from-id";
 import {Skeleton} from "../ui/skeleton";
 import {ManualDialog} from "./manual-dialog";
 import {RetroFundingImpactMetric} from "@/__generated__/api/agora.schemas";
 
 export function StatsSidebar({
-                                 title,
-                                 description,
-                                 isLoading,
-                                 isUpdating,
-                                 projects,
-                                 footer,
-                                 formatAllocation = (v: number) => v,
-                                 formatChartTick = (v: number) => String(v),
-                             }: {
+    title,
+    description,
+    isLoading,
+    isUpdating,
+    projects,
+    footer,
+    formatAllocation = (v: number) => v,
+    formatChartTick = (v: number) => String(v),
+}: {
     title: string;
     description?: string;
     isLoading?: boolean;
@@ -105,7 +105,7 @@ export function StatsSidebar({
                         </Tooltip>
                     </TooltipProvider>
                     <div className="flex justify-end gap-1">
-                        <MetricSort sort={sort} setSort={setSort}/>
+                        <MetricSort sort={sort} setSort={setSort} />
                     </div>
                 </div>
                 <ScrollArea className="h-[328px] relative">
@@ -122,13 +122,13 @@ export function StatsSidebar({
                             {formatAllocation(item.allocation ?? 0)}
                         </AllocationItem>
                     ))}
-                    <div ref={intersectionRef}/>
+                    <div ref={intersectionRef} />
                     {(intersection?.intersectionRatio ?? 0) < 1 && (
                         <Badge
                             variant="outline"
                             className="animate-in fade-in zoom-in absolute bottom-2 left-1/2 -translate-x-1/2 bg-white"
                         >
-                            More <ArrowDown className="ml-2 size-3 "/>
+                            More <ArrowDown className="ml-2 size-3 " />
                         </Badge>
                     )}
                 </ScrollArea>
@@ -140,12 +140,12 @@ export function StatsSidebar({
 }
 
 function MetricPopover({
-                           is_os,
-                           list,
-                           onOpenManual,
-                       }: {
+    is_os,
+    list,
+    onOpenManual,
+}: {
     is_os: boolean;
-    list?: Allocation[];
+    list?: Round4Allocation[];
     onOpenManual: () => void;
 }) {
     if (!list?.length) return null;
@@ -158,13 +158,13 @@ function MetricPopover({
                 {list?.map((m, i) => (
                     <li key={m.metric_id} className="flex gap-2 p-2">
                         <div>{i + 1}.</div>
-                        <MetricNameFromId id={m.metric_id}/>
+                        <MetricNameFromId id={m.metric_id} />
                     </li>
                 ))}
             </ol>
             {is_os && (
                 <>
-                    <Separator className="-mx-3 mb-2"/>
+                    <Separator className="-mx-3 mb-2" />
                     <Button
                         icon={OpenSourceIcon}
                         variant={"ghost"}
@@ -181,13 +181,13 @@ function MetricPopover({
 }
 
 function AllocationItem({
-                            name,
-                            image = AvatarPlaceholder.src,
-                            allocations_per_metric,
-                            is_os,
-                            isLoading,
-                            children,
-                        }: PropsWithChildren<Partial<ProjectAllocation>> & { isLoading?: boolean }) {
+    name,
+    image = AvatarPlaceholder.src,
+    allocations_per_metric,
+    is_os,
+    isLoading,
+    children,
+}: PropsWithChildren<Partial<ProjectAllocation>> & { isLoading?: boolean }) {
     const [isOpen, setOpen] = useState(false);
     return (
         <>
@@ -206,13 +206,13 @@ function AllocationItem({
                                     }}
                                 />
                                 <div className="truncate">
-                                    {name || <Skeleton className="h-3 w-16"/>}
+                                    {name || <Skeleton className="h-3 w-16" />}
                                 </div>
                                 {is_os && (
-                                    <OpenSourceIcon className="size-3 flex-shrink-0 mr-1"/>
+                                    <OpenSourceIcon className="size-3 flex-shrink-0 mr-1" />
                                 )}
                             </div>
-                            <div className={cn({["text-gray-400"]: isLoading})}>
+                            <div className={cn({ ["text-gray-400"]: isLoading })}>
                                 {children}
                             </div>
                         </div>
@@ -231,7 +231,7 @@ function AllocationItem({
                     </TooltipContent>
                 </Tooltip>
             </TooltipProvider>
-            <ManualDialog open={isOpen} onOpenChange={setOpen}/>
+            <ManualDialog open={isOpen} onOpenChange={setOpen} />
         </>
     );
 }
