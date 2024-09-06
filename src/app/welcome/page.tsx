@@ -6,7 +6,7 @@ import {WelcomeCarousel} from "@/components/welcome/carousel";
 import onboard1 from "../../../public/onboard1.svg";
 import onboard2 from "../../../public/onboard2.svg";
 import onboard3 from "../../../public/onboard3.svg";
-import onboard4 from "../../../public/onboard3.svg";
+import onboard4 from "../../../public/onboard4.svg";
 
 import {useAccount} from "wagmi";
 import {redirect} from "next/navigation";

@@ -167,9 +167,6 @@ export default function BudgetBallotPage() {
                                             {Math.round((getValues(`categories.${category.id}`) / 100) * 10000000)} OP
                                         </div>
                                     </div>
-                                    <Button size="icon" variant="ghost" className="outline-none hover:bg-transparent">
-                                        <LockKeyholeOpen className="h-4 w-4"/>
-                                    </Button>
                                 </div>
                                 {errors.categories?.[category.id] && (
                                     <p className="text-red-500">
