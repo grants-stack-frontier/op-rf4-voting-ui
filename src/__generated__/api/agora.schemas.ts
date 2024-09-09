@@ -43,7 +43,7 @@ Not Live.
 |----------|---------|---------------|
 | OP 0.2.0 | LIVE   | Aug 10th |
 | OP 0.2.1 | LIVE   | Aug 26th |
-| OP 0.2.2 | ON TRACK   | Aug 30th |
+| OP 0.2.2 | LIVE   | Sep 4th |
 | OP 0.2.3 | ON TRACK   | Sep 20th |
  * OpenAPI spec version: 0.2.1
  */
@@ -95,10 +95,6 @@ export type RecordImpactMetricView200 = {
   ts?: string;
 };
 
-export type UpdateRetroFundingBallotDistributionMethodBody = {
-  distribution_method?: string;
-};
-
 export type UpdateRetroFundingRoundCategoryAllocationBodyCategorySlug = typeof UpdateRetroFundingRoundCategoryAllocationBodyCategorySlug[keyof typeof UpdateRetroFundingRoundCategoryAllocationBodyCategorySlug];
 
 
@@ -113,6 +109,16 @@ export type UpdateRetroFundingRoundCategoryAllocationBody = {
   allocation?: string;
   category_slug?: UpdateRetroFundingRoundCategoryAllocationBodyCategorySlug;
   locked?: boolean;
+};
+
+export type UpdateRetroFundingRoundProjectsBodyProjectsItem = {
+  allocation?: string;
+  impact?: number;
+  project_id?: string;
+};
+
+export type UpdateRetroFundingRoundProjectsBody = {
+  projects?: UpdateRetroFundingRoundProjectsBodyProjectsItem[];
 };
 
 export type AddImpactMetricToRetroFundingBallotBody = {
@@ -137,6 +143,22 @@ export const GetRetroFundingRoundProjectsCategory = {
   op_rnd: 'op_rnd',
 } as const;
 
+export type GetRetroFundingRoundProjectsParams = {
+/**
+ * Limits the number of returned results.
+ */
+limit?: LimitParamParameter;
+/**
+ * Offset from which start returned results.
+ */
+offset?: OffsetParamParameter;
+/**
+ * The desired method by which returned votes will be filtered. Supported values are: 'all', 'eth_core', "op_tooling", "op_rnd"
+
+ */
+category?: GetRetroFundingRoundProjectsCategory;
+};
+
 export type SubmitRetroFundingBallot200 = {
   address?: string;
   created_at?: string;
@@ -149,22 +171,6 @@ export type SubmitRetroFundingBallot200 = {
 export type SubmitRetroFundingBallotBody = RetroFunding4BallotSubmission | RetroFunding5BallotSubmission;
 
 export type GetRetroFundingRoundBallotById200 = Round5Ballot | Round4Ballot;
-
-export type GetRetroFundingRoundBallots200 = {
-  ballots?: Round4Ballot[];
-  metadata?: PageMetadata;
-};
-
-export type GetRetroFundingRoundBallotsParams = {
-/**
- * Limits the number of returned results.
- */
-limit?: LimitParamParameter;
-/**
- * Offset from which start returned results.
- */
-offset?: OffsetParamParameter;
-};
 
 export type GetRetroFundingRounds200 = {
   metadata?: PageMetadata;
@@ -307,22 +313,6 @@ export type OffsetParamParameter = number;
  * Limits the number of returned results.
  */
 export type LimitParamParameter = number;
-
-export type GetRetroFundingRoundProjectsParams = {
-/**
- * Limits the number of returned results.
- */
-limit?: LimitParamParameter;
-/**
- * Offset from which start returned results.
- */
-offset?: OffsetParamParameter;
-/**
- * The desired method by which returned votes will be filtered. Supported values are: 'all', 'eth_core', "op_tooling", "op_rnd"
-
- */
-category?: GetRetroFundingRoundProjectsCategory;
-};
 
 export type GetProposalsParams = {
 /**
@@ -569,33 +559,6 @@ export interface SocialLinks {
   website?: string;
 }
 
-/**
- * Information about a project submitted for Retroactive Public Goods Funding on Agora.
-
- * @summary A project submitted for RetroFunding
- */
-export interface Project {
-  category?: string;
-  /**
-   * Information about the contracts deployed by the project, including the contract address, chain ID, deployer, and creation block.
-
-   * @summary Deployed contracts for the project
-   */
-  contracts?: ProjectContractsItem[];
-  description?: string;
-  github?: ProjectGithubItem[];
-  grantsAndFunding?: ProjectGrantsAndFunding;
-  id?: string;
-  links?: string[];
-  name?: string;
-  organization?: Organization;
-  packages?: string[];
-  profileAvatarUrl?: string;
-  projectCoverImageUrl?: string;
-  socialLinks?: SocialLinks;
-  team?: string[];
-}
-
 export type ProjectGrantsAndFundingVentureFundingItem = {
   amount?: string;
   details?: string;
@@ -660,6 +623,33 @@ export type ProjectContractsItemAllOf = {
 };
 
 export type ProjectContractsItem = Contract & ProjectContractsItemAllOf;
+
+/**
+ * Information about a project submitted for Retroactive Public Goods Funding on Agora.
+
+ * @summary A project submitted for RetroFunding
+ */
+export interface Project {
+  category?: string;
+  /**
+   * Information about the contracts deployed by the project, including the contract address, chain ID, deployer, and creation block.
+
+   * @summary Deployed contracts for the project
+   */
+  contracts?: ProjectContractsItem[];
+  description?: string;
+  github?: ProjectGithubItem[];
+  grantsAndFunding?: ProjectGrantsAndFunding;
+  id?: string;
+  links?: string[];
+  name?: string;
+  organization?: Organization;
+  packages?: string[];
+  profileAvatarUrl?: string;
+  projectCoverImageUrl?: string;
+  socialLinks?: SocialLinks;
+  team?: string[];
+}
 
 /**
  * A category for a RetroFunding project, including information about the category.
