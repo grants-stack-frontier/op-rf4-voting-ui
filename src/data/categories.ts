@@ -1,3 +1,4 @@
+import { CategoryId } from '@/hooks/useBallot';
 import ethCore from '../../public/eth_core.svg';
 import opRnd from '../../public/op_rnd.svg';
 import opTooling from '../../public/op_tooling.svg';
@@ -13,7 +14,7 @@ export enum CategoryType {
 }
 
 export type Category = {
-	id: string;
+	id: CategoryId;
 	name: string;
 	image: any;
 	description: string;
