@@ -39,12 +39,12 @@ export function EmptyBallot() {
       title="Score projects to unlock your ballot"
       description=""
     >
-      <Progress value={0/20} className="w-60" />
+      <Progress value={(quantities.total - quantities.toBeEvaluated)/(quantities.total)} className="w-60" />
       <Text className="text-center max-w-lg mx-auto">
         You&apos;ve scored {quantities.total - quantities.toBeEvaluated} of {quantities.total} projects
       </Text>
       <div className="flex gap-2">
-        <Link href="/ballot/projects">
+        <Link href={`/project/${ballot?.projects_to_be_evaluated[0]}`}>
           <Button variant="destructive">Score projects</Button>
         </Link>
         {/* <Button variant="outline" onClick={() => setOpen(true)}>
