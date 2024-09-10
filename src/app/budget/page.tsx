@@ -50,8 +50,15 @@ export default function BudgetBallotPage() {
         <BudgetForm
           categories={categories.data}
           countPerCategory={countPerCategory}
-          saveAllocation={(allocation: Round5Allocation) => 
-            saveAllocation.mutateAsync(allocation) as Promise<Round5Allocation[]>
+          saveAllocation={(allocation: Round5Allocation) => {
+            console.log('allocation', allocation)
+            
+            
+              return saveAllocation.mutateAsync({
+                ...allocation,
+                locked: false,
+              }) as Promise<Round5Allocation[]>
+          }
           }
           submitBudget={submitBudget.mutateAsync}
           initialAllocations={getBudget.data as Round5Allocation[] | undefined}
