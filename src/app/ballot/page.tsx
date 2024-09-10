@@ -128,10 +128,10 @@ function CheckBallotState() {
   if (!address && !isConnecting) {
     return <NonBadgeholder />;
   }
-  // const isEmptyBallot = !Object.keys(state).length;
-  // if (isEmptyBallot) {
-  //   return <EmptyBallot />;
-  // }
+  const isEmptyBallot = !Object.keys(state).length;
+  if (isEmptyBallot) {
+    return <EmptyBallot />;
+  }
   // ^^^Comment out for local dev if needed
   return <YourBallot />;
 }
