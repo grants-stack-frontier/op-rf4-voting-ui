@@ -1,23 +1,19 @@
-// useBudgetForm.ts
+'use client';
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 import { useToast } from "@/components/ui/use-toast";
-import { request } from "@/lib/request";
-import { agoraRoundsAPI } from "@/config";
+import { CategoryId, Round5Allocation } from "@/types/shared";
+import {
+  getRetroFundingRoundBallotById,
+  updateRetroFundingRoundCategoryAllocation,
+  getRetroFundingRoundBallotByIdResponse,
+  updateRetroFundingRoundCategoryAllocationResponse,
+} from '@/__generated__/api/agora';
 import { useState } from "react";
+import { Round5Ballot } from "@/__generated__/api/agora.schemas";
 
-export type CategoryId =
-  | "ETHEREUM_CORE_CONTRIBUTIONS"
-  | "OP_STACK_RESEARCH_AND_DEVELOPMENT"
-  | "OP_STACK_TOOLING";
-
-export type Round5Allocation = {
-  category_slug: CategoryId;
-  allocation: string;
-  locked: boolean;
-};
-
-export function useBudgetForm(roundId: string) {
+export function useBudgetForm(roundId: number) {
   const { toast } = useToast();
   const { address } = useAccount();
   const queryClient = useQueryClient();
@@ -26,38 +22,40 @@ export function useBudgetForm(roundId: string) {
   const getBudget = useQuery({
     enabled: Boolean(address),
     queryKey: ["budget", address, roundId],
-    queryFn: async () =>
-      request
-        .get(
-          `${agoraRoundsAPI}/ballots/${address}/categories`
-        )
-        .json<Round5Allocation[]>()
-        .then((allocations) => {
-          setLockedFields(
-            allocations.reduce((acc, allocation) => {
-              acc[allocation.category_slug] = allocation.locked;
-              return acc;
-            }, {} as Record<string, boolean>)
-          );
-          return allocations;
-        }),
+    queryFn: async () => {
+      if (!address) throw new Error("No address provided");
+      return getRetroFundingRoundBallotById(roundId, address)
+        .then((response: getRetroFundingRoundBallotByIdResponse) => {
+          const ballot = response.data as Round5Ballot;
+          const allocations = ballot.category_allocations;
+          if (allocations) {
+            setLockedFields(
+              allocations.reduce((acc, allocation) => {
+                if (allocation && allocation.category_slug !== undefined) {
+                  acc[allocation.category_slug] = allocation.locked ?? false;
+                }
+                return acc;
+              }, {} as Record<string, boolean>)
+            );
+          }
+          return allocations as Round5Allocation[];
+        });
+    },
   });
 
   const saveAllocation = useMutation({
     mutationKey: ["save-budget", roundId],
     mutationFn: async (allocation: Round5Allocation) => {
-      return request
-        .post(
-          `${agoraRoundsAPI}/ballots/${address}/categories`,
-          {
-            json: allocation,
-          }
-        )
-        .json<Round5Allocation[]>()
-        .then((r) => {
-          queryClient.setQueryData(["budget", address, roundId], r);
-          return r;
-        });
+      if (!address) throw new Error("No address provided");
+      return updateRetroFundingRoundCategoryAllocation(
+        roundId,
+        address,
+        allocation
+      ).then((response: updateRetroFundingRoundCategoryAllocationResponse) => {
+        const updatedBallot = response.data as Round5Ballot;
+        queryClient.setQueryData(["budget", address, roundId], updatedBallot.category_allocations);
+        return updatedBallot.category_allocations as Round5Allocation[];
+      });
     },
     onError: () =>
       toast({
@@ -69,15 +67,9 @@ export function useBudgetForm(roundId: string) {
   const submitBudget = useMutation({
     mutationKey: ["submit-budget", roundId],
     mutationFn: async (allocations: Round5Allocation[]) => {
+      if (!address) throw new Error("No address provided");
       const promises = allocations.map(allocation =>
-        request
-          .post(
-            `${agoraRoundsAPI}/ballots/${address}/categories`,
-            {
-              json: allocation,
-            }
-          )
-          .json()
+        updateRetroFundingRoundCategoryAllocation(roundId, address, allocation)
       );
       return Promise.all(promises);
     },

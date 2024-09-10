@@ -6,9 +6,9 @@ import { CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CategoryItem } from "./category-item";
 import { Category } from "@/data/categories";
-import { Round5Allocation, CategoryId } from "@/hooks/useBudgetForm";
 import { useRouter } from "next/navigation";
 import { debounce } from "lodash";
+import { Round5Allocation, CategoryId } from "@/types/shared";
 
 const BudgetSchema = z
   .object({
@@ -56,52 +56,55 @@ export function BudgetForm({
   lockedFields,
   toggleLock,
 }: BudgetFormProps) {
-  const router = useRouter();
-  const previousValues = useRef<Record<string, number>>({});
-  const {
-    control,
-    formState: { errors, isValid },
-    setValue,
-    getValues,
-    reset,
-    trigger,
-  } = useForm<FormData>({
-    resolver: zodResolver(BudgetSchema),
-    defaultValues: {
-      categories:
-        initialAllocations?.reduce((acc, allocation) => {
-          acc[allocation.category_slug] = parseFloat(allocation.allocation);
-          return acc;
-        }, {} as Record<string, number>) ||
-        categories?.reduce((acc, category, index) => {
+    const router = useRouter();
+    const previousValues = useRef<Record<string, number>>({});
+    const initialSetupDone = useRef(false);
+    const {
+      control,
+      formState: { errors, isValid },
+      setValue,
+      getValues,
+      reset,
+      trigger,
+    } = useForm<FormData>({
+      resolver: zodResolver(BudgetSchema),
+      defaultValues: {
+        categories:
+          initialAllocations?.reduce((acc, allocation) => {
+            acc[allocation.category_slug] = parseFloat(allocation.allocation);
+            return acc;
+          }, {} as Record<string, number>) ||
+          categories?.reduce((acc, category, index) => {
+            acc[category.id] = index === 0 ? 33.34 : 33.33;
+            return acc;
+          }, {} as Record<string, number>) ||
+          {},
+      },
+      mode: "onChange",
+    });
+  
+    useEffect(() => {
+      if (!initialSetupDone.current && !initialAllocations && categories) {
+        const initialCategoryValues = categories.reduce((acc, category, index) => {
           acc[category.id] = index === 0 ? 33.34 : 33.33;
           return acc;
-        }, {} as Record<string, number>) ||
-        {},
-    },
-    mode: "onChange",
-  });
-
-  useEffect(() => {
-    if (!initialAllocations && categories) {
-      const initialCategoryValues = categories.reduce((acc, category, index) => {
-        acc[category.id] = index === 0 ? 33.34 : 33.33;
-        return acc;
-      }, {} as Record<string, number>);
-
-      reset({ categories: initialCategoryValues });
-      previousValues.current = initialCategoryValues;
-      
-      // Save initial allocations
-      Object.entries(initialCategoryValues).forEach(([categoryId, allocation]) => {
-        saveAllocation({
-          category_slug: categoryId as CategoryId,
-          allocation: allocation.toFixed(2),
-          locked: false,
+        }, {} as Record<string, number>);
+  
+        reset({ categories: initialCategoryValues });
+        previousValues.current = initialCategoryValues;
+        
+        // Save initial allocations
+        Object.entries(initialCategoryValues).forEach(([categoryId, allocation]) => {
+          saveAllocation({
+            category_slug: categoryId as CategoryId,
+            allocation: allocation.toFixed(2),
+            locked: false,
+          });
         });
-      });
-    }
-  }, [categories, initialAllocations, reset, saveAllocation]);
+  
+        initialSetupDone.current = true;
+      }
+    }, [categories, initialAllocations, reset, saveAllocation]);
 
   const debouncedSaveAllocation = debounce(async (allocation: Round5Allocation) => {
     try {

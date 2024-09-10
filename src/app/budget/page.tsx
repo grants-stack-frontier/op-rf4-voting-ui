@@ -1,4 +1,3 @@
-// BudgetBallotPage.tsx
 "use client";
 import { BallotTabs } from "@/components/ballot/ballot-tabs";
 import { PageView } from "@/components/common/page-view";
@@ -9,13 +8,12 @@ import { RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BudgetForm } from "@/components/budget/budget-form";
 import { useBudgetForm } from "@/hooks/useBudgetForm";
-import { useAccount } from "wagmi";
+import { Round5Allocation } from "@/types/shared";
 
 export default function BudgetBallotPage() {
   const categories = useCategories();
   const projects = useProjects();
-  const { address } = useAccount();
-  const roundId = "5"; // Assuming round 5, adjust as needed
+  const roundId = 5;
 
   const { getBudget, saveAllocation, submitBudget, lockedFields, toggleLock } =
     useBudgetForm(roundId);
@@ -52,9 +50,11 @@ export default function BudgetBallotPage() {
         <BudgetForm
           categories={categories.data}
           countPerCategory={countPerCategory}
-          saveAllocation={saveAllocation.mutateAsync}
+          saveAllocation={(allocation: Round5Allocation) => 
+            saveAllocation.mutateAsync(allocation) as Promise<Round5Allocation[]>
+          }
           submitBudget={submitBudget.mutateAsync}
-          initialAllocations={getBudget.data}
+          initialAllocations={getBudget.data as Round5Allocation[] | undefined}
           lockedFields={lockedFields}
           toggleLock={toggleLock}
         />

@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Control, Controller, FieldErrors } from "react-hook-form";
 import { Category } from "@/data/categories";
-import { CategoryId } from "@/hooks/useBallot";
+import { CategoryId } from "@/types/shared";
 
 interface CategoryItemProps {
   category: Category;
