@@ -9,6 +9,7 @@ import { badgeholderManualUrl, votingEndDate } from "@/config";
 import mixpanel from "mixpanel-browser";
 import { ConnectButton } from "../auth/connect-button";
 import { SignMessage } from "../auth/sign-message";
+import { VoterConfirmationDialog } from "../auth/voter-confirmation";
 import { ModeToggle } from "../dark-mode-toggle";
 import { Separator } from "../ui/separator";
 import { VotingEndsIn } from "../voting-ends-in";
@@ -44,6 +45,7 @@ export function Header() {
       </div>
 
       <SignMessage />
+      <VoterConfirmationDialog />
     </header>
   );
 }

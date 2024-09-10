@@ -1,11 +1,12 @@
 "use client";
 import { Heading } from "@/components/ui/headings";
-import { Category, CategoryType } from "@/data/categories";
+import { Category } from "@/data/categories";
 import { useProjectsByCategory } from "@/hooks/useProjects";
 import Image from "next/image";
 import { Markdown } from "../markdown";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
+import {useSession} from "@/components/auth/sign-message";
 export function CategoryDetails({
 	id,
 	data,
@@ -17,6 +18,10 @@ export function CategoryDetails({
 	const { data: projects, isPending } = useProjectsByCategory(id);
 	const { name, image, description, eligibility, examples } = category ?? {};
 	const { eligible_projects, note } = eligibility ?? {};
+	const { data: session } = useSession();
+
+	const userCategory = session?.category;
+	const isUserCategory = !!userCategory && !!category && userCategory === category.id;
 
 	return (
 		<section className="space-y-16">
@@ -42,7 +47,7 @@ export function CategoryDetails({
 							>
 								{projects?.length} project(s)
 							</Badge>
-							{id === CategoryType.ETHEREUM_CORE_CONTRIBUTIONS && (
+							{isUserCategory && (
 								<Badge
 									variant={null}
 									className="cursor-pointer border-0 bg-green-500/25 text-green-600 font-medium"

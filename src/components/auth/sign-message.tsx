@@ -63,10 +63,10 @@ export function SignMessage() {
           <DialogTitle>Authenticate</DialogTitle>
           <DialogDescription>Sign message to authenticate.</DialogDescription>
         </DialogHeader>
-        <div className="space-y-2">
+        <div className='space-y-2'>
           <Button
-            type="button"
-            className="w-full"
+            type='button'
+            className='w-full'
             variant={"destructive"}
             isLoading={sign.isPending}
             onClick={handleSign}
@@ -74,8 +74,8 @@ export function SignMessage() {
             Sign message
           </Button>
           <Button
-            className="w-full"
-            variant="ghost"
+            className='w-full'
+            variant='ghost'
             onClick={() => {
               disconnect?.();
             }}
@@ -110,11 +110,26 @@ function useVerify() {
       setToken(access_token);
       // Trigger a refetch of the session
       await client.invalidateQueries({ queryKey: ["session"] });
+      
+      setVoterConfirmationView();
 
       return { access_token };
     },
   });
 }
+
+export function setVoterConfirmationView() {
+  localStorage.setItem("voter-confirmation-view", "true");
+}
+export function getVoterConfirmationView() {
+  const view = localStorage.getItem("voter-confirmation-view");
+  return !!view
+}
+export function removeVoterConfirmationView() {
+  const view = localStorage.getItem("voter-confirmation-view");
+  if (view) localStorage.removeItem("voter-confirmation-view");
+}
+
 export function useDisconnect() {
   const client = useQueryClient();
   const router = useRouter();
@@ -135,6 +150,7 @@ export function useSession() {
     queryKey: ["session"],
     queryFn: async () => {
       const accessToken = getToken();
+
       const user = accessToken
         ? decodeJwt<{ siwe: { address: Address }; isBadgeholder?: boolean }>(
             accessToken
@@ -148,7 +164,6 @@ export function useSession() {
           badgeholder: user.isBadgeholder,
         });
       }
-      console.log(user);
 
       return user;
     },
