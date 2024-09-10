@@ -1,4 +1,4 @@
-import { CategoryId } from '@/hooks/useBallot';
+import { CategoryId } from '@/types/types';
 import ethCore from '../../public/eth_core.svg';
 import opRnd from '../../public/op_rnd.svg';
 import opTooling from '../../public/op_tooling.svg';

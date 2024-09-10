@@ -1,31 +1,25 @@
 "use client";
 import { useAccount } from "wagmi";
-import { EmptyBallot, NonBadgeholder } from "@/components/ballot/ballot-states";
+import { NonBadgeholder } from "@/components/ballot/ballot-states";
 import { Card } from "@/components/ui/card";
 
 import { Button } from "@/components/ui/button";
 import { ArrowDownToLineIcon, LoaderIcon, Menu } from "lucide-react";
 import { ComponentProps, useEffect, useState } from "react";
-import { SubmitDialog, downloadImage } from "@/components/ballot/submit-dialog";
+import { downloadImage } from "@/components/ballot/submit-dialog";
 import { MetricsEditor } from "../../components/metrics-editor";
 import {
-  CategoryId,
   MAX_MULTIPLIER_VALUE,
-  Round5Allocation,
   Round5ProjectAllocation,
-  useBallot,
   useBallotWeightSum,
-  useIsSavingBallot,
   useOsMultiplier,
   useRound5Ballot,
 } from "@/hooks/useBallot";
-import { Metric, ProjectAllocation, useMetricsByRound } from "@/hooks/useMetrics";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { NumericFormat } from "react-number-format";
 import { Input } from "@/components/ui/input";
-import { useBallotContext } from "@/components/ballot/provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert } from "@/components/ui/alert";
 import { formatDate } from "@/lib/utils";
@@ -38,11 +32,10 @@ import { votingEndDate } from "@/config";
 import { useVotingTimeLeft } from "@/components/voting-ends-in";
 import { SearchInput } from "@/components/common/search-input";
 import Link from "next/link";
-import { useProjects, useProjectsByCategory } from "@/hooks/useProjects";
 import { useBallotRound5Context } from "@/components/ballot/provider5";
 import { SubmitRound5Dialog } from "@/components/ballot/submit-dialog5";
-import { useDistributionMethod, useIsSavingRound5Ballot, useRound5BallotWeightSum, useSaveRound5Allocation, useSaveRound5Position } from "@/hooks/useBallotRound5";
-import { ImpactScore, useSaveProjectImpact } from "@/hooks/useProjectImpact";
+import { useIsSavingRound5Ballot, useRound5BallotWeightSum, useSaveRound5Allocation, useSaveRound5Position } from "@/hooks/useBallotRound5";
+import { CategoryId } from "@/types/shared";
 
 function formatAllocationOPAmount(amount: number) {
   const value = amount.toString()

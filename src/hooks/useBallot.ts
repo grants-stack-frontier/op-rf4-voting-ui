@@ -15,6 +15,7 @@ import { ProjectAllocation } from "./useMetrics";
 import debounce from "lodash.debounce";
 import { useRef } from "react";
 import { useBallotContext } from "@/components/ballot/provider";
+import { CategoryId } from "@/types/shared";
 
 export type Round4Ballot = {
   address: string;
@@ -31,11 +32,6 @@ export type Round4Allocation = {
   allocation: number;
   locked?: boolean;
 };
-
-export type CategoryId =
-  | "ETHEREUM_CORE_CONTRIBUTIONS"
-  | "OP_STACK_RESEARCH_AND_DEVELOPMENT"
-  | "OP_STACK_TOOLING";
 
 export type Round5Allocation = {
   category_slug: CategoryId;
