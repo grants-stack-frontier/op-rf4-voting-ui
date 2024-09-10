@@ -10,11 +10,8 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { format, parse } from "@/lib/csv";
-import { Round5Ballot, Round5ProjectAllocation, useSaveRound5Allocation } from "@/hooks/useBallotRound5";
-import { useBallotContext } from "./provider";
-import { useMetricIds } from "@/hooks/useMetrics";
+import { Round5ProjectAllocation, useSaveRound5Allocation } from "@/hooks/useBallotRound5";
 import mixpanel from "@/lib/mixpanel";
-import { CategoryId, Round5Allocation } from "@/hooks/useBallot";
 import { useBallotRound5Context } from "./provider5";
 
 export function ImportBallotDialog({
