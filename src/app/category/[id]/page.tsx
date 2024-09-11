@@ -60,7 +60,7 @@ export default function CategoryDetailsPage({ params: { id = "" } }) {
 						<TabsContent className="pt-10" key={categoryType} value={categoryType}>
 							<section className="flex items-start justify-between">
 								<CategoryDetails {...category} id={categoryType} />
-								<aside>
+								<aside className="sticky top-8">
 									<ProjectsSidebar
 										id={categoryType}
 										{...category}
