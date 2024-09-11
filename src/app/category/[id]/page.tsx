@@ -45,7 +45,12 @@ export default function CategoryDetailsPage({ params: { id = "" } }) {
 								categoryName = categoryName.replace('Op', 'OP')
 							}
 							return (
-								<TabsTrigger onClick={() => router.push(`/category/${categoryType}`)} key={categoryType} value={categoryType}>
+								<TabsTrigger 
+									onClick={() => router.push(`/category/${categoryType}`)} 
+									key={categoryType} 
+									value={categoryType}
+									className={`${id === categoryType ? 'text-black' : 'text-gray-500'}`}
+								>
 									{categoryName}
 								</TabsTrigger>
 							)
