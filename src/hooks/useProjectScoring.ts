@@ -30,8 +30,7 @@ export const useProjectScoring = (category: string, id: string) => {
 
 			if (score !== 'Skip' && !projectsScored.votedIds.includes(id)) {
 				updatedProjectsScored = addScoredProject(category, id);
-				saveProjectImpact.mutate({ projectId: id, impact: score });
-				setProjectsScored(updatedProjectsScored);
+				saveProjectImpact.mutate({ projectId: id, impact: score }, { onSuccess: () => setProjectsScored(updatedProjectsScored) });
 			}
 
 			const allProjectsScored = updatedProjectsScored.count === totalProjects;

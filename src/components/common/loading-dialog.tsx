@@ -1,4 +1,5 @@
 "use client";
+import { AlertDialogTitle } from "@radix-ui/react-alert-dialog";
 import { ComponentProps } from "react";
 import {
 	AlertDialog,
@@ -17,6 +18,8 @@ export function LoadingDialog({
 	return (
 		<AlertDialog open={isOpen} onOpenChange={setOpen}>
 			<AlertDialogContent>
+				<AlertDialogTitle>
+				</AlertDialogTitle>
 				<div className="flex flex-col items-center gap-2">
 					<div
 						className="inline-block h-16 w-16 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"

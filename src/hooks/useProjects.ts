@@ -45,7 +45,7 @@ export function useProjectsByCategory(categoryId: string) {
 		queryFn: async () =>
 			getRetroFundingRoundProjects(5).then((results: getRetroFundingRoundProjectsResponse) => {
 				const res: ProjectsResponse = results.data;
-				return res.data?.filter((p) => p.category === categoryId);
+				return res.data?.filter((p) => p.applicationCategory === categoryId);
 			}),
 	});
 }
@@ -56,7 +56,7 @@ export function useProjectById(projectId: string) {
 		queryFn: async () =>
 			getRetroFundingRoundProjects(5).then((results: getProjectsResponse) => {
 				const res: ProjectsResponse = results.data;
-				const filtered = res.data?.filter((p) => p.id === projectId);
+				const filtered = res.data?.filter((p) => p.projectId === projectId);
 				return filtered?.[0];
 			}),
 	});

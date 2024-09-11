@@ -16,37 +16,32 @@ import { ImpactScore, useProjectScoring } from "@/hooks/useProjectScoring";
 import { useProjectsByCategory } from "@/hooks/useProjects";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 export default function ProjectDetailsPage({ params, searchParams }: { params: { id: string }, searchParams: { category: string } }) {
 	const { id } = params;
 	const { category } = searchParams;
 	const router = useRouter();
 	const { data: projects, isPending: isProjectsLoading } = useProjectsByCategory(category);
-	const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
 	const [isNextProjectLoading, setIsNextProjectLoading] = useState(false);
 	const [isConflictOfInterestDialogOpen, setIsConflictOfInterestDialogOpen] = useState(false);
 	const { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect } = useProjectScoring(category, id);
-
-	useEffect(() => {
-		const index = projects?.findIndex(project => project.id === id) ?? -1;
-		if (index !== -1) setCurrentProjectIndex(index);
-	}, [projects, id]);
 
 	const handleScore = useCallback((score: ImpactScore) => {
 		setIsNextProjectLoading(true);
 		const totalProjects = projects?.length ?? 0;
 		const allProjectsScored = handleScoreSelect(score, totalProjects);
 
-		if (!allProjectsScored) {
-			const nextIndex = (currentProjectIndex + 1) % totalProjects;
-			const nextProjectId = projects?.[nextIndex].id;
+		if (!allProjectsScored && projects) {
+			const currentIndex = projects.findIndex(project => project.projectId === id);
+			const nextIndex = (currentIndex + 1) % totalProjects;
+			const nextProjectId = projects[nextIndex].projectId;
 			if (nextProjectId) {
 				router.push(`/project/${nextProjectId}?category=${category}`);
 			}
 		}
 		setIsNextProjectLoading(false);
-	}, [projects, currentProjectIndex, category, router, handleScoreSelect]);
+	}, [projects, id, category, router, handleScoreSelect]);
 
 	const handleConflictOfInterest = useCallback(() => {
 		setIsConflictOfInterestDialogOpen(true);
@@ -59,7 +54,7 @@ export default function ProjectDetailsPage({ params, searchParams }: { params: {
 		setIsNextProjectLoading(false);
 	}, [handleScore, setIsNextProjectLoading]);
 
-	const currentProject = projects?.[currentProjectIndex];
+	const currentProject = projects?.find(project => project.projectId === id);
 	const isLoading = isProjectsLoading || !currentProject;
 
 	const sidebarProps = useMemo(() => ({
