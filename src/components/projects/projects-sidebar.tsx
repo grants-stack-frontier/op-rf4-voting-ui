@@ -35,7 +35,7 @@ export function ProjectsSidebar({
 
   return (
     <Card
-      className={cn("w-[300px] sticky top-4", {
+      className={cn("w-[300px]", {
         ["opacity-50 animate-pulse"]: isPending,
       })}
     >
