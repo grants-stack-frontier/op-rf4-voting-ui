@@ -107,7 +107,7 @@ export default function BudgetBallotPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center justify-between pb-6">
-                            Your Budget
+                            Your budget
                             <Button className="outline-none hover:bg-transparent" variant="ghost" size="icon">
                                 <RotateCw className="h-4 w-4"/>
                             </Button>
