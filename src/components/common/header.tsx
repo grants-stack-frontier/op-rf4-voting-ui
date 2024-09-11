@@ -21,15 +21,17 @@ export function Header() {
         <Logo />
       </Link>
       <div className="hidden sm:flex items-center gap-2 divide-x space-x-2 text-sm">
-        <div className="flex flex-col lg:flex-row items-center">
-          Time left to vote{" "}
-          <VotingEndsIn className="pl-2" date={votingEndDate} />
+        <div className="flex flex-col lg:flex-row items-center h-8">
+          <p>Round 5: OP Stack</p>
+        </div>
+        <div className="flex flex-col lg:flex-row items-center h-8">
+          <VotingEndsIn className="pl-4" date={votingEndDate} />
         </div>
         <Link href={badgeholderManualUrl} target="_blank">
           <Button
             iconRight={ArrowUpRight}
             variant="link"
-            className="pl-4"
+            className="pl-4 h-8"
             onClick={() => mixpanel.track("Open Manual", { external: true })}
           >
             View badgeholder manual

@@ -13,8 +13,8 @@ import { BallotProvider } from "@/components/ballot/provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const title = "Retro Funding 4: Voting";
-const description = "Voting is now live for Retro Funding 4: Onchain Builders";
+const title = "Retro Funding 5: Voting";
+const description = "Voting is now live for Retro Funding 5: OP Stack";
 const url = "https://op-rf4-voting-ui.vercel.app";
 export const metadata: Metadata = {
   title,

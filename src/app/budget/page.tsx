@@ -107,16 +107,16 @@ export default function BudgetBallotPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center justify-between pb-6">
-                            Your Budget
+                            Your budget
                             <Button className="outline-none hover:bg-transparent" variant="ghost" size="icon">
                                 <RotateCw className="h-4 w-4"/>
                             </Button>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {categories.data?.map((category) => (
+                        {categories.data?.map((category, index) => (
                             <div key={category.id}>
-                                <Separator/>
+                                {index === 0 && (<Separator/>)}
                                 <div className="flex items-center gap-4 py-4">
                                     <Image src={category.image} alt={category.name} width={80} height={80}/>
                                     <div className="flex-1">

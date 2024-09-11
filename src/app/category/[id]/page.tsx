@@ -39,11 +39,22 @@ export default function CategoryDetailsPage({ params: { id = "" } }) {
 				</Breadcrumb>
 				<Tabs defaultValue={id} className="w-full pt-3">
 					<TabsList className="grid w-full grid-cols-3">
-						{Object.values(CategoryType).map((categoryType) => (
-							<TabsTrigger onClick={() => router.push(`/category/${categoryType}`)} key={categoryType} value={categoryType}>
-								{categoryType.replace(/_/g, ' ')}
-							</TabsTrigger>
-						))}
+						{Object.values(CategoryType).map((categoryType) => {
+							let categoryName = categoryType.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+							if (categoryName.startsWith('Op')) {
+								categoryName = categoryName.replace('Op', 'OP')
+							}
+							return (
+								<TabsTrigger 
+									onClick={() => router.push(`/category/${categoryType}`)} 
+									key={categoryType} 
+									value={categoryType}
+									className={`${id === categoryType ? 'text-black' : 'text-gray-500'}`}
+								>
+									{categoryName}
+								</TabsTrigger>
+							)
+						})}
 					</TabsList>
 					{Object.values(CategoryType).map((categoryType) => (
 						<TabsContent className="pt-10" key={categoryType} value={categoryType}>
