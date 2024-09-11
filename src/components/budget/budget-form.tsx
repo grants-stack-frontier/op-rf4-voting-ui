@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CategoryItem } from "./category-item";
 import { Category } from "@/data/categories";
 import { useRouter } from "next/navigation";
-import { debounce } from "lodash";
+import debounce from "lodash.debounce";
 import { Round5Allocation, CategoryId } from "@/types/shared";
 
 const BudgetSchema = z
