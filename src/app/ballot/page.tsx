@@ -128,10 +128,10 @@ function CheckBallotState() {
   if (!address && !isConnecting) {
     return <NonBadgeholder />;
   }
-  const isEmptyBallot = !Object.keys(state).length;
-  if (isEmptyBallot) {
-    return <EmptyBallot />;
-  }
+  // const isEmptyBallot = !Object.keys(state).length;
+  // if (isEmptyBallot) {
+  //   return <EmptyBallot />;
+  // }
   // ^^^Comment out for local dev if needed
   return <YourBallot />;
 }
@@ -233,7 +233,8 @@ function YourBallot() {
           </div>
         </Alert>
       )}
-      <p>Your voting category is <a href={`/budget/category/${categoryIds[0]}`} className="underline">{categoryNames[categoryIds[0]]}</a> ({projects.length} projects)</p>
+      {/* TO DO: Change to category based on badgeholder */}
+      <p>Your voting category is <a href={`/category/${categoryIds[0]}`} className="underline">{categoryNames[categoryIds[0]]}</a> ({projects.length} projects)</p>
       <Card className="p-6 space-y-8">
         <MetricsEditor
           onAllocationMethodSelect={handleAllocationMethodSelect}

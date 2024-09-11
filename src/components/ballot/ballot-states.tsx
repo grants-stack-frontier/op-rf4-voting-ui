@@ -14,7 +14,6 @@ import {
   useState,
 } from "react";
 import { useDisconnect } from "../auth/sign-message";
-import { ImportBallotDialog } from "./import-ballot";
 import { Progress } from "../ui/progress";
 import { useBallotRound5Context } from "./provider5";
 
@@ -98,7 +97,7 @@ function EmptyCard({
   description: string;
 }>) {
   return (
-    <DashedCard className="px-6 py-16 flex items-center justify-center flex-col gap-4">
+    <DashedCard className="px-6 py-16 flex items-center justify-center flex-col gap-2">
       <Icon />
       <Heading variant="h3">{title}</Heading>
       <Text className="text-center max-w-lg mx-auto">{description}</Text>
