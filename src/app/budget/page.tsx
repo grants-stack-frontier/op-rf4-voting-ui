@@ -114,9 +114,9 @@ export default function BudgetBallotPage() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        {categories.data?.map((category) => (
+                        {categories.data?.map((category, index) => (
                             <div key={category.id}>
-                                <Separator/>
+                                {index === 0 && (<Separator/>)}
                                 <div className="flex items-center gap-4 py-4">
                                     <Image src={category.image} alt={category.name} width={80} height={80}/>
                                     <div className="flex-1">
