@@ -1,7 +1,7 @@
 "use client";
-import { votingEndDate } from "@/config";
 import { useIsBadgeholder } from "@/hooks/useIsBadgeholder";
 import { useAccount } from "wagmi";
+import { votingEndDate } from "@/config";
 import { useVotingTimeLeft } from "../voting-ends-in";
 
 export function Callouts() {
@@ -13,7 +13,7 @@ export function Callouts() {
   if (Number(seconds) < 0) {
     return (
       <div className="bg-accent-foreground dark:text-black text-center p-3 text-white">
-        Voting in Retro Funding Round 4 has closed
+        Voting in Retro Funding Round 5 has closed
       </div>
     );
   }
