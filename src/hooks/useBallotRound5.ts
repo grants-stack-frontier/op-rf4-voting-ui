@@ -11,16 +11,11 @@ import { agoraRoundsAPI } from "@/config";
 import { useAccount, useSignMessage } from "wagmi";
 import { useToast } from "@/components/ui/use-toast";
 import { request } from "@/lib/request";
-import { ProjectAllocation } from "./useMetrics";
 import debounce from "lodash.debounce";
 import { useRef } from "react";
-import { useBallotContext } from "@/components/ballot/provider";
 import { useBallotRound5Context } from "@/components/ballot/provider5";
+import { CategoryId } from "@/types/shared";
 
-export type CategoryId =
-  | "ETHEREUM_CORE_CONTRIBUTIONS"
-  | "OP_STACK_RESEARCH_AND_DEVELOPMENT"
-  | "OP_STACK_TOOLING";
 
 export type Round5CategoryAllocation = {
   category_slug: CategoryId;

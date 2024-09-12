@@ -1,3 +1,4 @@
+import { CategoryId } from '@/types/shared';
 import ethCore from '../../public/eth_core.svg';
 import opRnd from '../../public/op_rnd.svg';
 import opTooling from '../../public/op_tooling.svg';
@@ -19,7 +20,7 @@ export const categoryNames: Record<string, string> = {
 };
 
 export type Category = {
-	id: string;
+	id: CategoryId;
 	name: string;
 	image: any;
 	description: string;

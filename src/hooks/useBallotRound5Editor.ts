@@ -1,12 +1,11 @@
 "use client";
 import { useCallback, useMemo, useRef, useState } from "react";
 
-import { CategoryId, Round4Allocation, Round5Allocation } from "./useBallot";
 import { createSortFn, useMetricsByRound } from "./useMetrics";
 import { useBallotFilter } from "./useFilter";
 import { useBallotContext } from "@/components/ballot/provider";
-import debounce from "lodash.debounce";
 import { Round5Ballot, Round5ProjectAllocation } from "./useBallotRound5";
+import { CategoryId } from "@/types/shared";
 
 export type BallotRound5State = Record<
   string,
