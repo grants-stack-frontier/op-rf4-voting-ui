@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { toast } from "@/components/ui/use-toast";
 import { ImpactScore, useProjectScoring } from "@/hooks/useProjectScoring";
-import { useProjectsByCategory, useSaveProjectImpact } from "@/hooks/useProjects";
+import { useProjectById, useProjectsByCategory, useSaveProjectImpact } from "@/hooks/useProjects";
 import { setProjectsScored } from "@/utils/localStorage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -25,6 +25,7 @@ export default function ProjectDetailsPage({ params, searchParams }: { params: {
 	const { category } = searchParams;
 	const router = useRouter();
 	const { data: projects, isPending: isProjectsLoading } = useProjectsByCategory(category);
+	const { data: project, isPending: isProjectLoading } = useProjectById(id);
 	const [isNextProjectLoading, setIsNextProjectLoading] = useState(false);
 	const [isConflictOfInterestDialogOpen, setIsConflictOfInterestDialogOpen] = useState(false);
 	const { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect } = useProjectScoring(category, id);
@@ -71,7 +72,7 @@ export default function ProjectDetailsPage({ params, searchParams }: { params: {
 		} else {
 			setIsNextProjectLoading(false);
 		}
-	}, [projects, id, category, router, handleScoreSelect, saveProjectImpact, projectsScored]);
+	}, [project, projects, id, category, router, handleScoreSelect, saveProjectImpact, projectsScored]);
 
 	const handleConflictOfInterest = useCallback(() => {
 		setIsConflictOfInterestDialogOpen(true);
@@ -84,7 +85,7 @@ export default function ProjectDetailsPage({ params, searchParams }: { params: {
 		setIsNextProjectLoading(false);
 	}, [handleScore, setIsNextProjectLoading]);
 
-	const currentProject = projects?.find(project => project.projectId === id);
+	const currentProject = project;
 	const isLoading = isProjectsLoading || !currentProject;
 
 	const sidebarProps = useMemo(() => ({
@@ -93,7 +94,7 @@ export default function ProjectDetailsPage({ params, searchParams }: { params: {
 		projectsScored: projectsScored.count,
 		totalProjects: projects?.length ?? 0,
 		isVoted: projectsScored.votedIds.includes(id),
-	}), [handleScore, handleConflictOfInterest, projectsScored, projects, id]);
+	}), [handleScore, handleConflictOfInterest, projectsScored, projects, project, id]);
 
 	if (isLoading) {
 		return <LoadingDialog isOpen={true} setOpen={() => { }} message="Loading project" />;
