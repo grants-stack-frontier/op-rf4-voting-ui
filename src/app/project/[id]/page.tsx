@@ -1,4 +1,5 @@
 "use client";
+import { useBallotRound5Context } from "@/components/ballot/provider5";
 import { UnlockBallotDialog } from "@/components/ballot/unlock-ballot";
 import { ConflictOfInterestDialog } from "@/components/common/conflict-of-interest-dialog";
 import { LoadingDialog } from "@/components/common/loading-dialog";
@@ -20,35 +21,38 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 
-export default function ProjectDetailsPage({ params, searchParams }: { params: { id: string }, searchParams: { category: string } }) {
+export default function ProjectDetailsPage({ params }: { params: { id: string } }) {
 	const { id } = params;
-	const { category } = searchParams;
 	const router = useRouter();
-	const { data: projects, isPending: isProjectsLoading } = useProjectsByCategory(category);
 	const { data: project, isPending: isProjectLoading } = useProjectById(id);
+	const { data: projects, isPending: isProjectsLoading } = useProjectsByCategory(project?.applicationCategory ?? '');
 	const [isNextProjectLoading, setIsNextProjectLoading] = useState(false);
 	const [isConflictOfInterestDialogOpen, setIsConflictOfInterestDialogOpen] = useState(false);
-	const { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect } = useProjectScoring(category, id);
+	const { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect } = useProjectScoring(project?.applicationCategory ?? '', project?.projectId ?? id);
 	const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
+	const { ballot } = useBallotRound5Context();
 
 	const handleScore = useCallback(async (score: ImpactScore) => {
 		setIsNextProjectLoading(true);
 		const totalProjects = projects?.length ?? 0;
 		const { updatedProjectsScored, allProjectsScored } = await handleScoreSelect(score, totalProjects);
 
-		if (score !== 'Skip' && !projectsScored.votedIds.includes(id)) {
+		if (score !== 'Skip' && !projectsScored.votedIds.includes(project?.projectId ?? id)) {
 			try {
-				await saveProjectImpact({ projectId: id, impact: score }, {
+				if (!project?.projectId) {
+					throw new Error("Project ID is undefined");
+				}
+				await saveProjectImpact({ projectId: project.projectId, impact: score }, {
 					onSuccess: () => {
 						setProjectsScored(updatedProjectsScored);
 						setIsNextProjectLoading(false);
 
 						if (!allProjectsScored && projects) {
-							const currentIndex = projects.findIndex(project => project.projectId === id);
+							const currentIndex = projects.findIndex(p => p.projectId === project?.projectId || p.id === id);
 							const nextIndex = (currentIndex + 1) % totalProjects;
 							const nextProjectId = projects[nextIndex].projectId;
 							if (nextProjectId) {
-								router.push(`/project/${nextProjectId}?category=${category}`);
+								router.push(`/project/${nextProjectId}`);
 							}
 						}
 					},
@@ -62,17 +66,17 @@ export default function ProjectDetailsPage({ params, searchParams }: { params: {
 				toast({ variant: 'destructive', title: 'Error saving project impact' });
 			}
 		} else if (score === 'Skip' && projects) {
-			const currentIndex = projects.findIndex(project => project.projectId === id);
+			const currentIndex = projects.findIndex(p => p.projectId === project?.projectId || p.id === id);
 			const nextIndex = (currentIndex + 1) % totalProjects;
 			const nextProjectId = projects[nextIndex].projectId;
 			if (nextProjectId) {
-				router.push(`/project/${nextProjectId}?category=${category}`);
+				router.push(`/project/${nextProjectId}`);
 			}
 			setIsNextProjectLoading(false);
 		} else {
 			setIsNextProjectLoading(false);
 		}
-	}, [project, projects, id, category, router, handleScoreSelect, saveProjectImpact, projectsScored]);
+	}, [projects, project, id, router, handleScoreSelect, saveProjectImpact, projectsScored]);
 
 	const handleConflictOfInterest = useCallback(() => {
 		setIsConflictOfInterestDialogOpen(true);
@@ -86,15 +90,20 @@ export default function ProjectDetailsPage({ params, searchParams }: { params: {
 	}, [handleScore, setIsNextProjectLoading]);
 
 	const currentProject = project;
-	const isLoading = isProjectsLoading || !currentProject;
+	const isLoading = isProjectsLoading || isProjectLoading || !currentProject;
+
+	const isVoted = useMemo(() => {
+		if (!ballot || !project) return false;
+		return ballot.projects_to_be_evaluated.includes(project.projectId ?? id) || projectsScored.votedIds.includes(project.projectId ?? id);
+	}, [ballot, project, projectsScored, id]);
 
 	const sidebarProps = useMemo(() => ({
 		onScoreSelect: handleScore,
 		onConflictOfInterest: handleConflictOfInterest,
 		projectsScored: projectsScored.count,
 		totalProjects: projects?.length ?? 0,
-		isVoted: projectsScored.votedIds.includes(id),
-	}), [handleScore, handleConflictOfInterest, projectsScored, projects, project, id]);
+		isVoted: isVoted,
+	}), [handleScore, handleConflictOfInterest, projectsScored, projects, isVoted]);
 
 	if (isLoading) {
 		return <LoadingDialog isOpen={true} setOpen={() => { }} message="Loading project" />;
@@ -113,7 +122,7 @@ export default function ProjectDetailsPage({ params, searchParams }: { params: {
 						<BreadcrumbSeparator />
 						<BreadcrumbItem>
 							<BreadcrumbLink asChild>
-								<Link href={`/project/${id}?category=${category}`}>Project</Link>
+								<Link href={`/project/${id}`}>Project</Link>
 							</BreadcrumbLink>
 						</BreadcrumbItem>
 					</BreadcrumbList>
