@@ -1,13 +1,13 @@
 "use client";
 import { CategoryDetails } from "@/components/category-details";
 import { PageView } from "@/components/common/page-view";
-import { ProjectsSidebar } from "@/components/projects/projects-sidebar";
+import { ProjectsSidebar } from "@/components/project-details/projects-sidebar";
 import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbLink,
-	BreadcrumbList,
-	BreadcrumbSeparator
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CategoryType } from "@/data/categories";
