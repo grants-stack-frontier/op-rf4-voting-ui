@@ -1,5 +1,5 @@
 "use client";
-import { NonBadgeholder } from "@/components/ballot/ballot-states";
+import { EmptyBallot, NonBadgeholder } from "@/components/ballot/ballot-states";
 import { Card } from "@/components/ui/card";
 import { useAccount } from "wagmi";
 
@@ -136,11 +136,10 @@ function CheckBallotState() {
   if (!address && !isConnecting) {
     return <NonBadgeholder />;
   }
-  // const isEmptyBallot = !Object.keys(state).length;
-  // if (isEmptyBallot) {
-  //   return <EmptyBallot />;
-  // }
-  // ^^^Comment out for local dev if needed
+  const isEmptyBallot = !Object.keys(state).length;
+  if (isEmptyBallot) {
+    return <EmptyBallot />;
+  }
   return <YourBallot />;
 }
 
