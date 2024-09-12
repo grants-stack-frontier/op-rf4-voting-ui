@@ -106,7 +106,7 @@ export const UpdateRetroFundingRoundCategoryAllocationBodyCategorySlug = {
 } as const;
 
 export type UpdateRetroFundingRoundCategoryAllocationBody = {
-  allocation?: string;
+  allocation?: number;
   category_slug?: UpdateRetroFundingRoundCategoryAllocationBodyCategorySlug;
   locked?: boolean;
 };
@@ -439,7 +439,7 @@ export const RetroFundingBallotCategoriesAllocationCategorySlug = {
  * @summary Categories allocation distribution based on the vote
  */
 export interface RetroFundingBallotCategoriesAllocation {
-  allocation?: string;
+  allocation?: number;
   category_slug?: RetroFundingBallotCategoriesAllocationCategorySlug;
   locked?: boolean;
 }

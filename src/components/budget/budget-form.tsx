@@ -71,7 +71,7 @@ export function BudgetForm({
       defaultValues: {
         categories:
           initialAllocations?.reduce((acc, allocation) => {
-            acc[allocation.category_slug] = parseFloat(allocation.allocation);
+            acc[allocation.category_slug] = parseFloat((Number(allocation.allocation) || 0).toFixed(2));
             return acc;
           }, {} as Record<string, number>) ||
           categories?.reduce((acc, category, index) => {
@@ -97,7 +97,7 @@ export function BudgetForm({
         Object.entries(initialCategoryValues).forEach(([categoryId, allocation]) => {
           saveAllocation({
             category_slug: categoryId as CategoryId,
-            allocation: allocation.toFixed(2),
+            allocation: parseFloat(allocation.toFixed(2)),
             locked: false,
           });
         });
@@ -146,7 +146,7 @@ export function BudgetForm({
           if (value !== previousValues.current[id]) {
             debouncedSaveAllocation({
               category_slug: id as CategoryId,
-              allocation: value.toFixed(2),
+              allocation: parseFloat(value.toFixed(2)),
               locked: lockedFields[id],
             });
           }
@@ -162,7 +162,7 @@ export function BudgetForm({
       const currentValues = getValues().categories;
       const allocations: Round5Allocation[] = Object.entries(currentValues).map(([id, value]) => ({
         category_slug: id as CategoryId,
-        allocation: value.toFixed(2),
+        allocation: parseFloat(value.toFixed(2)),
         locked: lockedFields[id],
       }));
       await submitBudget(allocations);

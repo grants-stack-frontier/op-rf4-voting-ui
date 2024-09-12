@@ -5,6 +5,6 @@ export type CategoryId =
 
 export type Round5Allocation = {
   category_slug: CategoryId;
-  allocation: string;
+  allocation: number;
   locked: boolean;
 };
