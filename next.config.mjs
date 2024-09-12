@@ -53,6 +53,12 @@ const nextConfig = {
 			},
 			{
 				protocol: 'https',
+				hostname: 'cdn.charmverse.io',
+				port: '',
+				pathname: '/**',
+			},
+			{
+				protocol: 'https',
 				hostname: 'storage.googleapis.com',
 				port: '',
 				pathname: '/**',

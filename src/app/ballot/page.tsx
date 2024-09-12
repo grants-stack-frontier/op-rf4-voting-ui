@@ -1,48 +1,42 @@
 "use client";
-import { useAccount } from "wagmi";
-import { EmptyBallot, NonBadgeholder } from "@/components/ballot/ballot-states";
+import { NonBadgeholder } from "@/components/ballot/ballot-states";
 import { Card } from "@/components/ui/card";
+import { useAccount } from "wagmi";
 
+import { useBallotRound5Context } from "@/components/ballot/provider5";
+import { downloadImage } from "@/components/ballot/submit-dialog";
+import { SubmitRound5Dialog } from "@/components/ballot/submit-dialog5";
+import { PageView } from "@/components/common/page-view";
+import { SearchInput } from "@/components/common/search-input";
+import { Alert } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowDownToLineIcon, LoaderIcon, Menu } from "lucide-react";
-import { ComponentProps, useEffect, useState } from "react";
-import { SubmitDialog, downloadImage } from "@/components/ballot/submit-dialog";
-import { MetricsEditor } from "../../components/metrics-editor";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Slider } from "@/components/ui/slider";
+import { useVotingTimeLeft } from "@/components/voting-ends-in";
+import { votingEndDate } from "@/config";
+import { categoryNames } from "@/data/categories";
 import {
   CategoryId,
   MAX_MULTIPLIER_VALUE,
-  Round5Allocation,
   Round5ProjectAllocation,
-  useBallot,
   useBallotWeightSum,
-  useIsSavingBallot,
   useOsMultiplier,
-  useRound5Ballot,
+  useRound5Ballot
 } from "@/hooks/useBallot";
-import { Metric, ProjectAllocation, useMetricsByRound } from "@/hooks/useMetrics";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { Slider } from "@/components/ui/slider";
-import { NumericFormat } from "react-number-format";
-import { Input } from "@/components/ui/input";
-import { useBallotContext } from "@/components/ballot/provider";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert } from "@/components/ui/alert";
-import { formatDate } from "@/lib/utils";
+import { useIsSavingRound5Ballot, useRound5BallotWeightSum, useSaveRound5Allocation, useSaveRound5Position } from "@/hooks/useBallotRound5";
 import { useIsBadgeholder } from "@/hooks/useIsBadgeholder";
-import { ManualDialog } from "../../components/common/manual-dialog";
-import { PageView } from "@/components/common/page-view";
+import { formatDate } from "@/lib/utils";
+import { ArrowDownToLineIcon, LoaderIcon, Menu } from "lucide-react";
 import Image from "next/image";
-import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
-import { votingEndDate } from "@/config";
-import { useVotingTimeLeft } from "@/components/voting-ends-in";
-import { SearchInput } from "@/components/common/search-input";
 import Link from "next/link";
-import { useProjects, useProjectsByCategory } from "@/hooks/useProjects";
-import { useBallotRound5Context } from "@/components/ballot/provider5";
-import { SubmitRound5Dialog } from "@/components/ballot/submit-dialog5";
-import { useDistributionMethod, useIsSavingRound5Ballot, useRound5BallotWeightSum, useSaveRound5Allocation, useSaveRound5Position } from "@/hooks/useBallotRound5";
-import { ImpactScore, useSaveProjectImpact } from "@/hooks/useProjectImpact";
+import { ComponentProps, useEffect, useState } from "react";
+import { NumericFormat } from "react-number-format";
+import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
+import { ManualDialog } from "../../components/common/manual-dialog";
+import { MetricsEditor } from "../../components/metrics-editor";
 
 function formatAllocationOPAmount(amount: number) {
   const value = amount.toString()
@@ -126,7 +120,7 @@ export default function BallotPage() {
 function CheckBallotState() {
   const { address, isConnecting } = useAccount();
   const { isPending, data: ballot } = useRound5Ballot(address);
-  console.log("Ballot Data from new API:", {ballot});
+  console.log("Ballot Data from new API:", { ballot });
   const { state } = useBallotRound5Context();
   // Comment out for local dev if needed
   if (isPending) {
@@ -149,20 +143,16 @@ const categoryIds: CategoryId[] = [
   'OP_STACK_TOOLING'
 ]
 
-const categoryNames: { [key: string]: string } = {
-  ETHEREUM_CORE_CONTRIBUTIONS: 'Ethereum Core Contributions',
-  OP_STACK_RESEARCH_AND_DEVELOPMENT: 'OP Stack Research and Development',
-  OP_STACK_TOOLING: 'OP Stack Tooling'
-}
+
 
 function YourBallot() {
   const [isSubmitting, setSubmitting] = useState(false);
-  
+
   const { ballot } = useBallotRound5Context();
   const { mutate: saveAllocation } = useSaveRound5Allocation();
   const { mutate: savePosition } = useSaveRound5Position();
 
-  console.log({ballot});
+  console.log({ ballot });
 
   const [projectList, setProjectList] = useState(ballot?.project_allocations || []);
 
@@ -278,7 +268,7 @@ function YourBallot() {
                     <div className="flex justify-center items-center rounded-md border-2 w-10 h-10">
                       {i + 1}
                     </div>
-                    <div 
+                    <div
                       className="flex justify-center items-center rounded-md border-2 w-10 h-10 cursor-move"
                       onDragStart={(e) => {
                         e.dataTransfer.setData('text/plain', i.toString());
@@ -296,7 +286,7 @@ function YourBallot() {
                           const [removed] = newProjects.splice(draggedIndex, 1);
                           newProjects.splice(newIndex, 0, removed);
                           updateProjects(newProjects);
-                          savePosition({id: proj.project_id, position: newIndex})
+                          savePosition({ id: proj.project_id, position: newIndex })
                         }
                       }}
                     >
@@ -319,7 +309,7 @@ function YourBallot() {
                         const newProjectList = [...projectList];
                         newProjectList[i].allocation = isNaN(newAllocation) ? 0 : newAllocation;
                         setProjectList(newProjectList);
-                        saveAllocation({project_id: proj.project_id, allocation: newAllocation})
+                        saveAllocation({ project_id: proj.project_id, allocation: newAllocation })
                       }}
                     />
                     <span className="absolute right-10 top-1/2 transform -translate-y-1/2 pointer-events-none">%</span>

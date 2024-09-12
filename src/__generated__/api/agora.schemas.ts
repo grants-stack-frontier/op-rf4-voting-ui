@@ -543,8 +543,9 @@ export interface Round4Ballot {
  * @summary Organization information for a project
  */
 export interface Organization {
+  description?: string;
   name?: string;
-  profileAvatarUrl?: string;
+  organizationAvatarUrl?: string;
 }
 
 /**
@@ -558,6 +559,50 @@ export interface SocialLinks {
   twitter?: string;
   website?: string;
 }
+
+export type ProjectImpactStatement = {
+  category?: string;
+  statement?: ProjectImpactStatementStatement;
+  subcategory?: string[];
+};
+
+/**
+ * Information about a project submitted for Retroactive Public Goods Funding on Agora.
+
+ * @summary A project submitted for RetroFunding
+ */
+export interface Project {
+  applicationCategory?: string;
+  applicationId?: string;
+  category?: string;
+  /**
+   * Information about the contracts deployed by the project, including the contract address, chain ID, deployer, and creation block.
+
+   * @summary Deployed contracts for the project
+   */
+  contracts?: ProjectContractsItem[];
+  description?: string;
+  github?: ProjectGithubItem[];
+  grantsAndFunding?: ProjectGrantsAndFunding;
+  id?: string;
+  impactStatement?: ProjectImpactStatement;
+  links?: string[];
+  name?: string;
+  organization?: Organization;
+  packages?: string[];
+  pricingModel?: string;
+  pricingModelDetails?: string;
+  profileAvatarUrl?: string;
+  projectCoverImageUrl?: string;
+  projectId?: string;
+  socialLinks?: SocialLinks;
+  team?: string[];
+}
+
+export type ProjectImpactStatementStatement = {
+  answer?: string;
+  question?: string;
+};
 
 export type ProjectGrantsAndFundingVentureFundingItem = {
   amount?: string;
@@ -623,33 +668,6 @@ export type ProjectContractsItemAllOf = {
 };
 
 export type ProjectContractsItem = Contract & ProjectContractsItemAllOf;
-
-/**
- * Information about a project submitted for Retroactive Public Goods Funding on Agora.
-
- * @summary A project submitted for RetroFunding
- */
-export interface Project {
-  category?: string;
-  /**
-   * Information about the contracts deployed by the project, including the contract address, chain ID, deployer, and creation block.
-
-   * @summary Deployed contracts for the project
-   */
-  contracts?: ProjectContractsItem[];
-  description?: string;
-  github?: ProjectGithubItem[];
-  grantsAndFunding?: ProjectGrantsAndFunding;
-  id?: string;
-  links?: string[];
-  name?: string;
-  organization?: Organization;
-  packages?: string[];
-  profileAvatarUrl?: string;
-  projectCoverImageUrl?: string;
-  socialLinks?: SocialLinks;
-  team?: string[];
-}
 
 /**
  * A category for a RetroFunding project, including information about the category.
