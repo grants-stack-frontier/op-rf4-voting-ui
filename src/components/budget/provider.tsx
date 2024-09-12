@@ -13,13 +13,18 @@ import { useBudgetForm } from "@/hooks/useBudgetForm";
 import { Category } from "@/data/categories";
 import { Round5Allocation, CategoryId } from "@/types/shared";
 import debounce from "lodash.debounce";
+import Decimal from "decimal.js";
 
 interface BudgetContextType {
   categories: Category[] | undefined;
   countPerCategory: Record<string, number>;
   allocations: Record<string, number>;
   lockedFields: Record<string, boolean>;
-  handleValueChange: (categoryId: CategoryId, newValue: number) => void;
+  handleValueChange: (
+    categoryId: CategoryId,
+    newValue: number,
+    locked: boolean
+  ) => void;
   toggleLock: (categoryId: CategoryId) => void;
   isSubmitting: boolean;
   refetchBudget: () => void;
@@ -81,40 +86,56 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
     ) => {
       const allocations = Object.entries(state).map(([id, allocation]) => ({
         id,
-        allocation,
+        allocation: new Decimal(allocation),
         locked: lockedFields[id],
       }));
+      console.log("allocations", allocations);
 
       const [amountToBalance, totalUnlocked, unlockedEntities] =
         allocations.reduce(
           (acc, allocation) => {
-            if (allocation.id === changedCategoryId) {
-              acc[0] -= newValue;
-            } else if (allocation.locked) {
-              acc[0] -= allocation.allocation;
-            } else {
-              acc[1] += allocation.allocation;
-              acc[2]++;
-            }
-            return acc;
+            acc[0] -=
+              allocation.locked || allocation.id === changedCategoryId
+                ? Number(
+                    allocation.id === changedCategoryId
+                      ? new Decimal(newValue).toFixed(2)
+                      : allocation.allocation.toFixed(2)
+                  )
+                : 0;
+            return [
+              acc[0] < 0 ? 0 : acc[0],
+              acc[1] +
+                (allocation.locked || allocation.id === changedCategoryId
+                  ? 0
+                  : Number(allocation.allocation.toFixed(2))),
+              acc[2] +
+                (allocation.locked || allocation.id === changedCategoryId
+                  ? 0
+                  : 1),
+            ];
           },
           [100, 0, 0]
         );
 
-      return Object.fromEntries(
-        allocations.map((allocation) => {
-          if (allocation.id === changedCategoryId) {
-            return [allocation.id, newValue];
-          } else if (!allocation.locked) {
-            const newAllocation = totalUnlocked
-              ? (allocation.allocation / totalUnlocked) * amountToBalance
+      const result = allocations.map((allocation) => {
+        if (!allocation.locked && allocation.id !== changedCategoryId) {
+          return {
+            ...allocation,
+            allocation: totalUnlocked
+              ? (Number(allocation.allocation.toFixed(2)) / totalUnlocked) *
+                amountToBalance
               : unlockedEntities
               ? amountToBalance / unlockedEntities
-              : 0;
-            return [allocation.id, Number(newAllocation.toFixed(2))];
-          }
-          return [allocation.id, allocation.allocation];
-        })
+              : 0,
+          };
+        }
+        return allocation.id === changedCategoryId
+          ? { ...allocation, allocation: newValue }
+          : allocation;
+      });
+
+      return Object.fromEntries(
+        result.map(({ id, allocation }) => [id, Number(allocation.toFixed(3))])
       );
     },
     [lockedFields]
@@ -127,7 +148,7 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
   );
 
   const handleValueChange = useCallback(
-    (categoryId: CategoryId, newValue: number) => {
+    (categoryId: CategoryId, newValue: number, locked: boolean) => {
       setAllocations((prevAllocations) => {
         const updatedAllocations = calculateBalancedAmounts(
           prevAllocations,
@@ -138,13 +159,13 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
         saveAllocationRef.current({
           category_slug: categoryId,
           allocation: updatedAllocations[categoryId],
-          locked: lockedFields[categoryId],
+          locked,
         });
 
         return updatedAllocations;
       });
     },
-    [calculateBalancedAmounts, lockedFields]
+    [calculateBalancedAmounts]
   );
 
   const refetchBudget = () => {

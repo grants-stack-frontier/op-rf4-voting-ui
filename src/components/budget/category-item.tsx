@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,9 +22,41 @@ export function CategoryItem({ category }: CategoryItemProps) {
     countPerCategory,
   } = useBudgetContext();
 
+  const [inputValue, setInputValue] = useState("");
+
   const allocation = allocations[category.id] || 0;
   const isLocked = lockedFields[category.id] || false;
   const projectCount = countPerCategory[category.id] || 0;
+
+  const formatAllocation = (value: number) => {
+    return value.toFixed(3).replace(/\.?0+$/, "");
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace("%", "");
+    setInputValue(value);
+  };
+
+  const handleInputBlur = () => {
+    const parsedValue = parseFloat(inputValue);
+    if (!isNaN(parsedValue)) {
+      handleValueChange(category.id, parsedValue, isLocked);
+    }
+    setInputValue("");
+  };
+
+  const handleIncrement = () => {
+    handleValueChange(category.id, allocation + 1, isLocked);
+  };
+
+  const handleDecrement = () => {
+    handleValueChange(category.id, allocation - 1, isLocked);
+  };
+
+  const handleToggleLock = () => {
+    toggleLock(category.id);
+    handleValueChange(category.id, allocation, !isLocked);
+  };
 
   return (
     <div key={category.id}>
@@ -58,22 +90,15 @@ export function CategoryItem({ category }: CategoryItemProps) {
               type='button'
               variant='ghost'
               className='w-20 outline-none hover:bg-transparent'
-              onClick={() =>
-                handleValueChange(category.id, Math.max(0, allocation - 1))
-              }
+              onClick={handleDecrement}
             >
               <Minus className='h-4 w-4' />
             </Button>
             <Input
               type='text'
-              value={`${allocation.toFixed(2)}%`}
-              onChange={(e) => {
-                const inputValue = e.target.value.replace("%", "");
-                const parsedValue = parseFloat(inputValue);
-                if (!isNaN(parsedValue)) {
-                  handleValueChange(category.id, parsedValue);
-                }
-              }}
+              value={inputValue || `${formatAllocation(allocation)}%`}
+              onChange={handleInputChange}
+              onBlur={handleInputBlur}
               className='border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-center'
             />
             <Button
@@ -81,9 +106,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
               type='button'
               variant='ghost'
               className='w-20 outline-none hover:bg-transparent'
-              onClick={() =>
-                handleValueChange(category.id, Math.min(100, allocation + 1))
-              }
+              onClick={handleIncrement}
             >
               <Plus className='h-4 w-4' />
             </Button>
@@ -97,7 +120,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
           size='icon'
           variant='ghost'
           className='outline-none hover:bg-transparent'
-          onClick={() => toggleLock(category.id)}
+          onClick={handleToggleLock}
         >
           {isLocked ? (
             <Lock className='h-4 w-4 text-primary' />
