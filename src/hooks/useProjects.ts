@@ -2,8 +2,6 @@
 
 import {
 	getProjectsResponse,
-	getRetroFundingRoundProjectById,
-	getRetroFundingRoundProjectByIdResponse,
 	getRetroFundingRoundProjects,
 	getRetroFundingRoundProjectsResponse,
 	updateRetroFundingRoundProjectImpact,
@@ -54,13 +52,10 @@ export function useProjectById(projectId: string) {
 	return useQuery({
 		queryKey: ['projects-by-id', projectId],
 		queryFn: async () =>
-			// getRetroFundingRoundProjects(5).then((results: getProjectsResponse) => {
-			// 	const res: ProjectsResponse = results.data;
-			// 	const filtered = res.data?.filter((p) => p.projectId === projectId);
-			// 	return filtered?.[0];
-			// }),
-      getRetroFundingRoundProjectById(5, projectId).then((results: getRetroFundingRoundProjectByIdResponse) => {
-				return results.data;
+			getRetroFundingRoundProjects(5).then((results: getProjectsResponse) => {
+				const res: ProjectsResponse = results.data;
+				const filtered = res.data?.filter((p) => p.projectId === projectId || p.id === projectId || p.applicationId === projectId);
+				return filtered?.[0];
 			}),
 	});
 }

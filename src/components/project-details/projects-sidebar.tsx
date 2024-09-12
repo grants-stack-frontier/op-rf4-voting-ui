@@ -24,7 +24,6 @@ export function ProjectsSidebar({
   id: string;
   data?: Category[];
 }) {
-  const category = data?.find(cat => cat.id === id);
   const { data: projects, isPending } = useProjectsByCategory(id);
   const intersectionRef = useRef(null);
   const intersection = useIntersection(intersectionRef, {
@@ -61,7 +60,7 @@ export function ProjectsSidebar({
                 </ProjectItem>
               ))}
           {projects?.map((item) => (
-            <Link key={item.name} href={`/project/${item.projectId}?category=${id}`}>
+            <Link key={item.name} href={`/project/${item.projectId}`}>
               <ProjectItem  {...item}>
                 {item.name}
               </ProjectItem>

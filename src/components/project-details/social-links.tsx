@@ -35,7 +35,7 @@ export function SocialLinksList({ socialLinks }: { socialLinks?: SocialLinks }) 
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {website && (
+      {(website && (Array.isArray(website) && website?.length > 0)) && (
         <Button
           variant="link"
           className="gap-1"
@@ -43,12 +43,12 @@ export function SocialLinksList({ socialLinks }: { socialLinks?: SocialLinks }) 
           asChild
         >
           <Link2 className="-rotate-45 h-4 w-4" />
-          <Link className="truncate max-w-[200px] text-sm" href={getSafeUrl(website)} target="_blank">
+          <Link className="truncate max-w-[200px] text-sm lowercase" href={getSafeUrl(website)} target="_blank">
             {typeof website === 'string' ? website : Array.isArray(website) ? website[0] : 'Website'}
           </Link>
         </Button>
       )}
-      {farcaster && (
+      {(farcaster && (Array.isArray(farcaster) && farcaster?.length > 0)) && (
         <Button
           variant="link"
           className="gap-1"
@@ -56,7 +56,7 @@ export function SocialLinksList({ socialLinks }: { socialLinks?: SocialLinks }) 
           asChild
         >
           <Warpcast />
-          <Link className="truncate max-w-[200px] text-sm" href={getSafeUrl(farcaster)} target="_blank">
+          <Link className="truncate max-w-[200px] text-sm lowercase" href={getSafeUrl(farcaster)} target="_blank">
             {typeof farcaster === 'string' ? farcaster : Array.isArray(farcaster) ? farcaster[0] : 'Farcaster'}
           </Link>
         </Button>
@@ -69,7 +69,7 @@ export function SocialLinksList({ socialLinks }: { socialLinks?: SocialLinks }) 
           asChild
         >
           <X />
-          <Link className="truncate max-w-[200px] text-sm" href={getSafeUrl(twitter)} target="_blank">
+          <Link className="truncate max-w-[200px] text-sm lowercase" href={getSafeUrl(twitter)} target="_blank">
             {twitter}
           </Link>
         </Button>
@@ -82,7 +82,7 @@ export function SocialLinksList({ socialLinks }: { socialLinks?: SocialLinks }) 
           asChild
         >
           <Mirror />
-          <Link className="truncate max-w-[200px] text-sm" href={getSafeUrl(mirror)} target="_blank">
+          <Link className="truncate max-w-[200px] text-sm lowercase" href={getSafeUrl(mirror)} target="_blank">
             {mirror}
           </Link>
         </Button>
