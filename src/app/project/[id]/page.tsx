@@ -3,8 +3,8 @@ import { UnlockBallotDialog } from "@/components/ballot/unlock-ballot";
 import { ConflictOfInterestDialog } from "@/components/common/conflict-of-interest-dialog";
 import { LoadingDialog } from "@/components/common/loading-dialog";
 import { PageView } from "@/components/common/page-view";
-import { ProjectDetails } from "@/components/projects";
-import { ReviewSidebar } from "@/components/projects/review-sidebar";
+import { ProjectDetails } from "@/components/project-details";
+import { ReviewSidebar } from "@/components/project-details/review-sidebar";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -12,8 +12,10 @@ import {
 	BreadcrumbList,
 	BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
+import { toast } from "@/components/ui/use-toast";
 import { ImpactScore, useProjectScoring } from "@/hooks/useProjectScoring";
-import { useProjectsByCategory } from "@/hooks/useProjects";
+import { useProjectsByCategory, useSaveProjectImpact } from "@/hooks/useProjects";
+import { setProjectsScored } from "@/utils/localStorage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
@@ -26,22 +28,50 @@ export default function ProjectDetailsPage({ params, searchParams }: { params: {
 	const [isNextProjectLoading, setIsNextProjectLoading] = useState(false);
 	const [isConflictOfInterestDialogOpen, setIsConflictOfInterestDialogOpen] = useState(false);
 	const { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect } = useProjectScoring(category, id);
+	const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
 
-	const handleScore = useCallback((score: ImpactScore) => {
+	const handleScore = useCallback(async (score: ImpactScore) => {
 		setIsNextProjectLoading(true);
 		const totalProjects = projects?.length ?? 0;
-		const allProjectsScored = handleScoreSelect(score, totalProjects);
+		const { updatedProjectsScored, allProjectsScored } = await handleScoreSelect(score, totalProjects);
 
-		if (!allProjectsScored && projects) {
+		if (score !== 'Skip' && !projectsScored.votedIds.includes(id)) {
+			try {
+				await saveProjectImpact({ projectId: id, impact: score }, {
+					onSuccess: () => {
+						setProjectsScored(updatedProjectsScored);
+						setIsNextProjectLoading(false);
+
+						if (!allProjectsScored && projects) {
+							const currentIndex = projects.findIndex(project => project.projectId === id);
+							const nextIndex = (currentIndex + 1) % totalProjects;
+							const nextProjectId = projects[nextIndex].projectId;
+							if (nextProjectId) {
+								router.push(`/project/${nextProjectId}?category=${category}`);
+							}
+						}
+					},
+					onError: () => {
+						setIsNextProjectLoading(false);
+						toast({ variant: 'destructive', title: 'Error saving project impact' });
+					}
+				});
+			} catch (error) {
+				setIsNextProjectLoading(false);
+				toast({ variant: 'destructive', title: 'Error saving project impact' });
+			}
+		} else if (score === 'Skip' && projects) {
 			const currentIndex = projects.findIndex(project => project.projectId === id);
 			const nextIndex = (currentIndex + 1) % totalProjects;
 			const nextProjectId = projects[nextIndex].projectId;
 			if (nextProjectId) {
 				router.push(`/project/${nextProjectId}?category=${category}`);
 			}
+			setIsNextProjectLoading(false);
+		} else {
+			setIsNextProjectLoading(false);
 		}
-		setIsNextProjectLoading(false);
-	}, [projects, id, category, router, handleScoreSelect]);
+	}, [projects, id, category, router, handleScoreSelect, saveProjectImpact, projectsScored]);
 
 	const handleConflictOfInterest = useCallback(() => {
 		setIsConflictOfInterestDialogOpen(true);
