@@ -1,31 +1,31 @@
 "use client";
-import {PropsWithChildren, useRef, useState} from "react";
+import { PropsWithChildren, useRef, useState } from "react";
 
-import {cn} from "@/lib/utils";
-import {ArrowDown} from "lucide-react";
-import {useIntersection} from "react-use";
+import { cn } from "@/lib/utils";
+import { ArrowDown } from "lucide-react";
+import { useIntersection } from "react-use";
 import AvatarPlaceholder from "../../../public/avatar-placeholder.svg";
-import {Badge} from "../ui/badge";
-import {Card} from "../ui/card";
-import {Heading} from "../ui/headings";
-import {ScrollArea} from "../ui/scroll-area";
+import { Badge } from "../ui/badge";
+import { Card } from "../ui/card";
+import { Heading } from "../ui/headings";
+import { ScrollArea } from "../ui/scroll-area";
 
-import {Project} from "@/__generated__/api/agora.schemas";
-import {Category} from "@/data/categories";
-import {useProjectsByCategory} from "@/hooks/useProjects";
+import { Project } from "@/__generated__/api/agora.schemas";
+import { Category } from "@/data/categories";
+import { useProjectsByCategory } from "@/hooks/useProjects";
 import Link from "next/link";
-import {ManualDialog} from "../common/manual-dialog";
-import {Skeleton} from "../ui/skeleton";
+import { ManualDialog } from "../common/manual-dialog";
+import { Skeleton } from "../ui/skeleton";
 
 export function ProjectsSidebar({
-                                  id,
-                                  data,
-                                }: {
+  id,
+  data,
+}: {
   id: string;
   data?: Category[];
 }) {
   const category = data?.find(cat => cat.id === id);
-  const {data: projects, isPending} = useProjectsByCategory(id);
+  const { data: projects, isPending } = useProjectsByCategory(id);
   const intersectionRef = useRef(null);
   const intersection = useIntersection(intersectionRef, {
     root: null,
@@ -35,7 +35,7 @@ export function ProjectsSidebar({
 
   return (
     <Card
-      className={cn("w-[300px]", {
+      className={cn("w-[300px] sticky top-8", {
         ["opacity-50 animate-pulse"]: isPending,
       })}
     >
@@ -61,19 +61,19 @@ export function ProjectsSidebar({
                 </ProjectItem>
               ))}
           {projects?.map((item) => (
-            <Link key={item.name} href={`/project/${item.id}?category=${id}`}>
+            <Link key={item.name} href={`/project/${item.projectId}?category=${id}`}>
               <ProjectItem  {...item}>
                 {item.name}
               </ProjectItem>
             </Link>
           ))}
-          <div ref={intersectionRef}/>
+          <div ref={intersectionRef} />
           {(intersection?.intersectionRatio ?? 0) < 1 && (
             <Badge
               variant="outline"
               className="animate-in fade-in zoom-in absolute bottom-2 left-1/2 -translate-x-1/2 bg-white"
             >
-              More <ArrowDown className="ml-2 size-3 "/>
+              More <ArrowDown className="ml-2 size-3 " />
             </Badge>
           )}
         </ScrollArea>
@@ -99,14 +99,14 @@ function ProjectItem({
             }}
           />
           <div className="truncate">
-            {name || <Skeleton className="h-3 w-16"/>}
+            {name || <Skeleton className="h-3 w-16" />}
           </div>
         </div>
-        <div className={cn({["text-gray-400"]: isLoading})}>
+        <div className={cn({ ["text-gray-400"]: isLoading })}>
           {/* {children} */}
         </div>
       </div>
-      <ManualDialog open={isOpen} onOpenChange={setOpen}/>
+      <ManualDialog open={isOpen} onOpenChange={setOpen} />
     </>
   );
 }

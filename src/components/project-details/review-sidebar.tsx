@@ -39,7 +39,7 @@ export function ReviewSidebar({
 	}, [onConflictOfInterest, onScoreSelect]);
 
 	return (
-		<Card className={cn("w-[304px] h-[560px]", className)} {...props}>
+		<Card className={cn("w-[304px] h-[560px] sticky top-8", className)} {...props}>
 			<CardHeader>
 				<CardTitle className="text-base font-medium text-center">
 					{isVoted ? "You've already voted on this project" : "How would you score this project's impact on the OP Stack?"}

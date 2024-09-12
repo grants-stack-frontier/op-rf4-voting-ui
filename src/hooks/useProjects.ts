@@ -7,7 +7,6 @@ import {
 	updateRetroFundingRoundProjectImpact,
 } from '@/__generated__/api/agora';
 import { PageMetadata, Project } from '@/__generated__/api/agora.schemas';
-import { toast } from '@/components/ui/use-toast';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
 import { ImpactScore } from './useProjectScoring';
@@ -31,11 +30,10 @@ export function useProjects() {
 export function useSaveProjectImpact() {
 	const { address } = useAccount();
 	return useMutation({
-		mutationKey: ['save-impact'],
+		mutationKey: ['save-project-impact'],
 		mutationFn: async ({ projectId, impact }: { projectId: string; impact: ImpactScore }) => {
 			return updateRetroFundingRoundProjectImpact(5, address as string, projectId, impact as number);
 		},
-		onError: () => toast({ variant: 'destructive', title: 'Error saving ballot' }),
 	});
 }
 
@@ -45,7 +43,7 @@ export function useProjectsByCategory(categoryId: string) {
 		queryFn: async () =>
 			getRetroFundingRoundProjects(5).then((results: getRetroFundingRoundProjectsResponse) => {
 				const res: ProjectsResponse = results.data;
-				return res.data?.filter((p) => p.category === categoryId);
+				return res.data?.filter((p) => p.applicationCategory === categoryId);
 			}),
 	});
 }
@@ -56,7 +54,7 @@ export function useProjectById(projectId: string) {
 		queryFn: async () =>
 			getRetroFundingRoundProjects(5).then((results: getProjectsResponse) => {
 				const res: ProjectsResponse = results.data;
-				const filtered = res.data?.filter((p) => p.id === projectId);
+				const filtered = res.data?.filter((p) => p.projectId === projectId);
 				return filtered?.[0];
 			}),
 	});

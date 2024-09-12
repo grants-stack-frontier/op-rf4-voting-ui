@@ -13,6 +13,12 @@ export enum CategoryType {
 	OP_STACK_TOOLING = 'OP_STACK_TOOLING',
 }
 
+export const categoryNames: Record<string, string> = {
+	ETHEREUM_CORE_CONTRIBUTIONS: 'Ethereum Core Contributions',
+	OP_STACK_RESEARCH_AND_DEVELOPMENT: 'OP Stack Research & Development',
+	OP_STACK_TOOLING: 'OP Stack Tooling',
+};
+
 export type Category = {
 	id: CategoryId;
 	name: string;

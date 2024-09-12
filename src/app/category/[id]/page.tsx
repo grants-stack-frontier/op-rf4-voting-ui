@@ -1,13 +1,13 @@
 "use client";
 import { CategoryDetails } from "@/components/category-details";
 import { PageView } from "@/components/common/page-view";
-import { ProjectsSidebar } from "@/components/projects/projects-sidebar";
+import { ProjectsSidebar } from "@/components/project-details/projects-sidebar";
 import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbLink,
-	BreadcrumbList,
-	BreadcrumbSeparator
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CategoryType } from "@/data/categories";
@@ -45,9 +45,9 @@ export default function CategoryDetailsPage({ params: { id = "" } }) {
 								categoryName = categoryName.replace('Op', 'OP')
 							}
 							return (
-								<TabsTrigger 
-									onClick={() => router.push(`/category/${categoryType}`)} 
-									key={categoryType} 
+								<TabsTrigger
+									onClick={() => router.push(`/category/${categoryType}`)}
+									key={categoryType}
 									value={categoryType}
 									className={`${id === categoryType ? 'text-black' : 'text-gray-500'}`}
 								>
@@ -60,7 +60,7 @@ export default function CategoryDetailsPage({ params: { id = "" } }) {
 						<TabsContent className="pt-10" key={categoryType} value={categoryType}>
 							<section className="flex items-start justify-between">
 								<CategoryDetails {...category} id={categoryType} />
-								<aside className="sticky top-8">
+								<aside>
 									<ProjectsSidebar
 										id={categoryType}
 										{...category}
