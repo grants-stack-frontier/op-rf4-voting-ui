@@ -28,7 +28,12 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [lockedFields, setLockedFields] = useState<Record<string, boolean>>({});
   const [countPerCategory, setCountPerCategory] = useState<Record<string, number>>({});
-  console.log('lockedFields', lockedFields)
+
+  const lockedFieldsRef = useRef(lockedFields);
+
+  useEffect(() => {
+    lockedFieldsRef.current = lockedFields;
+  }, [lockedFields]);
 
   useEffect(() => {
     if (projects.data && categories.data) {
@@ -65,7 +70,7 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
     }
   }, [projects.data, categories.data, getBudget.data]);
 
-  const autobalanceAllocations = (
+  const autobalanceAllocations = useCallback((
     allocations: Array<{ id: string; allocation: number; locked: boolean }>,
     idToSkip: string
   ) => {
@@ -101,28 +106,27 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
       }
       return allocation;
     });
-  };
+  }, []);
   
-  const calculateBalancedAmounts = useCallback(
-    (
-      allocations: Record<string, number>,
-      changedCategoryId: string,
-      newValue: number
-    ) => {
-      let newAllocations = Object.entries(allocations).map(([id, allocation]) => ({
-        id,
-        allocation: id === changedCategoryId ? newValue : allocation,
-        locked: lockedFields[id],
-      }));
-  
-      const balancedAllocations = autobalanceAllocations(newAllocations, changedCategoryId);
-      
-      return Object.fromEntries(
-        balancedAllocations.map(({ id, allocation }) => [id, Number(allocation.toFixed(14))])
-      );
-    },
-    [lockedFields]
-  );
+  const calculateBalancedAmounts = useCallback((
+    allocations: Record<string, number>,
+    changedCategoryId: string,
+    newValue: number
+  ) => {
+    const currentLockedFields = lockedFieldsRef.current;
+    
+    let newAllocations = Object.entries(allocations).map(([id, allocation]) => ({
+      id,
+      allocation: id === changedCategoryId ? newValue : allocation,
+      locked: currentLockedFields[id],
+    }));
+
+    const balancedAllocations = autobalanceAllocations(newAllocations, changedCategoryId);
+    
+    return Object.fromEntries(
+      balancedAllocations.map(({ id, allocation }) => [id, Number(allocation.toFixed(14))])
+    );
+  }, [autobalanceAllocations]);
 
   const saveAllocationRef = useRef(
     debounce((allocations: Record<string, number>, categoryId: CategoryId, locked: boolean) => {
