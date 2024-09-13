@@ -14,6 +14,7 @@ import {
 	BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import { toast } from "@/components/ui/use-toast";
+import { HttpStatusCode } from "@/enums/http-status-codes";
 import { ImpactScore, useProjectScoring } from "@/hooks/useProjectScoring";
 import { useProjectById, useProjectsByCategory, useSaveProjectImpact } from "@/hooks/useProjects";
 import { setProjectsScored } from "@/utils/localStorage";
@@ -35,7 +36,6 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 	const handleScore = useCallback(async (score: ImpactScore) => {
 		setIsNextProjectLoading(true);
 		const totalProjects = projects?.length ?? 0;
-		const { updatedProjectsScored, allProjectsScored } = await handleScoreSelect(score, totalProjects);
 
 		if (score !== 'Skip' && !projectsScored.votedIds.includes(project?.projectId ?? id)) {
 			try {
@@ -43,22 +43,30 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 					throw new Error("Project ID is undefined");
 				}
 				await saveProjectImpact({ projectId: project.projectId, impact: score }, {
-					onSuccess: () => {
-						setProjectsScored(updatedProjectsScored);
-						setIsNextProjectLoading(false);
+					onSuccess: async (data) => {
+						if (data.status === HttpStatusCode.OK) {
+							const { updatedProjectsScored, allProjectsScored } = await handleScoreSelect(score, totalProjects);
+							setProjectsScored(updatedProjectsScored);
+							setIsNextProjectLoading(false);
 
-						if (!allProjectsScored && projects) {
-							const currentIndex = projects.findIndex(p => p.projectId === project?.projectId || p.id === id);
-							const nextIndex = (currentIndex + 1) % totalProjects;
-							const nextProjectId = projects[nextIndex].projectId;
-							if (nextProjectId) {
-								router.push(`/project/${nextProjectId}`);
+							if (!allProjectsScored && projects) {
+								const currentIndex = projects.findIndex(p => p.projectId === project?.projectId || p.id === id);
+								const nextIndex = (currentIndex + 1) % totalProjects;
+								const nextProjectId = projects[nextIndex].projectId;
+								if (nextProjectId) {
+									router.push(`/project/${nextProjectId}`);
+								}
 							}
+						} else {
+							setIsNextProjectLoading(false);
+							toast({ variant: 'destructive', title: "Error saving project impact" });
 						}
 					},
-					onError: () => {
-						setIsNextProjectLoading(false);
-						toast({ variant: 'destructive', title: 'Error saving project impact' });
+					onError: (error) => {
+						if (error instanceof Error) {
+							setIsNextProjectLoading(false);
+							toast({ variant: 'destructive', title: error.message });
+						}
 					}
 				});
 			} catch (error) {
