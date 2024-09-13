@@ -1,33 +1,20 @@
 "use client";
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useEffect,
-  useRef,
-} from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
 import { useCategories } from "@/hooks/useCategories";
 import { useProjects } from "@/hooks/useProjects";
 import { useBudgetForm } from "@/hooks/useBudgetForm";
 import { Category } from "@/data/categories";
-import { Round5Allocation, CategoryId } from "@/types/shared";
+import { CategoryId } from "@/types/shared";
 import debounce from "lodash.debounce";
-import Decimal from "decimal.js";
 
 interface BudgetContextType {
   categories: Category[] | undefined;
   countPerCategory: Record<string, number>;
   allocations: Record<string, number>;
   lockedFields: Record<string, boolean>;
-  handleValueChange: (
-    categoryId: CategoryId,
-    newValue: number,
-    locked: boolean
-  ) => void;
-  toggleLock: (categoryId: CategoryId) => void;
-  isSubmitting: boolean;
+  handleValueChange: (categoryId: CategoryId, newValue: number, locked: boolean) => void;
   refetchBudget: () => void;
+  toggleLock: (categoryId: CategoryId) => void;
 }
 
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
@@ -36,50 +23,48 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
   const categories = useCategories();
   const projects = useProjects();
   const roundId = 5;
-  const { getBudget, saveAllocation, lockedFields, toggleLock } =
-    useBudgetForm(roundId);
+  const { getBudget, saveAllocation } = useBudgetForm(roundId);
 
   const [allocations, setAllocations] = useState<Record<string, number>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [countPerCategory, setCountPerCategory] = useState<
-    Record<string, number>
-  >({});
+  const [lockedFields, setLockedFields] = useState<Record<string, boolean>>({});
+  const [countPerCategory, setCountPerCategory] = useState<Record<string, number>>({});
+  console.log('lockedFields', lockedFields)
 
   useEffect(() => {
     if (projects.data && categories.data) {
-      // Calculate count per category
       const counts = projects.data.reduce((acc, project) => {
-        const category = categories.data.find(
-          (cat) => cat.id === project.category
-        );
+        const category = categories.data.find((cat) => cat.id === project.category);
         if (category) {
           acc[category.id] = (acc[category.id] ?? 0) + 1;
         }
         return acc;
       }, {} as Record<string, number>);
       setCountPerCategory(counts);
-  
-      // Set allocations
+
       if (getBudget.data) {
-        setAllocations(
-          getBudget.data.reduce((acc, allocation) => {
-            if (allocation.category_slug !== undefined) {
-              acc[allocation.category_slug] = Number(allocation.allocation);
-            }
-            return acc;
-          }, {} as Record<string, number>)
-        );
+        const newAllocations: Record<string, number> = {};
+        const newLockedFields: Record<string, boolean> = {};
+        getBudget.data.forEach(allocation => {
+          if (allocation.category_slug !== undefined) {
+            newAllocations[allocation.category_slug] = Number(allocation.allocation);
+            newLockedFields[allocation.category_slug] = allocation.locked ?? false;
+          }
+        });
+        setAllocations(newAllocations);
+        setLockedFields(newLockedFields);
       } else {
-        setAllocations(
-          categories.data.reduce((acc, category) => {
-            acc[category.id] = 100 / categories.data.length;
-            return acc;
-          }, {} as Record<string, number>)
-        );
+        setAllocations(categories.data.reduce((acc, category) => {
+          acc[category.id] = 100 / categories.data.length;
+          return acc;
+        }, {} as Record<string, number>));
+        setLockedFields(categories.data.reduce((acc, category) => {
+          acc[category.id] = false;
+          return acc;
+        }, {} as Record<string, boolean>));
       }
     }
   }, [projects.data, categories.data, getBudget.data]);
-  
+
   const autobalanceAllocations = (
     allocations: Array<{ id: string; allocation: number; locked: boolean }>,
     idToSkip: string
@@ -118,10 +103,6 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
     });
   };
   
-  const roundToPrecision = (value: number, precision: number = 14): number => {
-    return Number(new Decimal(value).toFixed(precision));
-  };
-  
   const calculateBalancedAmounts = useCallback(
     (
       allocations: Record<string, number>,
@@ -137,7 +118,7 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
       const balancedAllocations = autobalanceAllocations(newAllocations, changedCategoryId);
       
       return Object.fromEntries(
-        balancedAllocations.map(({ id, allocation }) => [id, roundToPrecision(allocation)])
+        balancedAllocations.map(({ id, allocation }) => [id, Number(allocation.toFixed(14))])
       );
     },
     [lockedFields]
@@ -145,14 +126,8 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
 
   const saveAllocationRef = useRef(
     debounce((allocations: Record<string, number>, categoryId: CategoryId, locked: boolean) => {
-      const updatedAllocations = calculateBalancedAmounts(
-        allocations,
-        categoryId,
-        allocations[categoryId]
-      );
-      
+      const updatedAllocations = calculateBalancedAmounts(allocations, categoryId, allocations[categoryId]);
       setAllocations(updatedAllocations);
-      
       saveAllocation.mutate({
         category_slug: categoryId,
         allocation: updatedAllocations[categoryId],
@@ -164,22 +139,32 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
   const handleValueChange = useCallback(
     (categoryId: CategoryId, newValue: number, locked: boolean) => {
       setAllocations((prevAllocations) => {
-        const updatedAllocations = {
-          ...prevAllocations,
-          [categoryId]: newValue
-        };
-        
+        const updatedAllocations = { ...prevAllocations, [categoryId]: newValue };
         saveAllocationRef.current(updatedAllocations, categoryId, locked);
-
         return updatedAllocations;
       });
     },
-    []
+    [saveAllocationRef]
   );
 
-  const refetchBudget = () => {
+  const toggleLock = useCallback((categoryId: CategoryId) => {
+    setLockedFields(prev => {
+      const newLockedState = !prev[categoryId];
+      const updatedLockedFields = { ...prev, [categoryId]: newLockedState };
+      
+      saveAllocation.mutate({
+        category_slug: categoryId,
+        allocation: allocations[categoryId],
+        locked: newLockedState,
+      });
+
+      return updatedLockedFields;
+    });
+  }, [allocations, saveAllocation]);
+
+  const refetchBudget = useCallback(() => {
     getBudget.refetch();
-  };
+  }, [getBudget]);
 
   const value = {
     categories: categories.data,
@@ -188,13 +173,10 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
     lockedFields,
     handleValueChange,
     toggleLock,
-    isSubmitting,
     refetchBudget,
   };
 
-  return (
-    <BudgetContext.Provider value={value}>{children}</BudgetContext.Provider>
-  );
+  return <BudgetContext.Provider value={value}>{children}</BudgetContext.Provider>;
 }
 
 export const useBudgetContext = () => {

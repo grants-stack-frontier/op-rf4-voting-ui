@@ -28,31 +28,22 @@ export function CategoryItem({ category }: CategoryItemProps) {
   const isLocked = lockedFields[category.id] || false;
   const projectCount = countPerCategory[category.id] || 0;
 
-  const formatAllocation = (value: number) => {
-    return value.toFixed(3).replace(/\.?0+$/, "");
-  };
+  const formatAllocation = (value: number) => value.toFixed(3).replace(/\.?0+$/, "");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace("%", "");
-    setInputValue(value);
+    setInputValue(e.target.value.replace("%", ""));
   };
 
   const handleInputBlur = () => {
     const parsedValue = parseFloat(inputValue);
     if (!isNaN(parsedValue)) {
       handleValueChange(category.id, parsedValue, isLocked);
+      setInputValue("");
     }
-    setInputValue("");
   };
 
-  const handleIncrement = () => {
-    handleValueChange(category.id, allocation + 1, isLocked);
-  };
-
-  const handleDecrement = () => {
-    handleValueChange(category.id, allocation - 1, isLocked);
-  };
-
+  const handleIncrement = () => handleValueChange(category.id, allocation + 1, isLocked);
+  const handleDecrement = () => handleValueChange(category.id, allocation - 1, isLocked);
   const handleToggleLock = () => {
     toggleLock(category.id);
     handleValueChange(category.id, allocation, !isLocked);
@@ -62,18 +53,10 @@ export function CategoryItem({ category }: CategoryItemProps) {
     <div key={category.id}>
       <Separator />
       <div className='flex items-center gap-4 py-4'>
-        <Image
-          src={category.image}
-          alt={category.name}
-          width={80}
-          height={80}
-        />
+        <Image src={category.image} alt={category.name} width={80} height={80} />
         <div className='flex-1'>
           <Button variant='link' asChild>
-            <Link
-              href={`/category/${category.id}`}
-              className='flex items-center gap-2'
-            >
+            <Link href={`/category/${category.id}`} className='flex items-center gap-2'>
               <span className='font-medium'>{category.name}</span>
               <ChevronRight className='h-4 w-4' />
             </Link>
@@ -85,13 +68,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
         </div>
         <div className='flex flex-col items-center'>
           <div className='flex rounded-lg bg-transparent border w-full'>
-            <Button
-              size='icon'
-              type='button'
-              variant='ghost'
-              className='w-20 outline-none hover:bg-transparent'
-              onClick={handleDecrement}
-            >
+            <Button size='icon' type='button' variant='ghost' className='w-20 outline-none hover:bg-transparent' onClick={handleDecrement}>
               <Minus className='h-4 w-4' />
             </Button>
             <Input
@@ -101,13 +78,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
               onBlur={handleInputBlur}
               className='border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-center'
             />
-            <Button
-              size='icon'
-              type='button'
-              variant='ghost'
-              className='w-20 outline-none hover:bg-transparent'
-              onClick={handleIncrement}
-            >
+            <Button size='icon' type='button' variant='ghost' className='w-20 outline-none hover:bg-transparent' onClick={handleIncrement}>
               <Plus className='h-4 w-4' />
             </Button>
           </div>
@@ -115,18 +86,8 @@ export function CategoryItem({ category }: CategoryItemProps) {
             {Math.round((allocation / 100) * 10000000)} OP
           </div>
         </div>
-        <Button
-          type='button'
-          size='icon'
-          variant='ghost'
-          className='outline-none hover:bg-transparent'
-          onClick={handleToggleLock}
-        >
-          {isLocked ? (
-            <Lock className='h-4 w-4 text-primary' />
-          ) : (
-            <LockOpenIcon className='h-4 w-4 text-muted-foreground' />
-          )}
+        <Button type='button' size='icon' variant='ghost' className='outline-none hover:bg-transparent' onClick={handleToggleLock}>
+          {isLocked ? <Lock className='h-4 w-4 text-primary' /> : <LockOpenIcon className='h-4 w-4 text-muted-foreground' />}
         </Button>
       </div>
       <Separator />

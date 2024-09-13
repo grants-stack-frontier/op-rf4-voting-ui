@@ -6,7 +6,7 @@ import { useBudgetContext } from "./provider";
 import { useRouter } from "next/navigation";
 
 export function BudgetForm() {
-  const { categories, isSubmitting } = useBudgetContext();
+  const { categories } = useBudgetContext();
   const router = useRouter();
 
   const handleContinue = (e: React.FormEvent) => {
@@ -22,7 +22,7 @@ export function BudgetForm() {
         ))}
       </CardContent>
       <CardFooter className='gap-2'>
-        <Button variant='secondary' type='submit' disabled={isSubmitting}>
+        <Button variant='secondary' type='submit'>
           Continue
         </Button>
       </CardFooter>
