@@ -118,6 +118,10 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
     });
   };
   
+  const roundToPrecision = (value: number, precision: number = 14): number => {
+    return Number(new Decimal(value).toFixed(precision));
+  };
+  
   const calculateBalancedAmounts = useCallback(
     (
       allocations: Record<string, number>,
@@ -130,46 +134,47 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
         locked: lockedFields[id],
       }));
   
-      console.log("newAllocations", newAllocations);
-  
       const balancedAllocations = autobalanceAllocations(newAllocations, changedCategoryId);
       
-      console.log('balancedAllocations', balancedAllocations)
-  
       return Object.fromEntries(
-        balancedAllocations.map(({ id, allocation }) => [id, Number(allocation.toFixed(3))])
+        balancedAllocations.map(({ id, allocation }) => [id, roundToPrecision(allocation)])
       );
     },
     [lockedFields]
   );
 
   const saveAllocationRef = useRef(
-    debounce((allocation: Round5Allocation) => {
-      saveAllocation.mutate(allocation);
+    debounce((allocations: Record<string, number>, categoryId: CategoryId, locked: boolean) => {
+      const updatedAllocations = calculateBalancedAmounts(
+        allocations,
+        categoryId,
+        allocations[categoryId]
+      );
+      
+      setAllocations(updatedAllocations);
+      
+      saveAllocation.mutate({
+        category_slug: categoryId,
+        allocation: updatedAllocations[categoryId],
+        locked,
+      });
     }, 300)
   );
 
   const handleValueChange = useCallback(
     (categoryId: CategoryId, newValue: number, locked: boolean) => {
       setAllocations((prevAllocations) => {
-        const updatedAllocations = calculateBalancedAmounts(
-          prevAllocations,
-          categoryId,
-          newValue
-        );
+        const updatedAllocations = {
+          ...prevAllocations,
+          [categoryId]: newValue
+        };
         
-        console.log('updatedAllocations', updatedAllocations)
-        
-        saveAllocationRef.current({
-          category_slug: categoryId,
-          allocation: updatedAllocations[categoryId],
-          locked,
-        });
+        saveAllocationRef.current(updatedAllocations, categoryId, locked);
 
         return updatedAllocations;
       });
     },
-    [calculateBalancedAmounts]
+    []
   );
 
   const refetchBudget = () => {
