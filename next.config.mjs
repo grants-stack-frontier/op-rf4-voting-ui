@@ -2,6 +2,17 @@ const AGORA_API_URL = process.env.AGORA_API_URL;
 const AGORA_API_KEY = process.env.AGORA_API_KEY;
 const DEFORM_API_URL = 'https://api.deform.cc';
 
+const hostnames = [
+	'euc.li',
+	'ens.xyz',
+	'content.optimism.io',
+	'cdn.charmverse.io',
+	'storage.googleapis.com',
+	'i.imgur.com',
+	'imagedelivery.net',
+	'i.seadn.io',
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	env: {
@@ -32,50 +43,12 @@ const nextConfig = {
 		return config;
 	},
 	images: {
-		remotePatterns: [
-			{
-				protocol: 'https',
-				hostname: 'euc.li',
-				port: '',
-				pathname: '/**',
-			},
-			{
-				protocol: 'https',
-				hostname: 'ens.xyz',
-				port: '',
-				pathname: '/**',
-			},
-			{
-				protocol: 'https',
-				hostname: 'content.optimism.io',
-				port: '',
-				pathname: '/**',
-			},
-			{
-				protocol: 'https',
-				hostname: 'cdn.charmverse.io',
-				port: '',
-				pathname: '/**',
-			},
-			{
-				protocol: 'https',
-				hostname: 'storage.googleapis.com',
-				port: '',
-				pathname: '/**',
-			},
-			{
-				protocol: 'https',
-				hostname: 'i.imgur.com',
-				port: '',
-				pathname: '/**',
-			},
-			{
-				protocol: 'https',
-				hostname: 'imagedelivery.net',
-				port: '',
-				pathname: '/**',
-			},
-		],
+		remotePatterns: hostnames.map((hostname) => ({
+			protocol: 'https',
+			hostname,
+			port: '',
+			pathname: '/**',
+		})),
 	},
 };
 export default nextConfig;

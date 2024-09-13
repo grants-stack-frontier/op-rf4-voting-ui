@@ -54,7 +54,7 @@ export function useProjectById(projectId: string) {
 		queryFn: async () =>
 			getRetroFundingRoundProjects(5).then((results: getProjectsResponse) => {
 				const res: ProjectsResponse = results.data;
-				const filtered = res.data?.filter((p) => p.projectId === projectId);
+				const filtered = res.data?.filter((p) => p.projectId === projectId || p.id === projectId || p.applicationId === projectId);
 				return filtered?.[0];
 			}),
 	});
