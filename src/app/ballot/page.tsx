@@ -389,7 +389,7 @@ function YourBallot() {
 }
 
 function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
-  const allocationSum = useBallotWeightSum();
+  const allocationSum = useRound5BallotWeightSum();
   const isBadgeholder = useIsBadgeholder();
   const [days, hours, minutes, seconds] = useVotingTimeLeft(votingEndDate);
 
