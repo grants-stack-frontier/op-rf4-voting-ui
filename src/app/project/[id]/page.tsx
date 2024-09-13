@@ -33,6 +33,8 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 	const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
 	const { ballot } = useBallotRound5Context();
 
+	console.log({project})
+
 	const handleScore = useCallback(async (score: ImpactScore) => {
 		setIsNextProjectLoading(true);
 		const totalProjects = projects?.length ?? 0;
