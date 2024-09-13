@@ -11,7 +11,7 @@ import {
   updateRetroFundingRoundCategoryAllocationResponse,
 } from '@/__generated__/api/agora';
 import { useState } from "react";
-import { Round5Ballot } from "@/__generated__/api/agora.schemas";
+import { RetroFundingBallot5ProjectsAllocation, RetroFundingBallotCategoriesAllocation, Round5Ballot } from "@/__generated__/api/agora.schemas";
 
 export function useBudgetForm(roundId: number) {
   const { toast } = useToast();
@@ -28,6 +28,7 @@ export function useBudgetForm(roundId: number) {
         .then((response: getRetroFundingRoundBallotByIdResponse) => {
           const ballot = response.data as Round5Ballot;
           const allocations = ballot.category_allocations;
+          console.log('allocations', allocations)
           if (allocations) {
             setLockedFields(
               allocations.reduce((acc, allocation) => {
@@ -38,7 +39,8 @@ export function useBudgetForm(roundId: number) {
               }, {} as Record<string, boolean>)
             );
           }
-          return allocations as Round5Allocation[];
+          console.log('allocations', allocations)
+          return allocations as RetroFundingBallotCategoriesAllocation[];
         });
     },
   });
@@ -54,7 +56,7 @@ export function useBudgetForm(roundId: number) {
       ).then((response: updateRetroFundingRoundCategoryAllocationResponse) => {
         const updatedBallot = response.data as Round5Ballot;
         queryClient.setQueryData(["budget", address, roundId], updatedBallot.category_allocations);
-        return updatedBallot.category_allocations as Round5Allocation[];
+        return updatedBallot.category_allocations as RetroFundingBallot5ProjectsAllocation[];
       });
     },
     onError: () =>

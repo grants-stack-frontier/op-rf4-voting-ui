@@ -47,6 +47,7 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
 
   useEffect(() => {
     if (projects.data && categories.data) {
+      // Calculate count per category
       const counts = projects.data.reduce((acc, project) => {
         const category = categories.data.find(
           (cat) => cat.id === project.category
@@ -57,85 +58,86 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
         return acc;
       }, {} as Record<string, number>);
       setCountPerCategory(counts);
+  
+      // Set allocations
+      if (getBudget.data) {
+        setAllocations(
+          getBudget.data.reduce((acc, allocation) => {
+            if (allocation.category_slug !== undefined) {
+              acc[allocation.category_slug] = Number(allocation.allocation);
+            }
+            return acc;
+          }, {} as Record<string, number>)
+        );
+      } else {
+        setAllocations(
+          categories.data.reduce((acc, category) => {
+            acc[category.id] = 100 / categories.data.length;
+            return acc;
+          }, {} as Record<string, number>)
+        );
+      }
     }
-  }, [projects.data, categories.data]);
-
-  useEffect(() => {
-    if (getBudget.data) {
-      setAllocations(
-        getBudget.data.reduce((acc, allocation) => {
-          acc[allocation.category_slug] = Number(allocation.allocation);
-          return acc;
-        }, {} as Record<string, number>)
-      );
-    } else if (categories.data) {
-      setAllocations(
-        categories.data.reduce((acc, category) => {
-          acc[category.id] = 100 / categories.data.length;
-          return acc;
-        }, {} as Record<string, number>)
-      );
-    }
-  }, [getBudget.data, categories.data]);
-
+  }, [projects.data, categories.data, getBudget.data]);
+  
+  const autobalanceAllocations = (
+    allocations: Array<{ id: string; allocation: number; locked: boolean }>,
+    idToSkip: string
+  ) => {
+    const [amountToBalance, totalUnlocked, unlockedEntities] = allocations.reduce(
+      (acc, allocation) => {
+        acc[0] -=
+          allocation.locked || allocation.id === idToSkip
+            ? Number(allocation.allocation.toFixed(2))
+            : 0;
+        return [
+          acc[0] < 0 ? 0 : acc[0],
+          acc[1] +
+            (allocation.locked || allocation.id === idToSkip
+              ? 0
+              : Number(allocation.allocation.toFixed(2))),
+          acc[2] + (allocation.locked || allocation.id === idToSkip ? 0 : 1),
+        ];
+      },
+      [100, 0, 0]
+    );
+  
+    return allocations.map((allocation) => {
+      if (!allocation.locked && allocation.id !== idToSkip) {
+        return {
+          ...allocation,
+          allocation: totalUnlocked
+            ? (Number(allocation.allocation.toFixed(2)) / totalUnlocked) *
+              amountToBalance
+            : unlockedEntities
+            ? amountToBalance / unlockedEntities
+            : 0,
+        };
+      }
+      return allocation;
+    });
+  };
+  
   const calculateBalancedAmounts = useCallback(
     (
-      state: Record<string, number>,
+      allocations: Record<string, number>,
       changedCategoryId: string,
       newValue: number
     ) => {
-      const allocations = Object.entries(state).map(([id, allocation]) => ({
+      let newAllocations = Object.entries(allocations).map(([id, allocation]) => ({
         id,
-        allocation: new Decimal(allocation),
+        allocation: id === changedCategoryId ? newValue : allocation,
         locked: lockedFields[id],
       }));
-      console.log("allocations", allocations);
-
-      const [amountToBalance, totalUnlocked, unlockedEntities] =
-        allocations.reduce(
-          (acc, allocation) => {
-            acc[0] -=
-              allocation.locked || allocation.id === changedCategoryId
-                ? Number(
-                    allocation.id === changedCategoryId
-                      ? new Decimal(newValue).toFixed(2)
-                      : allocation.allocation.toFixed(2)
-                  )
-                : 0;
-            return [
-              acc[0] < 0 ? 0 : acc[0],
-              acc[1] +
-                (allocation.locked || allocation.id === changedCategoryId
-                  ? 0
-                  : Number(allocation.allocation.toFixed(2))),
-              acc[2] +
-                (allocation.locked || allocation.id === changedCategoryId
-                  ? 0
-                  : 1),
-            ];
-          },
-          [100, 0, 0]
-        );
-
-      const result = allocations.map((allocation) => {
-        if (!allocation.locked && allocation.id !== changedCategoryId) {
-          return {
-            ...allocation,
-            allocation: totalUnlocked
-              ? (Number(allocation.allocation.toFixed(2)) / totalUnlocked) *
-                amountToBalance
-              : unlockedEntities
-              ? amountToBalance / unlockedEntities
-              : 0,
-          };
-        }
-        return allocation.id === changedCategoryId
-          ? { ...allocation, allocation: newValue }
-          : allocation;
-      });
-
+  
+      console.log("newAllocations", newAllocations);
+  
+      const balancedAllocations = autobalanceAllocations(newAllocations, changedCategoryId);
+      
+      console.log('balancedAllocations', balancedAllocations)
+  
       return Object.fromEntries(
-        result.map(({ id, allocation }) => [id, Number(allocation.toFixed(3))])
+        balancedAllocations.map(({ id, allocation }) => [id, Number(allocation.toFixed(3))])
       );
     },
     [lockedFields]
@@ -155,7 +157,9 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
           categoryId,
           newValue
         );
-
+        
+        console.log('updatedAllocations', updatedAllocations)
+        
         saveAllocationRef.current({
           category_slug: categoryId,
           allocation: updatedAllocations[categoryId],

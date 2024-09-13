@@ -38,6 +38,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
   };
 
   const handleInputBlur = () => {
+    console.log('blur')
     const parsedValue = parseFloat(inputValue);
     if (!isNaN(parsedValue)) {
       handleValueChange(category.id, parsedValue, isLocked);
@@ -46,14 +47,17 @@ export function CategoryItem({ category }: CategoryItemProps) {
   };
 
   const handleIncrement = () => {
+    console.log('increment')
     handleValueChange(category.id, allocation + 1, isLocked);
   };
 
   const handleDecrement = () => {
+    console.log('decrement')
     handleValueChange(category.id, allocation - 1, isLocked);
   };
 
   const handleToggleLock = () => {
+    console.log('toggle lock')
     toggleLock(category.id);
     handleValueChange(category.id, allocation, !isLocked);
   };
