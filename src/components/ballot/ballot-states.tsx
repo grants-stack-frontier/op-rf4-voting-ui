@@ -39,7 +39,7 @@ export function EmptyBallot() {
       title="Score projects to unlock your ballot"
       description=""
     >
-      <Progress value={(quantities.total - quantities.toBeEvaluated)/(quantities.total)} className="w-60" />
+      <Progress value={(quantities.total - quantities.toBeEvaluated)/(quantities.total)*100} className="w-60" />
       <Text className="text-center max-w-lg mx-auto">
         You&apos;ve scored {quantities.total - quantities.toBeEvaluated} of {quantities.total} projects
       </Text>

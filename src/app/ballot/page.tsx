@@ -126,9 +126,8 @@ export default function BallotPage() {
 
 function CheckBallotState() {
   const { address, isConnecting } = useAccount();
-  const { isPending, data: ballot } = useRound5Ballot(address);
-  console.log("Ballot Data from new API:", { ballot });
-  const { state } = useBallotRound5Context();
+  const { isPending } = useRound5Ballot(address);
+  const { state, ballot } = useBallotRound5Context();
   // Comment out for local dev if needed
   if (isPending) {
     return <Skeleton className='p-6 h-96' />;
@@ -137,7 +136,8 @@ function CheckBallotState() {
     return <NonBadgeholder />;
   }
   const isEmptyBallot = !Object.keys(state).length;
-  if (isEmptyBallot) {
+  const needImpactScoring = ballot && ballot.projects_to_be_evaluated.length > 0;
+  if (isEmptyBallot||needImpactScoring) {
     return <EmptyBallot />;
   }
   return <YourBallot />;
@@ -389,7 +389,7 @@ function YourBallot() {
 }
 
 function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
-  const allocationSum = useBallotWeightSum();
+  const allocationSum = useRound5BallotWeightSum();
   const isBadgeholder = useIsBadgeholder();
   const [days, hours, minutes, seconds] = useVotingTimeLeft(votingEndDate);
 

@@ -17,6 +17,7 @@ import mixpanel from "@/lib/mixpanel";
 import { DistributionChart } from "../metrics/distribution-chart";
 import { Card } from "../ui/card";
 import { Separator } from "@radix-ui/react-dropdown-menu";
+import { DistributionMethod, useDistributionMethod } from "@/hooks/useBallotRound5";
 
 export function MetricsEditor({
   onAllocationMethodSelect,
@@ -24,6 +25,7 @@ export function MetricsEditor({
   onAllocationMethodSelect: (data: { x: number; y: number }[]) => void;
 }) {
   const { state, inc, dec, set, remove } = useBallotContext();
+  const { mutate: saveDistributionMethod } = useDistributionMethod();
 
   const { sorted } = useSortBallot(state);
 
@@ -85,8 +87,9 @@ export function MetricsEditor({
       ],
       // data: distributeImpactGroups(),
       formatChartTick: (tick: number) => `${tick}k`,
-      method: "Impact groups",
+      name: "Impact groups",
       description: "blah blah blah",
+      method: DistributionMethod.IMPACT_GROUPS,
     },
     {
       // data: [
@@ -98,8 +101,9 @@ export function MetricsEditor({
       // ],
       data: distributeTopToBottomLinear(),
       formatChartTick: (tick: number) => `${tick}k`,
-      method: "Top to bottom",
+      name: "Top to bottom",
       description: "blah blah blah",
+      method: DistributionMethod.TOP_TO_BOTTOM,
     },
     {
       // data: [
@@ -111,14 +115,16 @@ export function MetricsEditor({
       // ],
       data: distributeTopWeighted(),
       formatChartTick: (tick: number) => `${tick}k`,
-      method: "Top weighted",
+      name: "Top weighted",
       description: "blah blah blah",
+      method: DistributionMethod.TOP_WEIGHTED,
     },
     {
       data: [],
       formatChartTick: (tick: number) => `--k`,
-      method: "Custom",
+      name: "Custom",
       description: "blah blah blah",
+      method: "CUSTOM", // To Do: Change to enum
     },
   ]
   const allocationAmount = "3,333,333";
@@ -156,11 +162,18 @@ export function MetricsEditor({
             onClick={() => {
               setSelectedMethod(method.method);
               onAllocationMethodSelect(method.data);
+              if (
+                method.method === DistributionMethod.IMPACT_GROUPS
+                || method.method === DistributionMethod.TOP_TO_BOTTOM
+                || method.method === DistributionMethod.TOP_WEIGHTED
+              ) {
+                saveDistributionMethod(method.method);
+              }
             }}
           >
             <DistributionChart data={method.data} formatChartTick={method.formatChartTick} />
             <div className="mb-2 mx-4 flex flex-row justify-between items-center">
-              <p className="font-bold text-sm">{method.method}</p>
+              <p className="font-bold text-sm">{method.name}</p>
               <InfoIcon className="h-4 w-4" />
             </div>
           </Card>

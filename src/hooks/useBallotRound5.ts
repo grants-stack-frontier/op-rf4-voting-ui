@@ -156,16 +156,38 @@ export function useSaveRound5Position() {
   });
 }
 
-export function useDistributionMethod(params: { distribution_method: string }) {
-  const { distribution_method } = params;
+export enum DistributionMethod {
+  TOP_TO_BOTTOM = "TOP_TO_BOTTOM",
+  IMPACT_GROUPS = "IMPACT_GROUPS",
+  TOP_WEIGHTED = "TOP_WEIGHTED",
+}
+
+export function useDistributionMethod() {
   const { address } = useAccount();
-  return useQuery({
-    enabled: Boolean(address),
-    queryKey: ["distribution-method", address],
-    queryFn: async () =>
-      request.post(`${agoraRoundsAPI}/ballots/${address}/distribution_method`, {
-        json: { distribution_method },
-      }).json(),
+  // return useQuery({
+  //   enabled: Boolean(address),
+  //   queryKey: ["distribution-method", address],
+  //   queryFn: async () =>
+  //     request.post(`${agoraRoundsAPI}/ballots/${address}/distribution_method`, {
+  //       json: { distribution_method },
+  //     }).json(),
+  // });
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  return useMutation({
+    mutationKey: ["save-round5-distribution-method"],
+    mutationFn: async (distribution_method: DistributionMethod) => {
+      return request
+        .post(`${agoraRoundsAPI}/ballots/${address}/distribution_method/${distribution_method}`, {})
+        .json<any>()
+        .then((r) => {
+          queryClient.setQueryData(["ballot-round5", address], r);
+          return r;
+        });
+    },
+    // onSuccess: debounceToast,
+    onError: () =>
+      toast({ variant: "destructive", title: "Error setting distribution method" }),
   });
 }
 
