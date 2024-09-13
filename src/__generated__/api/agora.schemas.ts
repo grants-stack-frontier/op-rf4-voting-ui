@@ -439,7 +439,7 @@ export const RetroFundingBallotCategoriesAllocationCategorySlug = {
  * @summary Categories allocation distribution based on the vote
  */
 export interface RetroFundingBallotCategoriesAllocation {
-  allocation?: number;
+  allocation?: string;
   category_slug?: RetroFundingBallotCategoriesAllocationCategorySlug;
   locked?: boolean;
 }
