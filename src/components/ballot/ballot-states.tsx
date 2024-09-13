@@ -16,6 +16,7 @@ import {
 import { useDisconnect } from "../auth/sign-message";
 import { Progress } from "../ui/progress";
 import { useBallotRound5Context } from "./provider5";
+import { useSaveProjectImpact } from "@/hooks/useProjects";
 
 export function EmptyBallot() {
   const [isOpen, setOpen] = useState(false);
@@ -33,6 +34,7 @@ export function EmptyBallot() {
     }
   }, [ballot])
   console.log("Ballot (Empty Card):", ballot)
+  const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
   return (
     <EmptyCard
       icon={BallotSvg} // TO DO: Change to lock
@@ -51,6 +53,7 @@ export function EmptyBallot() {
           Import ballot
         </Button> */}
         {/* <ImportBallotDialog isOpen={isOpen} onOpenChange={setOpen} /> */}
+        <Button variant="outline" onClick={() => saveProjectImpact({ projectId: ballot?.projects_to_be_evaluated[0] ?? "", impact: 3 })}>Score</Button>
       </div>
     </EmptyCard>
   );

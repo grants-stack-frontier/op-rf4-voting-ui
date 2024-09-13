@@ -136,7 +136,7 @@ function CheckBallotState() {
   if (!address && !isConnecting) {
     return <NonBadgeholder />;
   }
-  const isEmptyBallot = !Object.keys(state).length;
+  const isEmptyBallot = !Object.keys(state).length; // TO DO: Update this to check if projects_to_be_evaluated is empty
   if (isEmptyBallot) {
     return <EmptyBallot />;
   }
