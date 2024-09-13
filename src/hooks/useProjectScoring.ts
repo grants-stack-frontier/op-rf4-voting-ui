@@ -19,6 +19,7 @@ export const useProjectScoring = (category: string, id: string) => {
 	const [isUnlocked, setIsUnlocked] = useState(false);
 
 	useEffect(() => {
+		console.log("category", category)
 		setProjectsScored(getProjectsScored(category));
 	}, [category]);
 

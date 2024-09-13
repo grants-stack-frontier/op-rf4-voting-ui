@@ -6,7 +6,13 @@ export function ProjectHeader({ profileAvatarUrl, name, projectCoverImageUrl }: 
     <>
       {projectCoverImageUrl && profileAvatarUrl ? (
         <div className="w-full h-56">
-          <Image className="rounded-md" src={projectCoverImageUrl} alt={name || ''} width={720} height={180} />
+          <Image
+            className="rounded-md w-full h-[180px] object-cover"
+            src={projectCoverImageUrl}
+            alt={name || ''}
+            width={720}
+            height={180}
+          />
           <Image className="rounded-md -mt-10 ml-6" src={profileAvatarUrl} alt={name || ''} width={80} height={80} />
         </div>
       ) : profileAvatarUrl && (
