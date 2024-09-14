@@ -20,6 +20,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
     toggleLock,
     lockedFields,
     countPerCategory,
+    isLoading,
   } = useBudgetContext();
 
   const [inputValue, setInputValue] = useState("");
@@ -89,7 +90,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
                 variant='ghost'
                 className='w-12 outline-none hover:bg-transparent'
                 onClick={handleDecrement}
-                disabled={allocation === 0}
+                disabled={allocation === 0 || isLoading}
               >
                 <Minus className='h-4 w-4' />
               </Button>
@@ -99,6 +100,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
                 onChange={handleInputChange}
                 onBlur={handleInputBlur}
                 className='w-16 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-center p-0'
+                disabled={isLoading}
               />
               <Button
                 size='icon'
@@ -106,7 +108,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
                 variant='ghost'
                 className='w-12 outline-none hover:bg-transparent'
                 onClick={handleIncrement}
-                disabled={allocation === 100}
+                disabled={allocation === 100 || isLoading}
               >
                 <Plus className='h-4 w-4' />
               </Button>
@@ -122,6 +124,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
           variant='ghost'
           className='outline-none hover:bg-transparent'
           onClick={handleToggleLock}
+          disabled={isLoading}
         >
           {isLocked ? (
             <Lock className='h-4 w-4 text-primary' />
