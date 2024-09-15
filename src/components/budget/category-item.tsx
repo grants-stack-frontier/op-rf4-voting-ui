@@ -27,6 +27,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
     lockedFields,
     countPerCategory,
     isLoading,
+    totalBudget,
   } = useBudgetContext();
 
   const [inputValue, setInputValue] = useState("");
@@ -46,7 +47,14 @@ export function CategoryItem({ category }: CategoryItemProps) {
     const parsedValue = parseFloat(inputValue);
     if (!isNaN(parsedValue)) {
       handleValueChange(category.id, Math.max(0, parsedValue), isLocked);
-      setInputValue("");
+    }
+    setInputValue("");
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleInputBlur();
     }
   };
 
@@ -64,13 +72,13 @@ export function CategoryItem({ category }: CategoryItemProps) {
 
   return (
     <div key={category.id}>
-      <Separator />
-      <div className='flex items-center gap-4 py-4'>
+      <div className='flex items-flex-start gap-3 py-6'>
         <Image
           src={category.image}
           alt={category.name}
-          width={80}
-          height={80}
+          width={64}
+          height={64}
+          style={{ height: "64px" }}
         />
         <div className='flex-1'>
           <Button variant='link' asChild>
@@ -82,13 +90,31 @@ export function CategoryItem({ category }: CategoryItemProps) {
               <ChevronRight className='h-4 w-4' />
             </Link>
           </Button>
-          <p className='text-[14px] font-small mb-4'>{category.description}</p>
+          <p className='text-[14px] font-small mb-2'>{category.description}</p>
           <Badge variant='secondary' className='cursor-pointer font-medium'>
             {projectCount} project{projectCount !== 1 ? "s" : ""}
           </Badge>
         </div>
-        <div className='flex items-center justify-end gap-4'>
-          <div className='flex flex-col items-center gap-2'>
+        <div className='flex flex-col items-center gap-2'>
+          <div className='flex items-center gap-2'>
+            <Button
+              type='button'
+              size='icon'
+              variant='ghost'
+              className={`outline-none ${
+                isLocked
+                  ? "bg-black text-white hover:bg-black"
+                  : "hover:bg-transparent"
+              }`}
+              onClick={handleToggleLock}
+              disabled={isLoading}
+            >
+              {isLocked ? (
+                <LockKeyhole className='h-4 w-4' />
+              ) : (
+                <LockKeyholeOpen className='h-4 w-4' />
+              )}
+            </Button>
             <div className='flex rounded-lg bg-transparent border'>
               <Button
                 size='icon'
@@ -105,6 +131,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
                 value={inputValue || `${formatAllocation(allocation)}%`}
                 onChange={handleInputChange}
                 onBlur={handleInputBlur}
+                onKeyDown={handleInputKeyDown}
                 className='w-16 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-center p-0'
                 disabled={isLoading}
               />
@@ -119,26 +146,13 @@ export function CategoryItem({ category }: CategoryItemProps) {
                 <Plus className='h-4 w-4' />
               </Button>
             </div>
-            <div className='text-sm text-muted-foreground text-right'>
-              {Math.round((allocation / 100) * 10000000).toLocaleString()} OP
-            </div>
+          </div>
+          <div className='text-sm text-muted-foreground text-center mt-1'>
+            {Math.round((allocation / 100) * totalBudget).toLocaleString()} OP
           </div>
         </div>
-        <Button
-          type='button'
-          size='icon'
-          variant='ghost'
-          className='outline-none hover:bg-transparent'
-          onClick={handleToggleLock}
-          disabled={isLoading}
-        >
-          {isLocked ? (
-            <LockKeyhole className='h-4 w-4 text-primary' />
-          ) : (
-            <LockKeyholeOpen className='h-4 w-4 text-muted-foreground' />
-          )}
-        </Button>
       </div>
+      <Separator />
     </div>
   );
 }

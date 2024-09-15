@@ -60,8 +60,39 @@ export function useBudgetForm(roundId: number) {
       }),
   });
 
+  // dummy api calls
+  const getBudgetAmount = useQuery({
+    enabled: Boolean(address),
+    queryKey: ["budget-amount", address, roundId],
+    queryFn: async () => {
+      return new Promise<number>((resolve) => {
+        setTimeout(() => {
+          resolve(8000000);
+        }, 500);
+      });
+    },
+  });
+
+  const setBudgetAmount = useMutation({
+    mutationKey: ["set-budget-amount", roundId],
+    mutationFn: async (amount: number) => {
+      return new Promise<void>((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, 500);
+      });
+    },
+    onError: () =>
+      toast({
+        variant: "destructive",
+        title: "Error setting budget amount",
+      }),
+  });
+
   return {
     getBudget,
     saveAllocation,
+    getBudgetAmount,
+    setBudgetAmount,
   };
 }

@@ -28,6 +28,8 @@ interface BudgetContextType {
   toggleLock: (categoryId: CategoryId) => void;
   error: string;
   isLoading: boolean;
+  totalBudget: number;
+  setTotalBudget: (budget: number) => void;
 }
 
 const EPSILON = 1e-3;
@@ -42,7 +44,15 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
   const categories = useCategories();
   const projects = useProjects();
   const roundId = 5;
-  const { getBudget, saveAllocation } = useBudgetForm(roundId);
+  const { getBudget, saveAllocation, getBudgetAmount } = useBudgetForm(roundId);
+  const [totalBudget, setTotalBudget] = useState(8000000); // Default to 8M OP
+
+  // Fetch total budget amount on mount
+  useEffect(() => {
+    if (getBudgetAmount.data) {
+      setTotalBudget(getBudgetAmount.data);
+    }
+  }, [getBudgetAmount.data]);
 
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [lockedFields, setLockedFields] = useState<Record<string, boolean>>({});
@@ -114,9 +124,9 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
             return prevLockedFields;
           }
         });
-      } else if (categories.data) {
+      } else {
         const defaultAllocations = categories.data.reduce((acc, category) => {
-          acc[category.id] = 100 / categories.data.length;
+          acc[category.id] = 33.33;
           return acc;
         }, {} as Record<string, number>);
 
@@ -306,7 +316,16 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
     getBudget.refetch();
   }, [getBudget]);
 
-  const isLoading = getBudget.isLoading || saveAllocation.isPending;
+  const isLoading =
+    getBudget.isLoading ||
+    getBudget.isFetching ||
+    categories.isLoading ||
+    categories.isFetching ||
+    projects.isLoading ||
+    projects.isFetching ||
+    getBudgetAmount.isLoading ||
+    getBudgetAmount.isFetching ||
+    saveAllocation.isPending;
 
   const value = {
     categories: categories.data,
@@ -318,6 +337,8 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
     refetchBudget,
     error,
     isLoading,
+    totalBudget,
+    setTotalBudget,
   };
 
   return (

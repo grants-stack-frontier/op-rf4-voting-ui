@@ -18,11 +18,11 @@ export default function Welcome() {
         {
             title: "Welcome badgeholders and guest voters",
             description:
-                "In this round of voting, you’ll assign the overall budget, score projects from high to low impact, and allocate rewards.",
+                "In this round of voting, you’ll propose the overall budget, score projects from high to low impact, and allocate rewards.",
             image: onboard1,
         },
         {
-            title: "First, you’ll assign the overall budget",
+            title: "First, you’ll propose the overall budget",
             description:
                 "There are three project categories. You’ll decide how much of the overall budget should go to each category.",
             image: onboard2,
