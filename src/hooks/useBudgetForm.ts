@@ -1,98 +1,278 @@
-"use client";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useCategories } from "@/hooks/useCategories";
+import { useProjects } from "@/hooks/useProjects";
+import { CategoryId } from "@/types/shared";
+import debounce from "lodash.debounce";
+import { calculateBalancedAmounts, isCloseEnough } from "@/lib/budget-helpers";
+import { useBudget } from "./useBudget";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAccount } from "wagmi";
-import { useToast } from "@/components/ui/use-toast";
-import { CategoryId, Round5Allocation } from "@/types/shared";
-import {
-  getRetroFundingRoundBallotById,
-  updateRetroFundingRoundCategoryAllocation,
-  getRetroFundingRoundBallotByIdResponse,
-  updateRetroFundingRoundCategoryAllocationResponse,
-} from "@/__generated__/api/agora";
-import {
-  RetroFundingBallot5ProjectsAllocation,
-  RetroFundingBallotCategoriesAllocation,
-  Round5Ballot,
-} from "@/__generated__/api/agora.schemas";
+export function useBudgetForm() {
+  const roundId = 5;
 
-export function useBudgetForm(roundId: number) {
-  const { toast } = useToast();
-  const { address } = useAccount();
-  const queryClient = useQueryClient();
+  const categories = useCategories();
+  const projects = useProjects();
+  const { getBudget, saveAllocation, getBudgetAmount } = useBudget(roundId);
+  const [totalBudget, setTotalBudget] = useState(8000000); // Default to 8M OP
+  const [allocations, setAllocations] = useState<Record<string, number>>({});
+  const [lockedFields, setLockedFields] = useState<Record<string, boolean>>({});
+  const [countPerCategory, setCountPerCategory] = useState<
+    Record<string, number>
+  >({});
+  const [error, setError] = useState("");
 
-  const getBudget = useQuery({
-    enabled: Boolean(address),
-    queryKey: ["budget", address, roundId],
-    queryFn: async () => {
-      if (!address) throw new Error("No address provided");
-      return getRetroFundingRoundBallotById(roundId, address).then(
-        (response: getRetroFundingRoundBallotByIdResponse) => {
-          const ballot = response.data as Round5Ballot;
-          const allocations = ballot.category_allocations;
-          return allocations as RetroFundingBallotCategoriesAllocation[];
+  const allocationsRef = useRef(allocations);
+  const lockedFieldsRef = useRef(lockedFields);
+
+  const checkTotalAllocation = useCallback((allocs: Record<string, number>) => {
+    const total = Object.values(allocs).reduce((sum, value) => sum + value, 0);
+    const diff = (100 - total).toFixed(2);
+
+    if (!isCloseEnough(total, 100)) {
+      if (total < 100) {
+        setError(
+          `Percentages must equal 100% (add ${diff}% to your categories)`
+        );
+      } else {
+        setError(
+          `Percentages must equal 100% (remove ${Math.abs(
+            Number(diff)
+          )}% from your categories)`
+        );
+      }
+      return false;
+    }
+    setError("");
+    return true;
+  }, []);
+
+  const getDefaultAllocations = useCallback((categories: any[]) => {
+    return categories.reduce((acc, category) => {
+      acc[category.id] = 33.33;
+      return acc;
+    }, {} as Record<string, number>);
+  }, []);
+
+  useEffect(() => {
+    if (getBudget.data) {
+      const newAllocations: Record<string, number> = {};
+      getBudget.data.forEach((allocation) => {
+        if (allocation.category_slug !== undefined) {
+          newAllocations[allocation.category_slug] = Number(
+            allocation.allocation
+          );
+        }
+      });
+      setAllocations(newAllocations);
+      checkTotalAllocation(newAllocations);
+    }
+  }, [getBudget.data, checkTotalAllocation]);
+
+  useEffect(() => {
+    allocationsRef.current = allocations;
+  }, [allocations]);
+
+  useEffect(() => {
+    lockedFieldsRef.current = lockedFields;
+  }, [lockedFields]);
+
+  useEffect(() => {
+    if (projects.data && categories.data) {
+      const counts = projects.data.reduce((acc, project) => {
+        const categoryId = project.applicationCategory;
+        if (categoryId !== undefined) {
+          acc[categoryId] = (acc[categoryId] ?? 0) + 1;
+        }
+        return acc;
+      }, {} as Record<string, number>);
+      setCountPerCategory(counts);
+
+      if (getBudget.data && getBudget.data.length > 0) {
+        setAllocations((prevAllocations) => {
+          const newAllocations: Record<string, number> = {};
+          getBudget.data.forEach((allocation) => {
+            if (allocation.category_slug !== undefined) {
+              newAllocations[allocation.category_slug] = Number(
+                allocation.allocation
+              );
+            }
+          });
+
+          return Object.keys(newAllocations).some(
+            (key) => newAllocations[key] !== prevAllocations[key]
+          )
+            ? newAllocations
+            : prevAllocations;
+        });
+
+        setLockedFields((prevLockedFields) => {
+          const newLockedFields: Record<string, boolean> = {};
+          getBudget.data.forEach((allocation) => {
+            if (allocation.category_slug !== undefined) {
+              newLockedFields[allocation.category_slug] =
+                allocation.locked ?? false;
+            }
+          });
+
+          return Object.keys(newLockedFields).some(
+            (key) => newLockedFields[key] !== prevLockedFields[key]
+          )
+            ? newLockedFields
+            : prevLockedFields;
+        });
+      } else {
+        const defaultAllocations = getDefaultAllocations(categories.data);
+        setAllocations(defaultAllocations);
+
+        const defaultLockedFields = categories.data.reduce((acc, category) => {
+          acc[category.id] = false;
+          return acc;
+        }, {} as Record<string, boolean>);
+
+        setLockedFields(defaultLockedFields);
+      }
+
+      checkTotalAllocation(
+        getBudget.data && getBudget.data.length > 0
+          ? Object.fromEntries(
+              getBudget.data.map((allocation) => [
+                allocation.category_slug,
+                Number(allocation.allocation),
+              ])
+            )
+          : getDefaultAllocations(categories.data)
+      );
+    }
+  }, [
+    projects.data,
+    categories.data,
+    getBudget.data,
+    getDefaultAllocations,
+    checkTotalAllocation,
+  ]);
+
+  const debouncedSaveAllocation = useRef(
+    debounce(
+      (allocationToSave: {
+        categoryId: CategoryId;
+        allocation: number;
+        locked: boolean;
+      }) => {
+        saveAllocation.mutate(
+          {
+            category_slug: allocationToSave.categoryId,
+            allocation: allocationToSave.allocation,
+            locked: allocationToSave.locked,
+          },
+          {
+            onError: () => {
+              setError("An error occurred while saving. Please try again.");
+            },
+          }
+        );
+      },
+      300
+    )
+  ).current;
+
+  const handleValueChange = useCallback(
+    (categoryId: CategoryId, newValue: number, locked: boolean) => {
+      const validatedValue = Math.max(0, newValue);
+      const originalValue = allocations[categoryId];
+
+      const tempAllocations = {
+        ...allocationsRef.current,
+        [categoryId]: validatedValue,
+      };
+      const rebalancedAllocations = calculateBalancedAmounts(
+        tempAllocations,
+        lockedFieldsRef.current,
+        categoryId,
+        validatedValue
+      );
+
+      if (!checkTotalAllocation(rebalancedAllocations)) {
+        setAllocations((prev) => ({
+          ...prev,
+          [categoryId]: originalValue,
+        }));
+        return;
+      }
+
+      setAllocations(rebalancedAllocations);
+
+      debouncedSaveAllocation({
+        categoryId,
+        allocation: validatedValue,
+        locked,
+      });
+    },
+    [debouncedSaveAllocation, allocations, checkTotalAllocation]
+  );
+
+  const toggleLock = useCallback(
+    (categoryId: CategoryId) => {
+      const newLockedState = !lockedFields[categoryId];
+      const originalLockState = lockedFields[categoryId];
+
+      setLockedFields((prev) => ({
+        ...prev,
+        [categoryId]: newLockedState,
+      }));
+
+      debouncedSaveAllocation({
+        categoryId,
+        allocation: allocationsRef.current[categoryId],
+        locked: newLockedState,
+      });
+
+      saveAllocation.mutate(
+        {
+          category_slug: categoryId,
+          allocation: allocationsRef.current[categoryId],
+          locked: newLockedState,
+        },
+        {
+          onError: () => {
+            setError(
+              "An error occurred while toggling lock. Please try again."
+            );
+            setLockedFields((prev) => ({
+              ...prev,
+              [categoryId]: originalLockState,
+            }));
+          },
         }
       );
     },
-  });
+    [debouncedSaveAllocation, lockedFields, saveAllocation]
+  );
 
-  const saveAllocation = useMutation({
-    mutationKey: ["save-budget", roundId],
-    mutationFn: async (allocation: Round5Allocation) => {
-      if (!address) throw new Error("No address provided");
-      return updateRetroFundingRoundCategoryAllocation(
-        roundId,
-        address,
-        allocation
-      ).then((response: updateRetroFundingRoundCategoryAllocationResponse) => {
-        const updatedBallot = response.data as Round5Ballot;
-        queryClient.setQueryData(
-          ["budget", address, roundId],
-          updatedBallot.category_allocations
-        );
-        return updatedBallot.category_allocations as RetroFundingBallot5ProjectsAllocation[];
-      });
-    },
-    onError: () =>
-      toast({
-        variant: "destructive",
-        title: "Error saving budget allocation",
-      }),
-  });
+  const refetchBudget = useCallback(() => {
+    getBudget.refetch();
+  }, [getBudget]);
 
-  // dummy api calls
-  const getBudgetAmount = useQuery({
-    enabled: Boolean(address),
-    queryKey: ["budget-amount", address, roundId],
-    queryFn: async () => {
-      return new Promise<number>((resolve) => {
-        setTimeout(() => {
-          resolve(8000000);
-        }, 500);
-      });
-    },
-  });
-
-  const setBudgetAmount = useMutation({
-    mutationKey: ["set-budget-amount", roundId],
-    mutationFn: async (amount: number) => {
-      return new Promise<void>((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 500);
-      });
-    },
-    onError: () =>
-      toast({
-        variant: "destructive",
-        title: "Error setting budget amount",
-      }),
-  });
+  const isLoading =
+    getBudget.isLoading ||
+    getBudget.isFetching ||
+    categories.isLoading ||
+    categories.isFetching ||
+    projects.isLoading ||
+    projects.isFetching ||
+    getBudgetAmount.isLoading ||
+    getBudgetAmount.isFetching ||
+    saveAllocation.isPending;
 
   return {
-    getBudget,
-    saveAllocation,
-    getBudgetAmount,
-    setBudgetAmount,
+    categories: categories.data,
+    countPerCategory,
+    allocations,
+    lockedFields,
+    handleValueChange,
+    toggleLock,
+    refetchBudget,
+    error,
+    isLoading,
+    totalBudget,
+    setTotalBudget,
   };
 }
