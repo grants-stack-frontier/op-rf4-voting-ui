@@ -3,7 +3,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { ChevronRight, Lock, LockOpenIcon, Minus, Plus } from "lucide-react";
+import {
+  ChevronRight,
+  LockKeyhole,
+  LockKeyholeOpen,
+  Minus,
+  Plus,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Category } from "@/data/categories";
@@ -20,6 +26,8 @@ export function CategoryItem({ category }: CategoryItemProps) {
     toggleLock,
     lockedFields,
     countPerCategory,
+    isLoading,
+    totalBudget,
   } = useBudgetContext();
 
   const [inputValue, setInputValue] = useState("");
@@ -28,7 +36,8 @@ export function CategoryItem({ category }: CategoryItemProps) {
   const isLocked = lockedFields[category.id] || false;
   const projectCount = countPerCategory[category.id] || 0;
 
-  const formatAllocation = (value: number) => value.toFixed(3).replace(/\.?0+$/, "");
+  const formatAllocation = (value: number) =>
+    value.toFixed(2).replace(/\.?0+$/, "");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value.replace("%", ""));
@@ -37,13 +46,25 @@ export function CategoryItem({ category }: CategoryItemProps) {
   const handleInputBlur = () => {
     const parsedValue = parseFloat(inputValue);
     if (!isNaN(parsedValue)) {
-      handleValueChange(category.id, parsedValue, isLocked);
-      setInputValue("");
+      handleValueChange(category.id, Math.max(0, parsedValue), isLocked);
+    }
+    setInputValue("");
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleInputBlur();
     }
   };
 
-  const handleIncrement = () => handleValueChange(category.id, allocation + 1, isLocked);
-  const handleDecrement = () => handleValueChange(category.id, allocation - 1, isLocked);
+  const handleIncrement = () =>
+    handleValueChange(category.id, allocation + 1, isLocked);
+  const handleDecrement = () => {
+    if (allocation > 0) {
+      handleValueChange(category.id, allocation - 1, isLocked);
+    }
+  };
   const handleToggleLock = () => {
     toggleLock(category.id);
     handleValueChange(category.id, allocation, !isLocked);
@@ -51,44 +72,85 @@ export function CategoryItem({ category }: CategoryItemProps) {
 
   return (
     <div key={category.id}>
-      <Separator />
-      <div className='flex items-center gap-4 py-4'>
-        <Image src={category.image} alt={category.name} width={80} height={80} />
+      <div className='flex items-flex-start gap-3 py-6'>
+        <Image
+          src={category.image}
+          alt={category.name}
+          width={64}
+          height={64}
+          style={{ height: "64px" }}
+        />
         <div className='flex-1'>
           <Button variant='link' asChild>
-            <Link href={`/category/${category.id}`} className='flex items-center gap-2'>
+            <Link
+              href={`/category/${category.id}`}
+              className='flex items-center gap-2'
+            >
               <span className='font-medium'>{category.name}</span>
               <ChevronRight className='h-4 w-4' />
             </Link>
           </Button>
-          <p>{category.description}</p>
+          <p className='text-[14px] font-small mb-2'>{category.description}</p>
           <Badge variant='secondary' className='cursor-pointer font-medium'>
-            {projectCount} project(s) in this category
+            {projectCount} project{projectCount !== 1 ? "s" : ""}
           </Badge>
         </div>
-        <div className='flex flex-col items-center'>
-          <div className='flex rounded-lg bg-transparent border w-full'>
-            <Button size='icon' type='button' variant='ghost' className='w-20 outline-none hover:bg-transparent' onClick={handleDecrement}>
-              <Minus className='h-4 w-4' />
+        <div className='flex flex-col items-center gap-2'>
+          <div className='flex items-center gap-2'>
+            <Button
+              type='button'
+              size='icon'
+              variant='ghost'
+              className={`outline-none ${
+                isLocked
+                  ? "bg-black text-white hover:bg-black"
+                  : "hover:bg-transparent"
+              }`}
+              onClick={handleToggleLock}
+              disabled={isLoading}
+            >
+              {isLocked ? (
+                <LockKeyhole className='h-4 w-4' />
+              ) : (
+                <LockKeyholeOpen className='h-4 w-4' />
+              )}
             </Button>
-            <Input
-              type='text'
-              value={inputValue || `${formatAllocation(allocation)}%`}
-              onChange={handleInputChange}
-              onBlur={handleInputBlur}
-              className='border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-center'
-            />
-            <Button size='icon' type='button' variant='ghost' className='w-20 outline-none hover:bg-transparent' onClick={handleIncrement}>
-              <Plus className='h-4 w-4' />
-            </Button>
+            <div className='flex rounded-lg bg-transparent border'>
+              <Button
+                size='icon'
+                type='button'
+                variant='ghost'
+                className='w-12 outline-none hover:bg-transparent'
+                onClick={handleDecrement}
+                disabled={allocation === 0 || isLoading}
+              >
+                <Minus className='h-4 w-4' />
+              </Button>
+              <Input
+                type='text'
+                value={inputValue || `${formatAllocation(allocation)}%`}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                onKeyDown={handleInputKeyDown}
+                className='w-16 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-center p-0'
+                disabled={isLoading}
+              />
+              <Button
+                size='icon'
+                type='button'
+                variant='ghost'
+                className='w-12 outline-none hover:bg-transparent'
+                onClick={handleIncrement}
+                disabled={allocation === 100 || isLoading}
+              >
+                <Plus className='h-4 w-4' />
+              </Button>
+            </div>
           </div>
-          <div className='text-sm text-muted-foreground text-center'>
-            {Math.round((allocation / 100) * 10000000)} OP
+          <div className='text-sm text-muted-foreground text-center mt-1'>
+            {Math.round((allocation / 100) * totalBudget).toLocaleString()} OP
           </div>
         </div>
-        <Button type='button' size='icon' variant='ghost' className='outline-none hover:bg-transparent' onClick={handleToggleLock}>
-          {isLocked ? <Lock className='h-4 w-4 text-primary' /> : <LockOpenIcon className='h-4 w-4 text-muted-foreground' />}
-        </Button>
       </div>
       <Separator />
     </div>
