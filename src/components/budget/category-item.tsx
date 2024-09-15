@@ -3,7 +3,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { ChevronRight, Lock, LockOpenIcon, Minus, Plus } from "lucide-react";
+import {
+  ChevronRight,
+  LockKeyhole,
+  LockKeyholeOpen,
+  Minus,
+  Plus,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Category } from "@/data/categories";
@@ -30,7 +36,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
   const projectCount = countPerCategory[category.id] || 0;
 
   const formatAllocation = (value: number) =>
-    value.toFixed(3).replace(/\.?0+$/, "");
+    value.toFixed(2).replace(/\.?0+$/, "");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value.replace("%", ""));
@@ -127,9 +133,9 @@ export function CategoryItem({ category }: CategoryItemProps) {
           disabled={isLoading}
         >
           {isLocked ? (
-            <Lock className='h-4 w-4 text-primary' />
+            <LockKeyhole className='h-4 w-4 text-primary' />
           ) : (
-            <LockOpenIcon className='h-4 w-4 text-muted-foreground' />
+            <LockKeyholeOpen className='h-4 w-4 text-muted-foreground' />
           )}
         </Button>
       </div>

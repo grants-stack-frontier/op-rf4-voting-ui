@@ -5,12 +5,14 @@ import React, {
   useState,
   useCallback,
   useEffect,
+  useRef,
 } from "react";
 import { useCategories } from "@/hooks/useCategories";
 import { useProjects } from "@/hooks/useProjects";
 import { useBudgetForm } from "@/hooks/useBudgetForm";
 import { Category } from "@/data/categories";
 import { CategoryId } from "@/types/shared";
+import debounce from "lodash.debounce";
 
 interface BudgetContextType {
   categories: Category[] | undefined;
@@ -28,7 +30,7 @@ interface BudgetContextType {
   isLoading: boolean;
 }
 
-const EPSILON = 1e-10;
+const EPSILON = 1e-3;
 
 const isCloseEnough = (value: number, target: number): boolean => {
   return Math.abs(value - target) < EPSILON;
@@ -49,23 +51,29 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
   >({});
   const [error, setError] = useState("");
 
-  // Remove isEditing state and references
+  const allocationsRef = useRef(allocations);
+  const lockedFieldsRef = useRef(lockedFields);
+
+  useEffect(() => {
+    allocationsRef.current = allocations;
+  }, [allocations]);
+
+  useEffect(() => {
+    lockedFieldsRef.current = lockedFields;
+  }, [lockedFields]);
 
   useEffect(() => {
     if (projects.data && categories.data) {
       const counts = projects.data.reduce((acc, project) => {
-        const category = categories.data.find(
-          (cat) => cat.id === project.category
-        );
-        if (category) {
-          acc[category.id] = (acc[category.id] ?? 0) + 1;
+        const categoryId = project.applicationCategory;
+        if (categoryId !== undefined) {
+          acc[categoryId] = (acc[categoryId] ?? 0) + 1;
         }
         return acc;
       }, {} as Record<string, number>);
       setCountPerCategory(counts);
 
       if (getBudget.data) {
-        // Only update allocations if they have changed
         setAllocations((prevAllocations) => {
           const newAllocations: Record<string, number> = {};
           getBudget.data.forEach((allocation) => {
@@ -76,7 +84,6 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
             }
           });
 
-          // Compare newAllocations with prevAllocations
           const allocationsChanged = Object.keys(newAllocations).some(
             (key) => newAllocations[key] !== prevAllocations[key]
           );
@@ -97,7 +104,6 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
             }
           });
 
-          // Compare newLockedFields with prevLockedFields
           const lockedFieldsChanged = Object.keys(newLockedFields).some(
             (key) => newLockedFields[key] !== prevLockedFields[key]
           );
@@ -175,7 +181,7 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
       changedCategoryId: string,
       newValue: number
     ) => {
-      const currentLockedFields = lockedFields;
+      const currentLockedFields = lockedFieldsRef.current;
 
       let newAllocations = Object.entries(allocations).map(
         ([id, allocation]) => ({
@@ -197,105 +203,103 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
         ])
       );
     },
-    [autobalanceAllocations, lockedFields]
+    [autobalanceAllocations]
   );
+
+  const debouncedSaveAllocation = useRef(
+    debounce(
+      (allocationToSave: {
+        categoryId: CategoryId;
+        allocation: number;
+        locked: boolean;
+      }) => {
+        saveAllocation.mutate(
+          {
+            category_slug: allocationToSave.categoryId,
+            allocation: allocationToSave.allocation,
+            locked: allocationToSave.locked,
+          },
+          {
+            onError: () => {
+              setError("An error occurred while saving. Please try again.");
+            },
+          }
+        );
+      },
+      300
+    )
+  ).current;
 
   const handleValueChange = useCallback(
     (categoryId: CategoryId, newValue: number, locked: boolean) => {
       const validatedValue = Math.max(0, newValue);
 
-      const tempUpdatedAllocations = {
-        ...allocations,
-        [categoryId]: validatedValue,
-      };
+      setAllocations((prevAllocations) => {
+        const tempUpdatedAllocations = {
+          ...prevAllocations,
+          [categoryId]: validatedValue,
+        };
 
-      // Attempt to rebalance immediately
-      const rebalancedAllocations = calculateBalancedAmounts(
-        tempUpdatedAllocations,
-        categoryId,
-        validatedValue
-      );
-
-      // Check if the rebalanced total is close enough to 100%
-      const rebalancedTotal = Object.values(rebalancedAllocations).reduce(
-        (sum, value) => sum + value,
-        0
-      );
-
-      if (rebalancedTotal > 100 && !isCloseEnough(rebalancedTotal, 100)) {
-        setError(
-          "This change would result in a total allocation significantly over 100%. Please adjust your input."
+        const rebalancedAllocations = calculateBalancedAmounts(
+          tempUpdatedAllocations,
+          categoryId,
+          validatedValue
         );
-        return;
-      }
 
-      setError("");
+        const rebalancedTotal = Object.values(rebalancedAllocations).reduce(
+          (sum, value) => sum + value,
+          0
+        );
 
-      const isLocked = lockedFields[categoryId];
+        if (rebalancedTotal > 100 && !isCloseEnough(rebalancedTotal, 100)) {
+          setError(
+            "This change would result in a total allocation significantly over 100%. Please adjust your input."
+          );
+          return prevAllocations;
+        }
 
-      if (isLocked) {
-        setLockedFields((prevLockedFields) => ({
-          ...prevLockedFields,
-          [categoryId]: false,
-        }));
-        locked = false;
-      }
+        setError("");
 
-      // Optimistically update allocations
-      setAllocations(rebalancedAllocations);
+        const isLocked = lockedFieldsRef.current[categoryId];
 
-      saveAllocation.mutate(
-        {
-          category_slug: categoryId,
+        if (isLocked) {
+          setLockedFields((prevLockedFields) => ({
+            ...prevLockedFields,
+            [categoryId]: false,
+          }));
+          locked = false;
+        }
+
+        allocationsRef.current = rebalancedAllocations;
+
+        debouncedSaveAllocation({
+          categoryId,
           allocation: rebalancedAllocations[categoryId],
           locked,
-        },
-        {
-          onError: (error, variables, context) => {
-            // Rollback to previous allocations on error
-            setAllocations((prevAllocations) => ({
-              ...prevAllocations,
-              [categoryId]: allocations[categoryId],
-            }));
-            setError("An error occurred while saving. Please try again.");
-          },
-        }
-      );
+        });
+
+        return rebalancedAllocations;
+      });
     },
-    [allocations, calculateBalancedAmounts, lockedFields, saveAllocation]
+    [calculateBalancedAmounts, debouncedSaveAllocation]
   );
 
   const toggleLock = useCallback(
     (categoryId: CategoryId) => {
       const newLockedState = !lockedFields[categoryId];
 
-      // Optimistically update locked fields
       setLockedFields((prev) => ({
         ...prev,
         [categoryId]: newLockedState,
       }));
 
-      saveAllocation.mutate(
-        {
-          category_slug: categoryId,
-          allocation: allocations[categoryId],
-          locked: newLockedState,
-        },
-        {
-          onError: () => {
-            // Rollback on error
-            setLockedFields((prev) => ({
-              ...prev,
-              [categoryId]: !newLockedState,
-            }));
-            setError(
-              "An error occurred while toggling lock. Please try again."
-            );
-          },
-        }
-      );
+      debouncedSaveAllocation({
+        categoryId,
+        allocation: allocationsRef.current[categoryId],
+        locked: newLockedState,
+      });
     },
-    [allocations, lockedFields, saveAllocation]
+    [debouncedSaveAllocation, lockedFields]
   );
 
   const refetchBudget = useCallback(() => {
