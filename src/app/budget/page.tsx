@@ -38,7 +38,7 @@ export default function BudgetBallotPage() {
   return (
     <BudgetProvider>
       <div className='flex flex-row'>
-        <section className='flex-grow min-w-[680px] space-y-6'>
+        <section className='flex-grow max-w-[740px] space-y-6'>
           <BallotTabs />
           <p className='text-gray-600'>
             Decide on the budget for this round, and then decide how much should

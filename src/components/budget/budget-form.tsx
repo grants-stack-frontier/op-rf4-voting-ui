@@ -38,7 +38,7 @@ export function BudgetForm() {
         ) : (
           <div>
             <p className='text-[14px] font-medium'>
-              First, choose how much OP should be dedicated to this round{" "}
+              First, choose how much OP should be dedicated to this round
               <span className='text-red-500'>*</span>
             </p>
             <p className='text-[14px] font-normal text-gray-600'>
@@ -51,7 +51,7 @@ export function BudgetForm() {
                 className='flex-1 mx-2'
                 min={2000000}
                 max={8000000}
-                step={100000}
+                step={50000}
                 value={[totalBudget]}
                 onValueChange={handleBudgetChange}
                 trackClassName='bg-gray-300'
@@ -73,7 +73,7 @@ export function BudgetForm() {
               <span className='text-red-500'>*</span>
             </p>
             <p className='text-[14px] font-normal text-gray-600 mb-2'>
-              Divide 5,150,000 OP among three categories.
+              Divide {totalBudget.toLocaleString()} among three categories.
             </p>
           </div>
         )}

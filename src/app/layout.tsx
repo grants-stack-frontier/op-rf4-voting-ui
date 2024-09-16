@@ -72,7 +72,7 @@ export default function RootLayout({
                     <div className='hidden sm:block'>
                       <Callouts />
                     </div>
-                    <div className='hidden sm:flex gap-8 max-w-[1072px] mx-auto py-16'>
+                    <div className='hidden sm:flex gap-8 max-w-[1172px] mx-auto py-16'>
                       {children}
                     </div>
                   </main>
