@@ -1,7 +1,8 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { CarouselNext, CarouselPrevious } from "../ui/carousel";
+import { Button } from "../ui/button";
 
 export function AvatarCarousel({ images }: { images: { url: string; name: string }[] }) {
 	const [currentGroup, setCurrentGroup] = useState(0);
@@ -21,6 +22,17 @@ export function AvatarCarousel({ images }: { images: { url: string; name: string
 	return (
 		<div className="flex items-center">
 			<div className="flex -space-x-2 rtl:space-x-reverse">
+				{currentGroup > 0 && (
+					<Button
+						variant={null}
+						size="icon"
+						onClick={handlePrevious}
+						className="-ml-2 h-7 w-7 text-sm border-0 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full"
+						aria-label="Previous"
+					>
+						<ChevronLeft className="h-4 w-4" />
+					</Button>
+				)}
 				{currentImages.map(({ url, name }, index) => (
 					<TooltipProvider key={index}>
 						<Tooltip delayDuration={url ? 0 : 1000000}>
@@ -37,11 +49,16 @@ export function AvatarCarousel({ images }: { images: { url: string; name: string
 					</TooltipProvider>
 				))}
 			</div>
-			{groupCount > 1 && (
-				<CarouselNext onClick={handleNext} className="ml-2 text-sm text-gray-500 hover:text-gray-700" />
-			)}
-			{groupCount > 1 && (
-				<CarouselPrevious onClick={handlePrevious} className="ml-2 text-sm text-gray-500 hover:text-gray-700" />
+			{currentGroup < groupCount - 1 && (
+				<Button
+					variant={null}
+					size="icon"
+					onClick={handleNext}
+					className="-ml-2 h-7 w-7 text-sm border-0 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full"
+					aria-label="Next"
+				>
+					<ChevronRight className="h-4 w-4" />
+				</Button>
 			)}
 		</div>
 	);

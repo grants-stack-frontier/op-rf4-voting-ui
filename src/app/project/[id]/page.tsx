@@ -29,22 +29,20 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 	const { data: projects, isPending: isProjectsLoading } = useProjectsByCategory(project?.applicationCategory ?? '');
 	const [isNextProjectLoading, setIsNextProjectLoading] = useState(false);
 	const [isConflictOfInterestDialogOpen, setIsConflictOfInterestDialogOpen] = useState(false);
-	const { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect } = useProjectScoring(project?.applicationCategory ?? '', project?.projectId ?? id);
+	const { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect } = useProjectScoring(project?.applicationCategory ?? '', project?.applicationId ?? id);
 	const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
 	const { ballot } = useBallotRound5Context();
-
-	console.log({project})
 
 	const handleScore = useCallback(async (score: ImpactScore) => {
 		setIsNextProjectLoading(true);
 		const totalProjects = projects?.length ?? 0;
 
-		if (score !== 'Skip' && !projectsScored.votedIds.includes(project?.projectId ?? id)) {
+		if (score !== 'Skip' && !projectsScored.votedIds.includes(project?.applicationId ?? id)) {
 			try {
-				if (!project?.projectId) {
+				if (!project?.applicationId) {
 					throw new Error("Project ID is undefined");
 				}
-				await saveProjectImpact({ projectId: project.projectId, impact: score }, {
+				await saveProjectImpact({ projectId: project?.applicationId ?? id, impact: score }, {
 					onSuccess: async (data) => {
 						if (data.status === HttpStatusCode.OK) {
 							const { updatedProjectsScored, allProjectsScored } = await handleScoreSelect(score, totalProjects);
@@ -52,9 +50,9 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 							setIsNextProjectLoading(false);
 
 							if (!allProjectsScored && projects) {
-								const currentIndex = projects.findIndex(p => p.projectId === project?.projectId || p.id === id);
+								const currentIndex = projects.findIndex(p => p.applicationId === id);
 								const nextIndex = (currentIndex + 1) % totalProjects;
-								const nextProjectId = projects[nextIndex].projectId;
+								const nextProjectId = projects[nextIndex].applicationId;
 								if (nextProjectId) {
 									router.push(`/project/${nextProjectId}`);
 								}
@@ -76,9 +74,9 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 				toast({ variant: 'destructive', title: 'Error saving project impact' });
 			}
 		} else if (score === 'Skip' && projects) {
-			const currentIndex = projects.findIndex(p => p.projectId === project?.projectId || p.id === id);
+			const currentIndex = projects.findIndex(p => p.applicationId === id);
 			const nextIndex = (currentIndex + 1) % totalProjects;
-			const nextProjectId = projects[nextIndex].projectId;
+			const nextProjectId = projects[nextIndex].applicationId;
 			if (nextProjectId) {
 				router.push(`/project/${nextProjectId}`);
 			}
@@ -104,7 +102,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 
 	const isVoted = useMemo(() => {
 		if (!ballot || !project) return false;
-		return ballot.projects_to_be_evaluated.includes(project.projectId ?? id) || projectsScored.votedIds.includes(project.projectId ?? id);
+		return !ballot.projects_to_be_evaluated.includes(project.applicationId ?? id) || projectsScored.votedIds.includes(project.applicationId ?? id);
 	}, [ballot, project, projectsScored, id]);
 
 	const sidebarProps = useMemo(() => ({

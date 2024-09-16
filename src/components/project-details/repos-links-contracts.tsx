@@ -29,6 +29,9 @@ export function ReposLinksContracts({ github, links, contracts }: ReposLinksCont
               </div>
             }
           >
+            <div className="p-2">
+              {typedRepo.description ?? 'No description'}
+            </div>
           </CustomAccordion>
         );
       })}
