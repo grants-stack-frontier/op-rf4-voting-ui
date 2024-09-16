@@ -60,7 +60,7 @@ export function ProjectsSidebar({
                 </ProjectItem>
               ))}
           {projects?.map((item) => (
-            <Link key={item.name} href={`/project/${item.projectId}`}>
+            <Link key={item.name} href={`/project/${item.id}`}>
               <ProjectItem  {...item}>
                 {item.name}
               </ProjectItem>
