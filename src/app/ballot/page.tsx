@@ -72,49 +72,6 @@ const impactScores: { [key: number]: string } = {
 
 const totalAllocationAmount = 3_333_333;
 
-const projects: Round5ProjectAllocation[] = [
-  {
-    position: 0,
-    allocation: 0,
-    impact: 0,
-    image: "https://via.placeholder.com/150",
-    name: "Project name 1",
-    project_id: "1",
-  },
-  {
-    position: 0,
-    allocation: 0,
-    impact: 0,
-    image: "https://via.placeholder.com/150",
-    name: "Project name 2",
-    project_id: "1",
-  },
-  {
-    position: 0,
-    allocation: 0,
-    impact: 0,
-    image: "https://via.placeholder.com/150",
-    name: "Project name 3",
-    project_id: "1",
-  },
-  {
-    position: 0,
-    allocation: 0,
-    impact: 0,
-    image: "https://via.placeholder.com/150",
-    name: "Project name 4",
-    project_id: "1",
-  },
-  {
-    position: 0,
-    allocation: 0,
-    impact: 0,
-    image: "https://via.placeholder.com/150",
-    name: "Project name 5",
-    project_id: "1",
-  },
-];
-
 export default function BallotPage() {
   return (
     <>
@@ -159,11 +116,12 @@ function YourBallot() {
   console.log({ ballot });
 
   const [projectList, setProjectList] = useState(
-    ballot?.project_allocations || []
+    ballot?.project_allocations.sort((a, b) => a.position - b.position) || []
   );
 
   useEffect(() => {
-    setProjectList(ballot?.project_allocations || []);
+    console.log("Ballot updated:", ballot?.project_allocations);
+    setProjectList(ballot?.project_allocations.sort((a, b) => a.position - b.position) || []);
   }, [ballot]);
 
   const updateProjects = (newProjects: Round5ProjectAllocation[]) => {
@@ -202,13 +160,8 @@ function YourBallot() {
 
   const displayProjects = searchTerm ? filteredProjects : projectList;
 
-  // For dev purposes only
-  // const { mutate: saveImpact } = useSaveProjectImpact();
-
-  // const handleImpactChange = (projectId: string, impact: ImpactScore) => {
-  //   saveImpact({projectId, impact});
-  // };
-
+  let draggedItem: Round5ProjectAllocation|null = null
+  
   return (
     <div className='space-y-4'>
       {ballot?.status === "SUBMITTED" && (
@@ -245,7 +198,7 @@ function YourBallot() {
         <a href={`/category/${categoryIds[0]}`} className='underline'>
           {categoryNames[categoryIds[0]]}
         </a>{" "}
-        ({projects.length} projects)
+        ({projectList.length} projects)
       </p>
       <Card className='p-6 space-y-8'>
         <MetricsEditor
@@ -294,28 +247,34 @@ function YourBallot() {
                     <div
                       className='flex justify-center items-center rounded-md border-2 w-10 h-10 cursor-move'
                       onDragStart={(e) => {
-                        e.dataTransfer.setData("text/plain", i.toString());
+                        draggedItem = proj;
+                        e.dataTransfer.setData("application/json", JSON.stringify({ index: i, id: proj.project_id }));
                       }}
                       onDragOver={(e) => {
                         e.preventDefault();
                       }}
                       onDrop={(e) => {
                         e.preventDefault();
-                        const draggedIndex = parseInt(
-                          e.dataTransfer.getData("text/plain")
-                        );
-                        console.log(draggedIndex, i);
-                        const newIndex = i;
-                        if (draggedIndex !== newIndex) {
-                          const newProjects = [...projectList];
-                          const [removed] = newProjects.splice(draggedIndex, 1);
-                          newProjects.splice(newIndex, 0, removed);
-                          updateProjects(newProjects);
-                          savePosition({
-                            id: proj.project_id,
-                            position: newIndex,
-                          });
+                        const data = e.dataTransfer.getData("application/json");
+                        console.log(data)
+                        console.log(draggedItem)
+                        if (data) {
+                          const { index: draggedIndex } = JSON.parse(data);
+                          const newIndex = i;
+                          if (draggedIndex !== newIndex) {
+                            const newProjects = [...projectList];
+                            const [removed] = newProjects.splice(draggedIndex, 1);
+                            newProjects.splice(newIndex, 0, removed);
+                            updateProjects(newProjects);
+                            savePosition({
+                              id: removed.project_id,
+                              position: newIndex,
+                            });
+                          }
                         }
+                      }}
+                      onDragEnd={() => {
+                        draggedItem = null;
                       }}
                     >
                       <Menu />
@@ -339,9 +298,12 @@ function YourBallot() {
                           ? 0
                           : newAllocation;
                         setProjectList(newProjectList);
+                        const allocation = projectList[i].allocation;
+                      }}
+                      onBlur={() => {
                         saveAllocation({
                           project_id: proj.project_id,
-                          allocation: newAllocation,
+                          allocation: proj.allocation,
                         });
                       }}
                     />

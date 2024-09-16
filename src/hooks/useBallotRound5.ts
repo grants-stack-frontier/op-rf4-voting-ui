@@ -77,13 +77,15 @@ export function useSaveRound5Allocation() {
   return useMutation({
     mutationKey: ["save-round5-ballot"],
     mutationFn: async (allocation: {project_id: string, allocation: number}) => {
-      return request
+      const res = await request
         .post(`${agoraRoundsAPI}/ballots/${address}/projects/${allocation.project_id}/allocation/${allocation.allocation}`, {})
         .json<Round5Ballot>()
-        .then((r) => {
-          queryClient.setQueryData(["ballot-round5", address], r);
-          return r;
-        });
+        // .then((r) => {
+        //   queryClient.setQueryData(["ballot-round5", address], r);
+        //   return r;
+        // });
+        console.log("Allocation response:", res);
+        return res;
     },
     // onSuccess: debounceToast,
     onError: () =>
@@ -145,10 +147,10 @@ export function useSaveRound5Position() {
       return request
         .post(`${agoraRoundsAPI}/ballots/${address}/projects/${project.id}/position/${project.position}`, {})
         .json<Round5Ballot>()
-        .then((r) => {
-          queryClient.setQueryData(["ballot-round5", address], r);
-          return r;
-        });
+        // .then((r) => {
+        //   queryClient.setQueryData(["ballot-round5", address], r);
+        //   return r;
+        // });
     },
     // onSuccess: debounceToast,
     onError: () =>
@@ -177,13 +179,15 @@ export function useDistributionMethod() {
   return useMutation({
     mutationKey: ["save-round5-distribution-method"],
     mutationFn: async (distribution_method: DistributionMethod) => {
-      return request
+      const res = await request
         .post(`${agoraRoundsAPI}/ballots/${address}/distribution_method/${distribution_method}`, {})
         .json<any>()
-        .then((r) => {
-          queryClient.setQueryData(["ballot-round5", address], r);
-          return r;
-        });
+        // .then((r) => {
+        //   queryClient.setQueryData(["ballot-round5", address], r);
+        //   return r;
+        // });
+        console.log(res);
+        return res;
     },
     // onSuccess: debounceToast,
     onError: () =>
