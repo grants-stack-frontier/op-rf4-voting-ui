@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Info, ChevronDown } from "lucide-react";
+import { Info, ArrowDown } from "lucide-react";
 
 interface FoundationGrant {
   title: string;
@@ -33,10 +33,18 @@ export function InfoBox({
 }: InfoBoxProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
-  const handleScrollToBottom = () => {
+  const handleScroll = () => {
     if (contentRef.current) {
+      const currentScroll = contentRef.current.scrollTop;
+      const maxScroll =
+        contentRef.current.scrollHeight - contentRef.current.clientHeight;
+      const newScrollPosition = Math.min(
+        currentScroll + contentRef.current.clientHeight,
+        maxScroll
+      );
+
       contentRef.current.scrollTo({
-        top: contentRef.current.scrollHeight,
+        top: newScrollPosition,
         behavior: "smooth",
       });
     }
@@ -52,11 +60,12 @@ export function InfoBox({
           Helpful information for Round {roundNumber} budgeting
         </h2>
       </div>
+
       <div
         ref={contentRef}
-        className='overflow-y-auto flex-grow text-gray-600 text-sm'
+        className='overflow-y-auto flex-grow text-gray-600 text-[12px]'
       >
-        <div className='space-y-6 pr-1'>
+        <div className='space-y-6 pr-1 pb-12'>
           <p>
             Optimism Foundation initially set the Round {roundNumber} budget to{" "}
             {totalBudget.toLocaleString()} OP. They decided on this budget after
@@ -105,10 +114,14 @@ export function InfoBox({
         </div>
       </div>
       <button
-        onClick={handleScrollToBottom}
-        className='flex items-center mt-4 text-blue-600 hover:underline focus:outline-none'
+        onClick={handleScroll}
+        className='absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-[2px] rounded-full border border-gray-200 bg-white shadow-sm hover:bg-gray-50 focus:outline-none transition-colors duration-200'
+        aria-label='Scroll down for more information'
       >
-        More <ChevronDown className='w-4 h-4 ml-1' />
+        <span className='text-[12px] leading-[16px] font-medium text-gray-600'>
+          More
+        </span>
+        <ArrowDown className='w-3 h-3 text-gray-600' />
       </button>
     </div>
   );
