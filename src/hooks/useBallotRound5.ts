@@ -182,11 +182,10 @@ export function useDistributionMethod() {
       const res = await request
         .post(`${agoraRoundsAPI}/ballots/${address}/distribution_method/${distribution_method}`, {})
         .json<any>()
-        // .then((r) => {
-        //   queryClient.setQueryData(["ballot-round5", address], r);
-        //   return r;
-        // });
-        console.log(res);
+        .then((r) => {
+          queryClient.setQueryData(["ballot-round5", address], r);
+          return r;
+        });
         return res;
     },
     // onSuccess: debounceToast,

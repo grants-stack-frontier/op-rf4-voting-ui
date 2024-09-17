@@ -22,7 +22,7 @@ import { DistributionMethod, useDistributionMethod } from "@/hooks/useBallotRoun
 export function MetricsEditor({
   onAllocationMethodSelect,
 }: {
-  onAllocationMethodSelect: (data: { x: number; y: number }[]) => void;
+  onAllocationMethodSelect?: (data: { x: number; y: number }[]) => void;
 }) {
   const { state, inc, dec, set, remove } = useBallotContext();
   const { mutate: saveDistributionMethod } = useDistributionMethod();
@@ -161,7 +161,7 @@ export function MetricsEditor({
             })}
             onClick={() => {
               setSelectedMethod(method.method);
-              onAllocationMethodSelect(method.data);
+              // onAllocationMethodSelect(method.data);
               if (
                 method.method === DistributionMethod.IMPACT_GROUPS
                 || method.method === DistributionMethod.TOP_TO_BOTTOM

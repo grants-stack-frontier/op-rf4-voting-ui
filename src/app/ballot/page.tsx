@@ -139,15 +139,15 @@ function YourBallot() {
     )
   };
 
-  const handleAllocationMethodSelect = (data: { x: number; y: number }[]) => {
-    const totalAllocation = data.reduce((sum, point) => sum + point.y, 0);
-    const newProjectList = projectList.map((project, index) => ({
-      ...project,
-      allocation:
-        index < data.length ? (data[index].y / totalAllocation) * 100 : 0,
-    }));
-    setProjectList(newProjectList);
-  };
+  // const handleAllocationMethodSelect = (data: { x: number; y: number }[]) => {
+  //   const totalAllocation = data.reduce((sum, point) => sum + point.y, 0);
+  //   const newProjectList = projectList.map((project, index) => ({
+  //     ...project,
+  //     allocation:
+  //       index < data.length ? (data[index].y / totalAllocation) * 100 : 0,
+  //   }));
+  //   setProjectList(newProjectList);
+  // };
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProjects, setFilteredProjects] = useState<
@@ -211,7 +211,7 @@ function YourBallot() {
       </p>
       <Card className='p-6 space-y-8'>
         <MetricsEditor
-          onAllocationMethodSelect={handleAllocationMethodSelect}
+          // onAllocationMethodSelect={handleAllocationMethodSelect}
         />
         <SearchInput
           className='my-2'
