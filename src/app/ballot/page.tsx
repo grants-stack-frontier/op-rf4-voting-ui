@@ -18,14 +18,13 @@ import { Slider } from "@/components/ui/slider";
 import { useVotingTimeLeft } from "@/components/voting-ends-in";
 import { votingEndDate } from "@/config";
 import { categoryNames } from "@/data/categories";
+// import {
+//   MAX_MULTIPLIER_VALUE,
+//   useOsMultiplier,
+// } from "@/hooks/useBallot";
 import {
-  MAX_MULTIPLIER_VALUE,
   Round5ProjectAllocation,
-  useBallotWeightSum,
-  useOsMultiplier,
   useRound5Ballot,
-} from "@/hooks/useBallot";
-import {
   useIsSavingRound5Ballot,
   useRound5BallotWeightSum,
   useSaveRound5Allocation,
@@ -42,6 +41,7 @@ import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
 import { ManualDialog } from "../../components/common/manual-dialog";
 import { MetricsEditor } from "../../components/metrics-editor";
 import { CategoryId } from "@/types/shared";
+import { useProjects } from "@/hooks/useProjects";
 
 function formatAllocationOPAmount(amount: number) {
   const value = amount.toString();
@@ -106,26 +106,37 @@ const categoryIds: CategoryId[] = [
   "OP_STACK_TOOLING",
 ];
 
+interface ProjectAllocationState extends Round5ProjectAllocation {
+  allocationInput: string;
+}
+
 function YourBallot() {
   const [isSubmitting, setSubmitting] = useState(false);
 
   const { ballot } = useBallotRound5Context();
   const { mutate: saveAllocation } = useSaveRound5Allocation();
   const { mutate: savePosition } = useSaveRound5Position();
+  const { data: projects } = useProjects();
 
   console.log({ ballot });
 
-  const [projectList, setProjectList] = useState(
-    ballot?.project_allocations.sort((a, b) => a.position - b.position) || []
+  const [projectList, setProjectList] = useState<ProjectAllocationState[]>(
+    sortAndPrepProjects(ballot?.project_allocations || [])
   );
 
   useEffect(() => {
     console.log("Ballot updated:", ballot?.project_allocations);
-    setProjectList(ballot?.project_allocations.sort((a, b) => a.position - b.position) || []);
+    setProjectList(sortAndPrepProjects(ballot?.project_allocations || []));
   }, [ballot]);
 
-  const updateProjects = (newProjects: Round5ProjectAllocation[]) => {
-    setProjectList(newProjects);
+  function sortAndPrepProjects(newProjects: Round5ProjectAllocation[]): ProjectAllocationState[] {
+    return newProjects
+      .sort((a, b) => a.position - b.position)
+      .map(p => ({
+        ...p,
+        allocationInput: p.allocation.toString(),
+      })
+    )
   };
 
   const handleAllocationMethodSelect = (data: { x: number; y: number }[]) => {
@@ -140,7 +151,7 @@ function YourBallot() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProjects, setFilteredProjects] = useState<
-    Round5ProjectAllocation[]
+    ProjectAllocationState[]
   >([]);
 
   useEffect(() => {
@@ -159,8 +170,6 @@ function YourBallot() {
   };
 
   const displayProjects = searchTerm ? filteredProjects : projectList;
-
-  let draggedItem: Round5ProjectAllocation|null = null
   
   return (
     <div className='space-y-4'>
@@ -217,6 +226,9 @@ function YourBallot() {
                 key={proj.project_id}
                 className='flex justify-between flex-1 border-b gap-1 py-2'
                 draggable='true'
+                onDragStart={(e) => {
+                  e.dataTransfer.setData("text/plain", JSON.stringify({ index: i, id: proj.project_id }));
+                }}
               >
                 <div className='flex items-start justify-between flex-grow'>
                   <div className='flex items-start gap-1'>
@@ -229,14 +241,16 @@ function YourBallot() {
                     <div className='flex flex-col gap-1 ml-4'>
                       <div>
                         <Link href={`/project/${proj.project_id}`}>
-                          <p className='font-semibold'>{proj.name}</p>
+                          <p className='font-semibold truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
+                            {proj.name}
+                          </p>
                         </Link>
-                        <p className='text-sm text-gray-400'>
-                          Some one-line description of project
+                        <p className='text-sm text-gray-400 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
+                          {projects?.find(p => p.id === proj.project_id)?.description ?? "No description"}
                         </p>
                       </div>
                       <div className='text-muted-foreground text-xs'>
-                        You scored: Very high impact
+                        You scored: {impactScores[proj.impact]}
                       </div>
                     </div>
                   </div>
@@ -246,35 +260,26 @@ function YourBallot() {
                     </div>
                     <div
                       className='flex justify-center items-center rounded-md border-2 w-10 h-10 cursor-move'
-                      onDragStart={(e) => {
-                        draggedItem = proj;
-                        e.dataTransfer.setData("application/json", JSON.stringify({ index: i, id: proj.project_id }));
-                      }}
                       onDragOver={(e) => {
                         e.preventDefault();
                       }}
                       onDrop={(e) => {
                         e.preventDefault();
-                        const data = e.dataTransfer.getData("application/json");
-                        console.log(data)
-                        console.log(draggedItem)
+                        const data = e.dataTransfer.getData("text/plain");
                         if (data) {
-                          const { index: draggedIndex } = JSON.parse(data);
+                          const { index: draggedIndex, id: draggedId } = JSON.parse(data);
                           const newIndex = i;
                           if (draggedIndex !== newIndex) {
                             const newProjects = [...projectList];
                             const [removed] = newProjects.splice(draggedIndex, 1);
                             newProjects.splice(newIndex, 0, removed);
-                            updateProjects(newProjects);
+                            setProjectList(newProjects);
                             savePosition({
-                              id: removed.project_id,
+                              id: draggedId,
                               position: newIndex,
                             });
                           }
                         }
-                      }}
-                      onDragEnd={() => {
-                        draggedItem = null;
                       }}
                     >
                       <Menu />
@@ -290,15 +295,15 @@ function YourBallot() {
                       type='number'
                       placeholder='--'
                       className='text-center'
-                      value={proj.allocation}
+                      value={proj.allocationInput}
                       onChange={(e) => {
                         const newAllocation = parseFloat(e.target.value);
                         const newProjectList = [...projectList];
                         newProjectList[i].allocation = isNaN(newAllocation)
                           ? 0
                           : newAllocation;
+                        newProjectList[i].allocationInput = e.target.value;
                         setProjectList(newProjectList);
-                        const allocation = projectList[i].allocation;
                       }}
                       onBlur={() => {
                         saveAllocation({
@@ -370,71 +375,71 @@ function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
   );
 }
 
-function OpenSourceMultiplier({ initialValue = 0 }) {
-  const { mutate, variables } = useOsMultiplier();
+// function OpenSourceMultiplier({ initialValue = 0 }) {
+//   const { mutate, variables } = useOsMultiplier();
 
-  const multiplier = variables ?? initialValue;
-  return (
-    <Card className='p-4'>
-      <div className='space-y-4 mb-4'>
-        <div className='text-muted-foreground text-xs'>Optional</div>
-        <div className='flex items-center gap-4'>
-          <div className='flex items-center gap-2'>
-            <div className='font-medium text-sm'>
-              Add an open source reward multiplier
-            </div>
-            <Badge
-              variant={multiplier > 1 ? "destructive" : "secondary"}
-              className='cursor-pointer'
-            >
-              {multiplier > 1 ? "On" : "Off"}
-            </Badge>
-          </div>
+//   const multiplier = variables ?? initialValue;
+//   return (
+//     <Card className='p-4'>
+//       <div className='space-y-4 mb-4'>
+//         <div className='text-muted-foreground text-xs'>Optional</div>
+//         <div className='flex items-center gap-4'>
+//           <div className='flex items-center gap-2'>
+//             <div className='font-medium text-sm'>
+//               Add an open source reward multiplier
+//             </div>
+//             <Badge
+//               variant={multiplier > 1 ? "destructive" : "secondary"}
+//               className='cursor-pointer'
+//             >
+//               {multiplier > 1 ? "On" : "Off"}
+//             </Badge>
+//           </div>
 
-          <div className='flex gap-2 flex-1'>
-            <Slider
-              value={[multiplier]}
-              onValueChange={([v]) => mutate(v)}
-              min={1.0}
-              step={0.1}
-              max={MAX_MULTIPLIER_VALUE}
-            />
-            <NumericFormat
-              customInput={OpenSourceInput}
-              className='w-16'
-              suffix='x'
-              allowNegative={false}
-              decimalScale={2}
-              allowLeadingZeros={false}
-              isAllowed={(values) =>
-                (values?.floatValue ?? 0) <= MAX_MULTIPLIER_VALUE
-              }
-              onValueChange={({ floatValue }) => mutate(floatValue ?? 0)}
-              value={multiplier ?? 0}
-              defaultValue={0}
-            />
-          </div>
-        </div>
-        <div className='text-xs text-muted-foreground'>
-          The reward multiplier takes your allocation and multiplies its effects
-          across open source projects. Projects must have open source licenses
-          in all of the Github repos, which contain their contract code, to
-          qualify. We adhered to the Open Source Initiative&apos;s definition of
-          open source software.{" "}
-          <ManualDialog>
-            <div
-              // onClick={() => setOpen(true)}
-              className='font-semibold'
-            >
-              Learn more
-            </div>
-          </ManualDialog>
-        </div>
-        <Separator />
-      </div>
-    </Card>
-  );
-}
+//           <div className='flex gap-2 flex-1'>
+//             <Slider
+//               value={[multiplier]}
+//               onValueChange={([v]) => mutate(v)}
+//               min={1.0}
+//               step={0.1}
+//               max={MAX_MULTIPLIER_VALUE}
+//             />
+//             <NumericFormat
+//               customInput={OpenSourceInput}
+//               className='w-16'
+//               suffix='x'
+//               allowNegative={false}
+//               decimalScale={2}
+//               allowLeadingZeros={false}
+//               isAllowed={(values) =>
+//                 (values?.floatValue ?? 0) <= MAX_MULTIPLIER_VALUE
+//               }
+//               onValueChange={({ floatValue }) => mutate(floatValue ?? 0)}
+//               value={multiplier ?? 0}
+//               defaultValue={0}
+//             />
+//           </div>
+//         </div>
+//         <div className='text-xs text-muted-foreground'>
+//           The reward multiplier takes your allocation and multiplies its effects
+//           across open source projects. Projects must have open source licenses
+//           in all of the Github repos, which contain their contract code, to
+//           qualify. We adhered to the Open Source Initiative&apos;s definition of
+//           open source software.{" "}
+//           <ManualDialog>
+//             <div
+//               // onClick={() => setOpen(true)}
+//               className='font-semibold'
+//             >
+//               Learn more
+//             </div>
+//           </ManualDialog>
+//         </div>
+//         <Separator />
+//       </div>
+//     </Card>
+//   );
+// }
 
 function OpenSourceInput(props: ComponentProps<typeof Input>) {
   return <Input {...props} />;
