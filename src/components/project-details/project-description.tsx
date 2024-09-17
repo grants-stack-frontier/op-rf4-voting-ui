@@ -6,7 +6,7 @@ export function ProjectDescription({ description }: { description?: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="flex flex-col items-start">
+    <div className="flex flex-col items-start my-6">
       <Markdown className={`dark:text-white ${isExpanded ? 'line-clamp-none' : 'line-clamp-3'}`}>
         {description}
       </Markdown>
