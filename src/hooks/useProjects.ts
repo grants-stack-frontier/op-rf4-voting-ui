@@ -8,7 +8,7 @@ import {
 	getRetroFundingRoundProjectsResponse,
 	updateRetroFundingRoundProjectImpact,
 } from '@/__generated__/api/agora';
-import { PageMetadata, Project } from '@/__generated__/api/agora.schemas';
+import { GetRetroFundingRoundProjectsCategory, PageMetadata, Project } from '@/__generated__/api/agora.schemas';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
 import { ImpactScore } from './useProjectScoring';
@@ -18,11 +18,22 @@ export type ProjectsResponse = {
 	data?: Project[];
 };
 
-export function useProjects() {
+export interface ProjectsParams {
+	limit?: number;
+	offset?: number;
+	category?: GetRetroFundingRoundProjectsCategory;
+}
+
+export function useProjects(params?: ProjectsParams) {
+	const { limit, offset, category } = params ?? {};
 	return useQuery({
 		queryKey: ['projects'],
 		queryFn: async () =>
-			getRetroFundingRoundProjects(5).then((results: getRetroFundingRoundProjectsResponse) => {
+			getRetroFundingRoundProjects(5, {
+				limit,
+				offset,
+				category: category ?? 'all'
+			}).then((results: getRetroFundingRoundProjectsResponse) => {
 				const res: ProjectsResponse = results.data;
 				return res.data;
 			}),

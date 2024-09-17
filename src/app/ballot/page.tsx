@@ -119,6 +119,7 @@ function YourBallot() {
   const { data: projects } = useProjects();
 
   console.log({ ballot });
+  console.log({ projects });
 
   const [projectList, setProjectList] = useState<ProjectAllocationState[]>(
     sortAndPrepProjects(ballot?.project_allocations || [])
@@ -245,8 +246,12 @@ function YourBallot() {
                             {proj.name}
                           </p>
                         </Link>
+                        {/* <p>
+                          {projects?.find(p => p.id === proj.project_id)?.category}
+                          {projects?.find(p => p.id === proj.project_id||p.applicationId === proj.project_id)?.applicationCategory}
+                        </p> */}
                         <p className='text-sm text-gray-400 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
-                          {projects?.find(p => p.id === proj.project_id)?.description ?? "No description"}
+                          {projects?.find(p => p.applicationId?.toLowerCase() === proj.project_id?.toLowerCase())?.description ?? "No description"}
                         </p>
                       </div>
                       <div className='text-muted-foreground text-xs'>

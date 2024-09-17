@@ -162,7 +162,22 @@ export enum DistributionMethod {
   TOP_TO_BOTTOM = "TOP_TO_BOTTOM",
   IMPACT_GROUPS = "IMPACT_GROUPS",
   TOP_WEIGHTED = "TOP_WEIGHTED",
+  CUSTOM = "CUSTOM",
 }
+
+export function saveDistributionMethodToLocalStorage(method: DistributionMethod|string) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('distributionMethod', method);
+  }
+};
+
+export function getDistributionMethodFromLocalStorage(): DistributionMethod | string | null {
+  if (typeof window !== 'undefined') {
+    const savedMethod = localStorage.getItem('distributionMethod');
+    return savedMethod as DistributionMethod | null;
+  }
+  return null;
+};
 
 export function useDistributionMethod() {
   const { address } = useAccount();
@@ -173,7 +188,6 @@ export function useDistributionMethod() {
   //     request.post(`${agoraRoundsAPI}/ballots/${address}/distribution_method`, {
   //       json: { distribution_method },
   //     }).json(),
-  // });
   const queryClient = useQueryClient();
   const { toast } = useToast();
   return useMutation({
@@ -181,8 +195,9 @@ export function useDistributionMethod() {
     mutationFn: async (distribution_method: DistributionMethod) => {
       const res = await request
         .post(`${agoraRoundsAPI}/ballots/${address}/distribution_method/${distribution_method}`, {})
-        .json<any>()
+        .json<Round5Ballot>()
         .then((r) => {
+          console.log("Distribution method response:", r);
           queryClient.setQueryData(["ballot-round5", address], r);
           return r;
         });
