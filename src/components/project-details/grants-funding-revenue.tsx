@@ -8,7 +8,7 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
   if (!grantsAndFunding || grantsAndFunding.grants?.length === 0 && grantsAndFunding.ventureFunding?.length === 0 && grantsAndFunding.revenue?.length === 0) return null;
 
   return (
-    <>
+    <div className="flex flex-col gap-2">
       <p className="font-medium">Grants & Investments</p>
       {grantsAndFunding.grants?.map(({ grant, amount, date, details, link }, index) => {
         const formattedAmount = amount && Number(amount) > 0 ? new Intl.NumberFormat('en-US').format(Number(amount)) : amount;
@@ -20,17 +20,17 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
                 <p className="truncate max-w-[200px] text-sm">Grant: {grant}</p>
                 {link && (
                   <div className="flex items-center gap-2">
-                    <Link2 className="h-4 w-4 -rotate-45" /> <p className="truncate max-w-[200px] text-sm">{link}</p>
+                    <Link2 className="h-4 w-4 -rotate-45" /> <p className="truncate max-w-[200px] text-sm font-medium leading-5">{link}</p>
                   </div>
                 )}
                 {formattedAmount && (
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-2 text-sm font-medium leading-5">
                     <Image src={Logo.src} alt="Logo" width={20} height={20} />
                     {formattedAmount} OP
                   </div>
                 )}
                 {date && (
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-2 text-sm font-medium leading-5">
                     <Clock3 className="h-4 w-4" />
                     {date}
                   </div>
@@ -83,6 +83,6 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
           );
         })
       }
-    </>
+    </div>
   );
 }

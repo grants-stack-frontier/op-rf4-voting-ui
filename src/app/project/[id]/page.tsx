@@ -118,8 +118,8 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 	}
 
 	return (
-		<>
-			<section className="flex-1 space-y-6">
+		<div className="flex gap-12 mx-auto">
+			<section className="flex-1 max-w-[720px]">
 				<Breadcrumb className="mb-6">
 					<BreadcrumbList>
 						<BreadcrumbItem>
@@ -145,9 +145,9 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 				<ProjectDetails data={currentProject} isPending={false} />
 				<PageView title={'project-details'} />
 			</section>
-			<aside>
+			<aside className="max-w-[304px]">
 				<ReviewSidebar {...sidebarProps} />
 			</aside>
-		</>
+		</div>
 	);
 }
