@@ -59,9 +59,14 @@ export function useSession() {
     queryKey: ["session"],
     queryFn: async () => {
       const accessToken = getToken();
+      /**
+       * isBadgeholder: true | false,
+       * category: string,
+       * siwe: { address, chainId, nonce }
+       */
 
       const user = accessToken
-        ? decodeJwt<{ siwe: { address: Address }; isBadgeholder?: boolean }>(
+        ? decodeJwt<{ siwe: { address: Address }; isBadgeholder?: boolean; category?: string }>(
             accessToken
           )
         : null;

@@ -29,19 +29,21 @@ import {
   useRound5BallotWeightSum,
   useSaveRound5Allocation,
   useSaveRound5Position,
+  useDistributionMethodFromLocalStorage,
 } from "@/hooks/useBallotRound5";
 import { useIsBadgeholder } from "@/hooks/useIsBadgeholder";
 import { formatDate } from "@/lib/utils";
 import { ArrowDownToLineIcon, LoaderIcon, Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useEffect, useMemo, useState } from "react";
 import { NumericFormat } from "react-number-format";
 import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
 import { ManualDialog } from "../../components/common/manual-dialog";
 import { MetricsEditor } from "../../components/metrics-editor";
 import { CategoryId } from "@/types/shared";
 import { useProjects } from "@/hooks/useProjects";
+import { useVotingCategory } from "@/hooks/useVotingCategory";
 
 function formatAllocationOPAmount(amount: number) {
   const value = amount.toString();
@@ -63,11 +65,12 @@ function formatAllocationOPAmount(amount: number) {
 }
 
 const impactScores: { [key: number]: string } = {
-  1: "Very low",
-  2: "Low",
-  3: "Medium",
-  4: "High",
-  5: "Very high",
+  0: "Conflict of interest",
+  1: "Very low impact",
+  2: "Low impact",
+  3: "Medium impact",
+  4: "High impact",
+  5: "Very high impact",
 };
 
 const totalAllocationAmount = 3_333_333;
@@ -117,38 +120,41 @@ function YourBallot() {
   const { mutate: saveAllocation } = useSaveRound5Allocation();
   const { mutate: savePosition } = useSaveRound5Position();
   const { data: projects } = useProjects();
+  const votingCategory = useVotingCategory();
 
   console.log({ ballot });
   console.log({ projects });
 
   const [projectList, setProjectList] = useState<ProjectAllocationState[]>(
-    sortAndPrepProjects(ballot?.project_allocations || [])
+    sortAndPrepProjects(ballot?.project_allocations || [], 'no-conflict')
+  );
+  const [conflicts, setConflicts] = useState<ProjectAllocationState[]>(
+    sortAndPrepProjects(ballot?.project_allocations || [], 'conflict')
   );
 
   useEffect(() => {
     console.log("Ballot updated:", ballot?.project_allocations);
-    setProjectList(sortAndPrepProjects(ballot?.project_allocations || []));
+    setProjectList(sortAndPrepProjects(ballot?.project_allocations || [], 'no-conflict'));
+    setConflicts(sortAndPrepProjects(ballot?.project_allocations || [], 'conflict'));
   }, [ballot]);
 
-  function sortAndPrepProjects(newProjects: Round5ProjectAllocation[]): ProjectAllocationState[] {
-    return newProjects
+  type Filter = 'conflict' | 'no-conflict'
+  function sortAndPrepProjects(newProjects: Round5ProjectAllocation[], filter?: Filter): ProjectAllocationState[] {
+    const projects = newProjects
       .sort((a, b) => a.position - b.position)
       .map(p => ({
         ...p,
         allocationInput: p.allocation.toString(),
       })
     )
+    if (filter === 'conflict') {
+      return projects.filter(p => p.impact === 0);
+    }
+    if (filter === 'no-conflict') {
+      return projects.filter(p => p.impact !== 0);
+    }
+    return projects;
   };
-
-  // const handleAllocationMethodSelect = (data: { x: number; y: number }[]) => {
-  //   const totalAllocation = data.reduce((sum, point) => sum + point.y, 0);
-  //   const newProjectList = projectList.map((project, index) => ({
-  //     ...project,
-  //     allocation:
-  //       index < data.length ? (data[index].y / totalAllocation) * 100 : 0,
-  //   }));
-  //   setProjectList(newProjectList);
-  // };
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProjects, setFilteredProjects] = useState<
@@ -205,15 +211,13 @@ function YourBallot() {
       {/* TO DO: Change to category based on badgeholder */}
       <p>
         Your voting category is{" "}
-        <a href={`/category/${categoryIds[0]}`} className='underline'>
-          {categoryNames[categoryIds[0]]}
+        <a href={`/category/${votingCategory}`} className='underline'>
+          {votingCategory ? categoryNames[votingCategory as CategoryId] : "Unknown"}
         </a>{" "}
         ({projectList.length} projects)
       </p>
       <Card className='p-6 space-y-8'>
-        <MetricsEditor
-          // onAllocationMethodSelect={handleAllocationMethodSelect}
-        />
+        <MetricsEditor />
         <SearchInput
           className='my-2'
           placeholder='Search projects...'
@@ -225,7 +229,7 @@ function YourBallot() {
             return (
               <div
                 key={proj.project_id}
-                className='flex justify-between flex-1 border-b gap-1 py-2'
+                className={`flex justify-between flex-1 border-b gap-1 py-6 ${i === 0 ? "pt-0" : ""}`}
                 draggable='true'
                 onDragStart={(e) => {
                   e.dataTransfer.setData("text/plain", JSON.stringify({ index: i, id: proj.project_id }));
@@ -246,11 +250,7 @@ function YourBallot() {
                             {proj.name}
                           </p>
                         </Link>
-                        {/* <p>
-                          {projects?.find(p => p.id === proj.project_id)?.category}
-                          {projects?.find(p => p.id === proj.project_id||p.applicationId === proj.project_id)?.applicationCategory}
-                        </p> */}
-                        <p className='text-sm text-gray-400 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
+                        <p className='text-sm text-gray-600 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
                           {projects?.find(p => p.applicationId?.toLowerCase() === proj.project_id?.toLowerCase())?.description ?? "No description"}
                         </p>
                       </div>
@@ -260,11 +260,11 @@ function YourBallot() {
                     </div>
                   </div>
                   <div className='flex gap-2'>
-                    <div className='flex justify-center items-center rounded-md border-2 w-10 h-10'>
+                    <div className='flex justify-center items-center rounded-md w-[42px] h-[40px] bg-[#F2F3F8] text-[#636779]'>
                       {i + 1}
                     </div>
                     <div
-                      className='flex justify-center items-center rounded-md border-2 w-10 h-10 cursor-move'
+                      className='flex justify-center items-center rounded-md w-[42px] h-[40px] cursor-move bg-[#F2F3F8] text-[#636779]'
                       onDragOver={(e) => {
                         e.preventDefault();
                       }}
@@ -336,11 +336,12 @@ function YourBallot() {
         {/* <OpenSourceMultiplier initialValue={ballot?.os_multiplier} /> */}
         {/* <Button onClick={() => handleImpactChange(ballot?.projects_to_be_evaluated[0] ?? "", 5)}>Score Impact</Button> */}
 
-        <div className='flex items-center gap-4'>
-          <BallotSubmitButton onClick={() => setSubmitting(true)} />
-
+        <div className='flex flex-col gap-6 mt-6'>
           <WeightsError />
-          <IsSavingBallot />
+          <div className='flex items-center gap-4'>
+            <BallotSubmitButton onClick={() => setSubmitting(true)} />
+            <IsSavingBallot />
+          </div>
         </div>
 
         {ballot?.address && (
@@ -356,6 +357,49 @@ function YourBallot() {
           />
         )}
       </Card>
+      {conflicts.length > 0 && (
+        <>
+        <h1 className="text-lg font-bold pt-6">Conflicts of interest</h1>
+        {conflicts.map((proj, i) => {
+          return (
+            <div
+              key={proj.project_id}
+              className={`flex justify-between flex-1 border-b gap-1 py-6`}
+              draggable='true'
+              onDragStart={(e) => {
+                e.dataTransfer.setData("text/plain", JSON.stringify({ index: i, id: proj.project_id }));
+              }}
+            >
+              <div className='flex items-start justify-between flex-grow'>
+                <div className='flex items-start gap-1'>
+                  <div
+                    className='size-12 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0'
+                    style={{
+                      backgroundImage: `url(${proj.image})`,
+                    }}
+                  />
+                  <div className='flex flex-col gap-1 ml-4'>
+                    <div>
+                      <Link href={`/project/${proj.project_id}`}>
+                        <p className='font-semibold truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
+                          {proj.name}
+                        </p>
+                      </Link>
+                      <p className='text-sm text-gray-600 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
+                        {projects?.find(p => p.applicationId?.toLowerCase() === proj.project_id?.toLowerCase())?.description ?? "No description"}
+                      </p>
+                    </div>
+                    <div className='text-muted-foreground text-xs'>
+                      You marked: {impactScores[proj.impact]}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        </>
+      )}
     </div>
   );
 }
@@ -375,7 +419,7 @@ function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
       type='submit'
       onClick={onClick}
     >
-      Submit ballot
+      Submit budget and ballot
     </Button>
   );
 }
@@ -452,12 +496,23 @@ function OpenSourceInput(props: ComponentProps<typeof Input>) {
 
 function WeightsError() {
   const allocationSum = useRound5BallotWeightSum();
+  const remainingAllocation = useMemo(() => {
+    return 100 - allocationSum;
+  }, [allocationSum]);
+
+  const { data: distributionMethod } = useDistributionMethodFromLocalStorage();
+
+  if (!distributionMethod) return (
+    <span className='text-sm text-destructive'>
+      Choose a distribution method at the top of this ballot.
+    </span>
+  );
 
   if (allocationSum === 100) return null;
 
   return (
     <span className='text-sm text-destructive'>
-      Weights must add up to 100%
+      Percentages must equal 100% ({remainingAllocation > 0 ? `add ${remainingAllocation}% to your ballot` : `remove ${Math.abs(remainingAllocation)}% from your ballot`})
     </span>
   );
 }
