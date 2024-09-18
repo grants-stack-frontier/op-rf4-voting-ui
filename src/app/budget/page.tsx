@@ -22,18 +22,6 @@ const foundationGrants = [
   },
 ];
 
-function BudgetContent() {
-  return (
-    <Card className='p-4'>
-      <CardHeader>
-        <CardTitle className='mb-4'>Your Budget</CardTitle>
-        <Separator />
-      </CardHeader>
-      <BudgetForm />
-    </Card>
-  );
-}
-
 export default function BudgetBallotPage() {
   return (
     <BudgetProvider>
@@ -45,7 +33,13 @@ export default function BudgetBallotPage() {
             go to each category. You can return to this step at any time before
             you submit your ballot.
           </p>
-          <BudgetContent />
+          <Card className='p-4'>
+            <CardHeader>
+              <CardTitle className='mb-4'>Your budget</CardTitle>
+              <Separator />
+            </CardHeader>
+            <BudgetForm />
+          </Card>
           <PageView title={"budget-ballot"} />
         </section>
         <aside className='w-96 ml-4 sticky top-4 h-[60vh]'>

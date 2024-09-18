@@ -11,7 +11,7 @@ export function useBudgetForm() {
 
   const projects = useProjects();
   const { getBudget, saveAllocation, getBudgetAmount } = useBudget(roundId);
-  const [totalBudget, setTotalBudget] = useState(8000000); // Default to 8M OP
+  const [totalBudget, setTotalBudget] = useState(2000000);
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [lockedFields, setLockedFields] = useState<Record<string, boolean>>({});
   const [countPerCategory, setCountPerCategory] = useState<
