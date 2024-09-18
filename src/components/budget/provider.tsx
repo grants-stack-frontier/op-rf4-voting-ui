@@ -14,7 +14,6 @@ interface BudgetContextType {
     newValue: number,
     locked: boolean
   ) => void;
-  refetchBudget: () => void;
   toggleLock: (categoryId: CategoryId) => void;
   error: string;
   isLoading: boolean;
@@ -32,7 +31,6 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
     lockedFields,
     handleValueChange,
     toggleLock,
-    refetchBudget,
     error,
     isLoading,
     totalBudget,
@@ -46,7 +44,6 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
     lockedFields,
     handleValueChange,
     toggleLock,
-    refetchBudget,
     error,
     isLoading,
     totalBudget,

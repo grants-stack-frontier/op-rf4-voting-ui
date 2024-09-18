@@ -60,15 +60,13 @@ export function CategoryItem({ category }: CategoryItemProps) {
 
   const handleIncrement = () =>
     handleValueChange(category.id, allocation + 1, isLocked);
+
   const handleDecrement = () => {
     if (allocation > 0) {
       handleValueChange(category.id, allocation - 1, isLocked);
     }
   };
-  const handleToggleLock = () => {
-    toggleLock(category.id);
-    handleValueChange(category.id, allocation, !isLocked);
-  };
+  const handleToggleLock = () => toggleLock(category.id);
 
   return (
     <div key={category.id}>

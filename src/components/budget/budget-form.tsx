@@ -8,8 +8,7 @@ import { Slider } from "../ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export function BudgetForm() {
-  const { categories, error, isLoading, totalBudget, setTotalBudget } =
-    useBudgetContext();
+  const { categories, error, isLoading, totalBudget, setTotalBudget } = useBudgetContext();
   const router = useRouter();
 
   const [initialLoad, setInitialLoad] = useState(isLoading);
