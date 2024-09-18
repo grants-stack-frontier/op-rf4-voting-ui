@@ -1,17 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { SiweMessage } from "siwe";
-import ky from "ky";
-import { decodeJwt } from "jose";
-import {
-  useAccount,
-  useChainId,
-  useDisconnect as useWagmiDisconnect,
-  useSignMessage,
-} from "wagmi";
+import { useAccount, useChainId, useSignMessage } from "wagmi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../ui/button";
-
 import {
   Dialog,
   DialogContent,
@@ -19,22 +12,31 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { getToken, setToken } from "@/lib/token";
-import { useRouter } from "next/navigation";
 import mixpanel from "@/lib/mixpanel";
-import { Address } from "viem";
-import { useEffect } from "react";
+import {
+  useDisconnect,
+  useNonce,
+  useSession,
+  useVerify,
+} from "@/hooks/useAuth";
 
 export function SignMessage() {
+  const [isLoading, setIsLoading] = useState(true);
   const { data: nonce } = useNonce();
-  const { data: session } = useSession();
+  const { data: session, isLoading: isSessionLoading } = useSession();
   const { address } = useAccount();
   const verify = useVerify();
   const chainId = useChainId();
   const sign = useSignMessage();
 
   useEffect(() => {
-    // if (address) mixpanel.track("Connect Wallet", { status: "success" });
+    if (!isSessionLoading) {
+      setIsLoading(false);
+    }
+  }, [isSessionLoading]);
+
+  useEffect(() => {
+    if (address) mixpanel.track("Connect Wallet", { status: "success" });
   }, [address]);
 
   async function handleSign() {
@@ -55,6 +57,10 @@ export function SignMessage() {
   }
 
   const { disconnect } = useDisconnect();
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <Dialog open={address && !session}>
@@ -86,86 +92,4 @@ export function SignMessage() {
       </DialogContent>
     </Dialog>
   );
-}
-
-function useNonce() {
-  return useQuery({
-    queryKey: ["nonce"],
-    queryFn: async () => ky.get("/api/agora/auth/nonce").text(),
-  });
-}
-function useVerify() {
-  const client = useQueryClient();
-  return useMutation({
-    mutationFn: async (json: {
-      message: string;
-      signature: string;
-      nonce: string;
-    }) => {
-      const { access_token, ...rest } = await ky
-        .post("/api/agora/auth/verify", { json })
-        .json<{ access_token: string }>();
-      console.log(rest);
-      mixpanel.track("Sign In", { status: "success" });
-      setToken(access_token);
-      // Trigger a refetch of the session
-      await client.invalidateQueries({ queryKey: ["session"] });
-      
-      setVoterConfirmationView();
-
-      return { access_token };
-    },
-  });
-}
-
-export function setVoterConfirmationView() {
-  localStorage.setItem("voter-confirmation-view", "true");
-}
-export function getVoterConfirmationView() {
-  const view = localStorage.getItem("voter-confirmation-view");
-  return !!view
-}
-export function removeVoterConfirmationView() {
-  const view = localStorage.getItem("voter-confirmation-view");
-  if (view) localStorage.removeItem("voter-confirmation-view");
-}
-
-export function useDisconnect() {
-  const client = useQueryClient();
-  const router = useRouter();
-  const wagmiDisconnect = useWagmiDisconnect();
-
-  async function disconnect() {
-    wagmiDisconnect.disconnect();
-    global?.localStorage.removeItem("token");
-    mixpanel.reset();
-    await client.invalidateQueries({ queryKey: ["session"] });
-    router.push("/");
-  }
-
-  return { disconnect };
-}
-export function useSession() {
-  return useQuery({
-    queryKey: ["session"],
-    queryFn: async () => {
-      const accessToken = getToken();
-
-      const user = accessToken
-        ? decodeJwt<{ siwe: { address: Address }; isBadgeholder?: boolean }>(
-            accessToken
-          )
-        : null;
-
-      if (user) {
-        mixpanel.identify(user.siwe.address);
-        mixpanel.people.set({
-          $name: user.siwe.address,
-          badgeholder: user.isBadgeholder,
-        });
-      }
-
-      return user;
-    },
-  });
 }

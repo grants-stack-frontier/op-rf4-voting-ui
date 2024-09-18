@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Markdown } from "../markdown";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
-import {useSession} from "@/components/auth/sign-message";
+import { useSession } from "@/hooks/useAuth";
 
 export function CategoryDetails({ id }: { id: string }) {
 	const category = categories?.find(cat => cat.id === id);

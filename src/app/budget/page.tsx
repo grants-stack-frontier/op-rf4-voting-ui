@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import { BallotTabs } from "@/components/ballot/ballot-tabs";
 import { PageView } from "@/components/common/page-view";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +9,7 @@ import { InfoBox } from "@/components/budget/info-box";
 import { Separator } from "@/components/ui/separator";
 import { DisconnectedState } from "@/components/common/disconnected-state";
 import { useAccount } from "wagmi";
+import { Loader2 } from "lucide-react";
 
 const foundationGrants = [
   {
@@ -26,15 +28,32 @@ const foundationGrants = [
 
 export default function BudgetBallotPage() {
   const { isConnecting, isConnected } = useAccount();
+  const [hasMounted, setHasMounted] = useState(false);
 
-  if (isConnecting) {
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  // If the component hasn't mounted yet, return null to prevent any render
+  if (!hasMounted) {
     return null;
   }
 
+  // After mounting, if still connecting, show a loader
+  if (isConnecting) {
+    return (
+      <div className='flex justify-center items-center h-screen'>
+        <Loader2 className='h-8 w-8 animate-spin' />
+      </div>
+    );
+  }
+
+  // If not connected after mounting and not connecting, show disconnected state
   if (!isConnected) {
     return <DisconnectedState />;
   }
 
+  // Connected and mounted, render the main content
   return (
     <BudgetProvider>
       <div className='flex flex-row gap-12'>

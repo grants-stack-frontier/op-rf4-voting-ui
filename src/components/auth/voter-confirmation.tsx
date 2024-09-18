@@ -12,13 +12,13 @@ import mixpanel from "@/lib/mixpanel";
 import { Address } from "viem";
 import { useEffect, useState } from "react";
 
-import {
-  getVoterConfirmationView,
-  removeVoterConfirmationView,
-} from "./sign-message";
 import { UnifiedDialog } from "./unified-dialog";
 
 import React from "react";
+import {
+  getVoterConfirmationView,
+  removeVoterConfirmationView,
+} from "@/hooks/useAuth";
 
 export function VoterConfirmationDialog() {
   const { data: session } = useSession();
