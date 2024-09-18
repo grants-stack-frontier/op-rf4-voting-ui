@@ -1,5 +1,4 @@
 "use client";
-import { GetRetroFundingRoundProjectsCategory } from "@/__generated__/api/agora.schemas";
 import { useBallotRound5Context } from "@/components/ballot/provider5";
 import { UnlockBallotDialog } from "@/components/ballot/unlock-ballot";
 import { ConflictOfInterestDialog } from "@/components/common/conflict-of-interest-dialog";
@@ -16,6 +15,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { toast } from "@/components/ui/use-toast";
 import { HttpStatusCode } from "@/enums/http-status-codes";
+import { useSession } from "@/hooks/useAuth";
 import { ImpactScore, useProjectScoring } from "@/hooks/useProjectScoring";
 import { useProjectById, useProjectsByCategory, useSaveProjectImpact } from "@/hooks/useProjects";
 import { CategoryId } from "@/types/shared";
@@ -34,6 +34,10 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 	const { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect } = useProjectScoring(project?.applicationCategory ?? '', project?.applicationId ?? id);
 	const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
 	const { ballot } = useBallotRound5Context();
+	const { data: session } = useSession();
+
+	const userCategory = session?.category;
+	const isUserCategory = !!userCategory && !!project?.applicationCategory && userCategory === project?.applicationCategory;
 
 	const handleScore = useCallback(async (score: ImpactScore) => {
 		setIsNextProjectLoading(true);
@@ -147,9 +151,11 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 				<ProjectDetails data={currentProject} isPending={false} />
 				<PageView title={'project-details'} />
 			</section>
-			<aside className="max-w-[304px]">
-				<ReviewSidebar {...sidebarProps} />
-			</aside>
+			{isUserCategory && (
+				<aside className="max-w-[304px]">
+					<ReviewSidebar {...sidebarProps} />
+				</aside>
+			)}
 		</div>
 	);
 }
