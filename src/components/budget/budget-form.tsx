@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CategoryItem } from "./category-item";
@@ -20,6 +20,11 @@ export function BudgetForm() {
   }, [isLoading]);
 
   const handleBudgetChange = (value: number[]) => {
+    const newBudget = value[0];
+    setTotalBudget(newBudget);
+  };
+
+  const handleBudgetChangeEnd = (value: number[]) => {
     const newBudget = value[0];
     setTotalBudget(newBudget);
   };
@@ -53,6 +58,7 @@ export function BudgetForm() {
                 step={50000}
                 value={[totalBudget]}
                 onValueChange={handleBudgetChange}
+                onValueCommit={handleBudgetChangeEnd}
                 trackClassName='bg-gray-300'
                 rangeClassName='bg-gray-800'
                 thumbClassName='border-gray-600'

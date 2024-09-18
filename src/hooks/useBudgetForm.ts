@@ -6,13 +6,14 @@ import { calculateBalancedAmounts, isCloseEnough } from "@/lib/budget-helpers";
 import { useBudget } from "./useBudget";
 import { categories } from "@/data/categories";
 import { useAccount } from "wagmi";
+import { updateRetroFundingRoundBudgetAllocation } from "@/__generated__/api/agora";
 
 export function useBudgetForm() {
   const roundId = 5;
 
   const projects = useProjects();
-  const { getBudget, saveAllocation, getBudgetAmount } = useBudget(roundId);
-  const [totalBudget, setTotalBudget] = useState(2000000);
+  const { getBudget, saveAllocation } = useBudget(roundId);
+  const [totalBudget, setTotalBudget] = useState<number>(2000000);
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [lockedFields, setLockedFields] = useState<Record<string, boolean>>({});
   const [countPerCategory, setCountPerCategory] = useState<
@@ -56,7 +57,9 @@ export function useBudgetForm() {
   useEffect(() => {
     if (getBudget.data) {
       const newAllocations: Record<string, number> = {};
-      getBudget.data.forEach((allocation) => {
+      setTotalBudget(getBudget.data.budget ?? 2000000);
+
+      getBudget.data.allocations?.forEach((allocation) => {
         if (allocation.category_slug !== undefined) {
           newAllocations[allocation.category_slug] = Number(
             allocation.allocation
@@ -87,10 +90,14 @@ export function useBudgetForm() {
       }, {} as Record<string, number>);
       setCountPerCategory(counts);
 
-      if (getBudget.data && getBudget.data.length > 0) {
+      console.log("getBudget?.data", getBudget?.data);
+      if (
+        getBudget?.data?.allocations &&
+        getBudget?.data?.allocations.length > 0
+      ) {
         setAllocations((prevAllocations) => {
           const newAllocations: Record<string, number> = {};
-          getBudget.data.forEach((allocation) => {
+          getBudget?.data?.allocations.forEach((allocation) => {
             if (allocation.category_slug !== undefined) {
               newAllocations[allocation.category_slug] = Number(
                 allocation.allocation
@@ -107,7 +114,7 @@ export function useBudgetForm() {
 
         setLockedFields((prevLockedFields) => {
           const newLockedFields: Record<string, boolean> = {};
-          getBudget.data.forEach((allocation) => {
+          getBudget?.data?.allocations.forEach((allocation) => {
             if (allocation.category_slug !== undefined) {
               newLockedFields[allocation.category_slug] =
                 allocation.locked ?? false;
@@ -133,9 +140,9 @@ export function useBudgetForm() {
       }
 
       checkTotalAllocation(
-        getBudget.data && getBudget.data.length > 0
+        getBudget?.data?.allocations && getBudget?.data?.allocations.length > 0
           ? Object.fromEntries(
-              getBudget.data.map((allocation) => [
+              getBudget?.data?.allocations.map((allocation) => [
                 allocation.category_slug,
                 Number(allocation.allocation),
               ])
@@ -145,9 +152,10 @@ export function useBudgetForm() {
     }
   }, [
     projects.data,
-    getBudget.data,
+    getBudget?.data?.allocations,
     getDefaultAllocations,
     checkTotalAllocation,
+    getBudget?.data,
   ]);
 
   const saveAllocationToBackend = useCallback(
@@ -179,12 +187,14 @@ export function useBudgetForm() {
       const unlockedCategories = Object.entries(lockedFields).filter(
         ([_, isLocked]) => !isLocked
       );
-      if (
-        unlockedCategories.length === 1 &&
-        unlockedCategories[0][0] === categoryId
-      ) {
+      const isModificationNotAllowed =
+        (unlockedCategories.length === 1 &&
+          unlockedCategories[0][0] === categoryId) ||
+        (lockedFields[categoryId] && unlockedCategories.length === 0);
+
+      if (isModificationNotAllowed) {
         setError(
-          "Cannot modify the only unlocked category. Please unlock at least one other category."
+          "Unable to modify allocation. Please ensure at least one other category is unlocked before making changes."
         );
         return;
       }
@@ -238,25 +248,51 @@ export function useBudgetForm() {
     [allocations, saveAllocationToBackend]
   );
 
+  const saveTotalBudgetToBackend = useCallback(
+    async (budget: number) => {
+      if (!address) return;
+      try {
+        await updateRetroFundingRoundBudgetAllocation(roundId, address, budget);
+      } catch (error) {
+        console.error("Failed to save budget allocation:", error);
+        setError(
+          "An error occurred while saving the total budget. Please try again."
+        );
+      }
+    },
+    [address]
+  );
+
+  const debouncedSaveTotalBudget = useRef(
+    debounce(saveTotalBudgetToBackend, 300)
+  ).current;
+
+  const handleTotalBudgetChange = useCallback(
+    (newBudget: number) => {
+      setTotalBudget(newBudget);
+      debouncedSaveTotalBudget(newBudget);
+    },
+    [debouncedSaveTotalBudget]
+  );
+
   const isLoading =
     getBudget.isLoading ||
     getBudget.isFetching ||
     projects.isLoading ||
     projects.isFetching ||
-    getBudgetAmount.isLoading ||
-    getBudgetAmount.isFetching ||
     saveAllocation.isPending;
 
   return {
-    categories: categories,
+    categories,
     countPerCategory,
     allocations,
+    budget: getBudget.data?.budget,
     lockedFields,
     handleValueChange,
     toggleLock,
     error,
     isLoading,
     totalBudget,
-    setTotalBudget,
+    setTotalBudget: handleTotalBudgetChange,
   };
 }
