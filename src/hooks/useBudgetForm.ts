@@ -12,7 +12,7 @@ export function useBudgetForm() {
   const roundId = 5;
 
   const projects = useProjects();
-  const { getBudget, saveAllocation, getBudgetAmount } = useBudget(roundId);
+  const { getBudget, saveAllocation } = useBudget(roundId);
   const [totalBudget, setTotalBudget] = useState<number>(2000000);
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [lockedFields, setLockedFields] = useState<Record<string, boolean>>({});
@@ -56,18 +56,17 @@ export function useBudgetForm() {
 
   useEffect(() => {
     if (getBudget.data) {
-      setTotalBudget(getBudget.data.budget ?? 2000000);
-      
       const newAllocations: Record<string, number> = {};
-      const newLockedFields: Record<string, boolean> = {};
-      getBudget.data.allocations.forEach((allocation) => {
+      setTotalBudget(getBudget.data.budget ?? 2000000);
+
+      getBudget.data.allocations?.forEach((allocation) => {
         if (allocation.category_slug !== undefined) {
-          newAllocations[allocation.category_slug] = Number(allocation.allocation);
-          newLockedFields[allocation.category_slug] = allocation.locked ?? false;
+          newAllocations[allocation.category_slug] = Number(
+            allocation.allocation
+          );
         }
       });
       setAllocations(newAllocations);
-      setLockedFields(newLockedFields);
       checkTotalAllocation(newAllocations);
     }
   }, [getBudget.data, checkTotalAllocation]);
@@ -91,7 +90,11 @@ export function useBudgetForm() {
       }, {} as Record<string, number>);
       setCountPerCategory(counts);
 
-      if (getBudget?.data?.allocations && getBudget?.data?.allocations.length > 0) {
+      console.log("getBudget?.data", getBudget?.data);
+      if (
+        getBudget?.data?.allocations &&
+        getBudget?.data?.allocations.length > 0
+      ) {
         setAllocations((prevAllocations) => {
           const newAllocations: Record<string, number> = {};
           getBudget?.data?.allocations.forEach((allocation) => {
@@ -152,6 +155,7 @@ export function useBudgetForm() {
     getBudget?.data?.allocations,
     getDefaultAllocations,
     checkTotalAllocation,
+    getBudget?.data,
   ]);
 
   const saveAllocationToBackend = useCallback(
@@ -183,12 +187,14 @@ export function useBudgetForm() {
       const unlockedCategories = Object.entries(lockedFields).filter(
         ([_, isLocked]) => !isLocked
       );
-      if (
-        unlockedCategories.length === 1 &&
-        unlockedCategories[0][0] === categoryId
-      ) {
+      const isModificationNotAllowed =
+        (unlockedCategories.length === 1 &&
+          unlockedCategories[0][0] === categoryId) ||
+        (lockedFields[categoryId] && unlockedCategories.length === 0);
+
+      if (isModificationNotAllowed) {
         setError(
-          "Cannot modify the only unlocked category. Please unlock at least one other category."
+          "Unable to modify allocation. Please ensure at least one other category is unlocked before making changes."
         );
         return;
       }
@@ -241,7 +247,7 @@ export function useBudgetForm() {
     },
     [allocations, saveAllocationToBackend]
   );
-  
+
   const saveTotalBudgetToBackend = useCallback(
     async (budget: number) => {
       if (!address) return;
@@ -249,7 +255,9 @@ export function useBudgetForm() {
         await updateRetroFundingRoundBudgetAllocation(roundId, address, budget);
       } catch (error) {
         console.error("Failed to save budget allocation:", error);
-        setError("An error occurred while saving the total budget. Please try again.");
+        setError(
+          "An error occurred while saving the total budget. Please try again."
+        );
       }
     },
     [address]
@@ -272,8 +280,6 @@ export function useBudgetForm() {
     getBudget.isFetching ||
     projects.isLoading ||
     projects.isFetching ||
-    getBudgetAmount.isLoading ||
-    getBudgetAmount.isFetching ||
     saveAllocation.isPending;
 
   return {

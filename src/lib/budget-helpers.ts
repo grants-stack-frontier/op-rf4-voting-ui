@@ -1,7 +1,7 @@
-const EPSILON = 1e-3;
+const EPSILON = 1e-1;
 
 export const isCloseEnough = (value: number, target: number): boolean => {
-  return Math.abs(value - target) < EPSILON;
+  return Math.abs(value - target) <= EPSILON;
 };
 
 export const autobalanceAllocations = (
