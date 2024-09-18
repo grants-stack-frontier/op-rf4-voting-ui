@@ -11,7 +11,6 @@ import {
   updateRetroFundingRoundCategoryAllocationResponse,
 } from "@/__generated__/api/agora";
 import {
-  RetroFundingBallot5ProjectsAllocation,
   RetroFundingBallotCategoriesAllocation,
   Round5Ballot,
 } from "@/__generated__/api/agora.schemas";
@@ -29,8 +28,11 @@ export function useBudget(roundId: number) {
       return getRetroFundingRoundBallotById(roundId, address).then(
         (response: getRetroFundingRoundBallotByIdResponse) => {
           const ballot = response.data as Round5Ballot;
-          const allocations = ballot.category_allocations;
-          return allocations as RetroFundingBallotCategoriesAllocation[];
+          return {
+            budget: ballot.budget,
+            allocations:
+              ballot.category_allocations as RetroFundingBallotCategoriesAllocation[],
+          };
         }
       );
     },
@@ -46,11 +48,15 @@ export function useBudget(roundId: number) {
         allocation
       ).then((response: updateRetroFundingRoundCategoryAllocationResponse) => {
         const updatedBallot = response.data as Round5Ballot;
+        // Update the query data with the full structure
         queryClient.setQueryData(
           ["budget", address, roundId],
-          updatedBallot.category_allocations
+          (oldData: any) => ({
+            budget: updatedBallot.budget,
+            allocations: updatedBallot.category_allocations,
+          })
         );
-        return updatedBallot.category_allocations as RetroFundingBallot5ProjectsAllocation[];
+        return updatedBallot.category_allocations;
       });
     },
     onError: () =>
@@ -60,39 +66,8 @@ export function useBudget(roundId: number) {
       }),
   });
 
-  // dummy api calls
-  const getBudgetAmount = useQuery({
-    enabled: Boolean(address),
-    queryKey: ["budget-amount", address, roundId],
-    queryFn: async () => {
-      return new Promise<number>((resolve) => {
-        setTimeout(() => {
-          resolve(8000000);
-        }, 500);
-      });
-    },
-  });
-
-  const setBudgetAmount = useMutation({
-    mutationKey: ["set-budget-amount", roundId],
-    mutationFn: async (amount: number) => {
-      return new Promise<void>((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 500);
-      });
-    },
-    onError: () =>
-      toast({
-        variant: "destructive",
-        title: "Error setting budget amount",
-      }),
-  });
-
   return {
     getBudget,
     saveAllocation,
-    getBudgetAmount,
-    setBudgetAmount,
   };
 }

@@ -42,10 +42,10 @@ export function CategoryAndTeam({ category, team }: { category?: CategoryType, t
   })) ?? [];
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-4 mb-12">
       <Badge
         variant={null}
-        className={`cursor-pointer border-0 font-medium ${getBadgeClassName(category)}`}
+        className={`h-7 cursor-pointer border-0 font-medium text-sm leading-5 ${getBadgeClassName(category)}`}
       >
         {category ? categoryNames[category] : 'N/A'}
       </Badge>

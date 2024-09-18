@@ -11,8 +11,8 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { forwardRef } from "react";
-import { useDisconnect } from "./sign-message";
 import mixpanel from "@/lib/mixpanel";
+import { useDisconnect } from "@/hooks/useAuth";
 
 export function ConnectButton({}) {
   const { disconnect } = useDisconnect();
@@ -49,7 +49,7 @@ export function ConnectButton({}) {
               if (!connected) {
                 return (
                   <Button
-                    variant="destructive"
+                    variant='destructive'
                     onClick={() => {
                       openConnectModal();
                       mixpanel.track("Connect Wallet", { status: "init" });
@@ -62,7 +62,7 @@ export function ConnectButton({}) {
 
               if (chain.unsupported) {
                 return (
-                  <Button variant="outline" onClick={openChainModal}>
+                  <Button variant='outline' onClick={openChainModal}>
                     Wrong network
                   </Button>
                 );
@@ -94,23 +94,23 @@ const UserButton = forwardRef(function UserButton(
 ) {
   return (
     <Button
-      variant="outline"
+      variant='outline'
       icon={() =>
         ensAvatar ? (
           <Image
             alt={displayName}
             width={24}
             height={24}
-            className="size-6 rounded-full mr-2"
+            className='size-6 rounded-full mr-2'
             src={ensAvatar}
           />
         ) : (
-          <div className="bg-gray-200 size-6 mr-2 rounded-full" />
+          <div className='bg-gray-200 size-6 mr-2 rounded-full' />
         )
       }
     >
       {displayName}
-      <ChevronDown className="size-4 ml-2" />
+      <ChevronDown className='size-4 ml-2' />
     </Button>
   );
 });

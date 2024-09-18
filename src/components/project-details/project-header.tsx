@@ -1,9 +1,11 @@
+import { Organization } from "@/__generated__/api/agora.schemas";
 import { Heading } from "@/components/ui/headings";
 import Image from "next/image";
 
-export function ProjectHeader({ profileAvatarUrl, name, projectCoverImageUrl }: { profileAvatarUrl?: string; name?: string; projectCoverImageUrl?: string }) {
+export function ProjectHeader({ profileAvatarUrl, name, projectCoverImageUrl, organization }: { profileAvatarUrl?: string; name?: string; projectCoverImageUrl?: string; organization?: Organization }) {
+  const { organizationAvatarUrl, name: orgName } = organization ?? {};
   return (
-    <>
+    <div className="flex flex-col gap-6">
       {projectCoverImageUrl && profileAvatarUrl ? (
         <div className="w-full h-56">
           <Image
@@ -23,15 +25,17 @@ export function ProjectHeader({ profileAvatarUrl, name, projectCoverImageUrl }: 
       {name && (
         <Heading variant="h2">{name}</Heading>
       )}
-      <div className="flex items-center gap-2">
-        <p className="font-medium">By</p>
-        {profileAvatarUrl && (
-          <Image className="rounded-full" src={profileAvatarUrl} alt={name || ''} width={30} height={30} />
-        )}
-        {name && (
-          <p className="font-medium">{name}</p>
-        )}
-      </div>
-    </>
+      {organization && (
+        <div className="flex items-center gap-2">
+          <p className="font-medium">By</p>
+          {organizationAvatarUrl && (
+            <Image className="rounded-full" src={organizationAvatarUrl} alt={orgName || ''} width={30} height={30} />
+          )}
+          {orgName && (
+            <p className="font-medium">{orgName}</p>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

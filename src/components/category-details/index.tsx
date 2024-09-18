@@ -1,20 +1,16 @@
 "use client";
 import { Heading } from "@/components/ui/headings";
-import { Category } from "@/data/categories";
+import { categories, Category, CategoryType } from "@/data/categories";
 import { useProjectsByCategory } from "@/hooks/useProjects";
 import Image from "next/image";
 import { Markdown } from "../markdown";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
-import {useSession} from "@/components/auth/sign-message";
-export function CategoryDetails({
-	id,
-	data,
-}: {
-	id: string;
-	data?: Category[];
-}) {
-	const category = data?.find(cat => cat.id === id);
+import { useSession } from "@/hooks/useAuth";
+import { CategoryId } from "@/types/shared";
+
+export function CategoryDetails({ id }: { id: CategoryId }) {
+	const category = categories?.find(cat => cat.id === id);
 	const { data: projects, isPending } = useProjectsByCategory(id);
 	const { name, image, description, eligibility, examples } = category ?? {};
 	const { eligible_projects, note } = eligibility ?? {};

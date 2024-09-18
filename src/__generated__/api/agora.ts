@@ -1013,6 +1013,39 @@ export const updateRetroFundingRoundCategoryAllocation = async (roundId: number,
 
 
 /**
+ * Updates a category budget allocation for a RetroFunding round on Agora. Value is in OP tokens. Min 2M, Max 8M.
+
+ * @summary Updates a budget allocation for a specific RetroFunding ballot
+ */
+export type updateRetroFundingRoundBudgetAllocationResponse = {
+  data: Round5Ballot;
+  status: number;
+}
+
+export const getUpdateRetroFundingRoundBudgetAllocationUrl = (roundId: number,
+    addressOrEnsName: string,
+    budget: number,) => {
+
+
+  return `/api/agora/retrofunding/rounds/${roundId}/ballots/${addressOrEnsName}/budget/${budget}`
+}
+
+export const updateRetroFundingRoundBudgetAllocation = async (roundId: number,
+    addressOrEnsName: string,
+    budget: number, options?: RequestInit): Promise<updateRetroFundingRoundBudgetAllocationResponse> => {
+  
+  return customFetch<Promise<updateRetroFundingRoundBudgetAllocationResponse>>(getUpdateRetroFundingRoundBudgetAllocationUrl(roundId,addressOrEnsName,budget),
+  {      
+    ...options,
+    method: 'POST'
+    
+    
+  }
+);}
+
+
+
+/**
  * Updates the distribution method for a specific ballot for a RetroFunding round on Agora.
 
  * @summary Updates the distribution method for a specific RetroFunding ballot

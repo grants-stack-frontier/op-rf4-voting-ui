@@ -16,12 +16,13 @@ import { useProjectsByCategory } from "@/hooks/useProjects";
 import Link from "next/link";
 import { ManualDialog } from "../common/manual-dialog";
 import { Skeleton } from "../ui/skeleton";
+import { CategoryId } from "@/types/shared";
 
 export function ProjectsSidebar({
   id,
   data,
 }: {
-  id: string;
+  id: CategoryId;
   data?: Category[];
 }) {
   const { data: projects, isPending } = useProjectsByCategory(id);

@@ -13,12 +13,11 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useDisconnect } from "../auth/sign-message";
 import { Progress } from "../ui/progress";
 import { useBallotRound5Context } from "./provider5";
+import { useDisconnect } from "@/hooks/useAuth";
 
 export function EmptyBallot() {
-  const [isOpen, setOpen] = useState(false);
   const { ballot } = useBallotRound5Context();
   const quantities = useMemo(() => {
     if (ballot) {
