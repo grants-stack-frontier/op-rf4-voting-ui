@@ -25,8 +25,8 @@ const foundationGrants = [
 export default function BudgetBallotPage() {
   return (
     <BudgetProvider>
-      <div className='flex flex-row'>
-        <section className='flex-grow max-w-[740px] space-y-6'>
+      <div className='flex flex-row gap-12'>
+        <section className='flex-grow max-w-[720px] space-y-6'>
           <BallotTabs />
           <p className='text-gray-600'>
             Decide on the budget for this round, and then decide how much should
@@ -42,7 +42,7 @@ export default function BudgetBallotPage() {
           </Card>
           <PageView title={"budget-ballot"} />
         </section>
-        <aside className='w-96 ml-4 sticky top-4 h-[60vh]'>
+        <aside className='w-[304px] sticky top-4 h-[60vh]'>
           <InfoBox
             totalBudget={8000000}
             roundNumber={5}
