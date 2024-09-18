@@ -1,6 +1,6 @@
 "use client";
 import { NumericFormat } from "react-number-format";
-import { CheckCircle2Icon, CheckCircleIcon, CircleCheckIcon, InfoIcon, LucideCircleCheck, LucideCircleCheckBig, Minus, Plus, Trash2 } from "lucide-react";
+import { CheckCircle2Icon, CheckCircleIcon, CircleCheckIcon, FileQuestionIcon, InfoIcon, LucideCircleCheck, LucideCircleCheckBig, MessageCircleQuestionIcon, Minus, Plus, Trash2 } from "lucide-react";
 import { Heading } from "@/components/ui/headings";
 import { useEffect, useState } from "react";
 
@@ -163,7 +163,7 @@ export function MetricsEditor() {
           <Card
             key={index}
             className={cn("cursor-pointer", {
-              "border-2 border-blue-500": distributionMethod === method.method
+              "border-2 border-[#BCBFCD]": distributionMethod === method.method
             })}
             onClick={() => {
               // setSelectedMethod(method.method);
@@ -186,7 +186,12 @@ export function MetricsEditor() {
               </div>
               <HoverCard>
                 <HoverCardTrigger>
-                  <InfoIcon className="h-4 w-4" />
+                  <svg width="16" height="16" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path 
+                      d="M7.00016 13.6673C3.31826 13.6673 0.333496 10.6825 0.333496 7.00065C0.333496 3.31875 3.31826 0.333984 7.00016 0.333984C10.682 0.333984 13.6668 3.31875 13.6668 7.00065C13.6668 10.6825 10.682 13.6673 7.00016 13.6673ZM6.3335 9.00065V10.334H7.66683V9.00065H6.3335ZM7.66683 7.90405C8.63063 7.61718 9.3335 6.72432 9.3335 5.66732C9.3335 4.37865 8.28883 3.33398 7.00016 3.33398C5.86816 3.33398 4.92441 4.14011 4.7117 5.20962L6.01936 5.47116C6.11056 5.0128 6.51503 4.66732 7.00016 4.66732C7.55243 4.66732 8.00016 5.11503 8.00016 5.66732C8.00016 6.21958 7.55243 6.66732 7.00016 6.66732C6.63196 6.66732 6.3335 6.96578 6.3335 7.33398V8.33398H7.66683V7.90405Z" 
+                      fill="#BCBFCD"
+                    />
+                  </svg>
                 </HoverCardTrigger>
                 <HoverCardContent className="border-rounded-md text-xs text-center py-1 px-2 drop-shadow-md">
                   {method.description}

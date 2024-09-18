@@ -216,7 +216,7 @@ function YourBallot() {
             return (
               <div
                 key={proj.project_id}
-                className='flex justify-between flex-1 border-b gap-1 py-4'
+                className={`flex justify-between flex-1 border-b gap-1 py-4 ${i === 0 ? "pt-0" : ""}`}
                 draggable='true'
                 onDragStart={(e) => {
                   e.dataTransfer.setData("text/plain", JSON.stringify({ index: i, id: proj.project_id }));
@@ -237,10 +237,6 @@ function YourBallot() {
                             {proj.name}
                           </p>
                         </Link>
-                        {/* <p>
-                          {projects?.find(p => p.id === proj.project_id)?.category}
-                          {projects?.find(p => p.id === proj.project_id||p.applicationId === proj.project_id)?.applicationCategory}
-                        </p> */}
                         <p className='text-sm text-gray-600 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
                           {projects?.find(p => p.applicationId?.toLowerCase() === proj.project_id?.toLowerCase())?.description ?? "No description"}
                         </p>
@@ -251,11 +247,11 @@ function YourBallot() {
                     </div>
                   </div>
                   <div className='flex gap-2'>
-                    <div className='flex justify-center items-center rounded-md border-2 w-10 h-10'>
+                    <div className='flex justify-center items-center rounded-md w-[42px] h-[40px] bg-[#F2F3F8] text-[#636779]'>
                       {i + 1}
                     </div>
                     <div
-                      className='flex justify-center items-center rounded-md border-2 w-10 h-10 cursor-move'
+                      className='flex justify-center items-center rounded-md w-[42px] h-[40px] cursor-move bg-[#F2F3F8] text-[#636779]'
                       onDragOver={(e) => {
                         e.preventDefault();
                       }}
