@@ -2,7 +2,7 @@
 import { PropsWithChildren, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
-import { ArrowDown } from "lucide-react";
+import { RiArrowDownLine } from "@remixicon/react";
 import { useIntersection } from "react-use";
 import AvatarPlaceholder from "../../../public/avatar-placeholder.svg";
 import { Badge } from "../ui/badge";
@@ -57,7 +57,7 @@ export function ProjectsSidebar({
                   --
                 </ProjectItem>
               ))}
-          {projects?.map((item) => (
+          {projects?.map((item: Project) => (
             <Link key={item.name} href={`/project/${item.id}`}>
               <ProjectItem  {...item}>
                 {item.name}
@@ -70,7 +70,7 @@ export function ProjectsSidebar({
               variant="outline"
               className="animate-in fade-in zoom-in absolute bottom-2 left-1/2 -translate-x-1/2 bg-white"
             >
-              More <ArrowDown className="ml-2 size-3 " />
+              More <RiArrowDownLine className="ml-2 size-3 " />
             </Badge>
           )}
         </ScrollArea>

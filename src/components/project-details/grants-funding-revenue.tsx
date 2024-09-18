@@ -1,5 +1,5 @@
 import { ProjectGrantsAndFunding } from "@/__generated__/api/agora.schemas";
-import { CircleDollarSign, Clock3, Link2 } from "lucide-react";
+import { RiLink, RiMoneyDollarCircleFill, RiTimeFill } from "@remixicon/react";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "../../../public/logo.png";
@@ -22,7 +22,7 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
                 {grant && <p className="truncate max-w-[200px] text-sm">Grant: {grant}</p>}
                 {link && (
                   <Link href={link} className="flex items-center gap-2 hover:underline" target="_blank">
-                    <Link2 className="h-4 w-4 -rotate-45" /> <p className="truncate max-w-[200px] text-sm font-medium leading-5">{link}</p>
+                    <RiLink className="h-5 w-5" /> <p className="truncate max-w-[200px] text-sm font-medium leading-5">{link}</p>
                   </Link>
                 )}
                 {formattedAmount && (
@@ -33,7 +33,7 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
                 )}
                 {date && (
                   <div className="flex items-center gap-2 text-sm font-medium leading-5">
-                    <Clock3 className="h-4 w-4" />
+                    <RiTimeFill className="h-5 w-5" />
                     {date}
                   </div>
                 )}
@@ -51,7 +51,7 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
                 {grant && <p className="truncate max-w-[200px] text-sm">Grant: {grant}</p>}
                 {link && (
                   <Link href={link} className="flex items-center gap-2 hover:underline" target="_blank">
-                    <Link2 className="h-4 w-4 -rotate-45" /> <p className="truncate max-w-[200px] text-sm font-medium leading-5">{link}</p>
+                    <RiLink className="h-5 w-5" /> <p className="truncate max-w-[200px] text-sm font-medium leading-5">{link}</p>
                   </Link>
                 )}
                 {formattedAmount && (
@@ -62,7 +62,7 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
                 )}
                 {date && (
                   <div className="flex items-center gap-2 text-sm font-medium leading-5">
-                    <Clock3 className="h-4 w-4" />
+                    <RiTimeFill className="h-5 w-5" />
                     {date}
                   </div>
                 )}
@@ -85,10 +85,10 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
                 <CardContent className="px-2.5 py-3">
                   <span>Funding:</span>
                   <div className="flex items-center gap-2">
-                    <CircleDollarSign className="h-4 w-4" /> <p>{amount || ''}</p>
+                    <RiMoneyDollarCircleFill className="h-4 w-4" /> <p>{amount || ''}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Clock3 className="h-4 w-4" /> <p>{year}</p>
+                    <RiTimeFill className="h-5 w-5" /> <p>{year}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -99,10 +99,10 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
               <>
                 <span>Funding:</span>
                 <div className="flex items-center gap-2">
-                  <CircleDollarSign className="h-4 w-4" /> <p>{amount || ''}</p>
+                  <RiMoneyDollarCircleFill className="h-4 w-4" /> <p>{amount || ''}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock3 className="h-4 w-4" /> <p>{year}</p>
+                  <RiTimeFill className="h-5 w-5" /> <p>{year}</p>
                 </div>
               </>
             }>
@@ -123,7 +123,7 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
                 <CardContent className="px-2.5 py-3">
                   <span>Revenue:</span>
                   <div className="flex items-center gap-2">
-                    <CircleDollarSign className="h-4 w-4" /> <p>{amount || ''}</p>
+                    <RiMoneyDollarCircleFill className="h-4 w-4" /> <p>{amount || ''}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -134,7 +134,7 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
               <>
                 <span>Revenue:</span>
                 <div className="flex items-center gap-2">
-                  <CircleDollarSign className="h-4 w-4" /> <p>{amount || ''}</p>
+                  <RiMoneyDollarCircleFill className="h-4 w-4" /> <p>{amount || ''}</p>
                 </div>
               </>
             }>

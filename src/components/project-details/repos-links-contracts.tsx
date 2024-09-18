@@ -1,5 +1,5 @@
 import { ProjectContractsItem, ProjectGithubItem } from "@/__generated__/api/agora.schemas";
-import { Github, Link2 } from "lucide-react";
+import { RiGithubFill, RiLink } from "@remixicon/react";
 import Image from "next/image";
 import Link from "next/link";
 import Logo from "../../../public/logo.png";
@@ -26,9 +26,9 @@ export function ReposLinksContracts({ github, links, contracts }: ReposLinksCont
             value={typedRepo.name ?? ''}
             trigger={
               <div className="flex items-center gap-2 text-sm font-medium leading-5">
-                <Github className="h-4 w-4" />
+                <RiGithubFill className="h-5 w-5" />
                 <Link className="hover:underline" href={typedRepo.url} target="_blank">
-                  {typedRepo.name ?? typedRepo.url}
+                  {typedRepo.name || typedRepo.url}
                 </Link>
               </div>
             }
@@ -47,9 +47,9 @@ export function ReposLinksContracts({ github, links, contracts }: ReposLinksCont
             value={typedLink.url ?? ''}
             trigger={
               <div className="flex items-center gap-2 text-sm font-medium leading-5">
-                <Link2 className="h-4 w-4 -rotate-45" />
+                <RiLink className="h-5 w-5" />
                 <Link className="hover:underline" href={typedLink.url} target="_blank">
-                  {typedLink.name ?? typedLink.url}
+                  {typedLink.name || typedLink.url}
                 </Link>
               </div>
             }
