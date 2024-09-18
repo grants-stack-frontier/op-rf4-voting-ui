@@ -6,6 +6,8 @@ import { BudgetForm } from "@/components/budget/budget-form";
 import { BudgetProvider } from "@/components/budget/provider";
 import { InfoBox } from "@/components/budget/info-box";
 import { Separator } from "@/components/ui/separator";
+import { DisconnectedState } from "@/components/common/disconnected-state";
+import { useAccount } from "wagmi";
 
 const foundationGrants = [
   {
@@ -23,6 +25,16 @@ const foundationGrants = [
 ];
 
 export default function BudgetBallotPage() {
+  const { isConnecting, isConnected } = useAccount();
+
+  if (isConnecting) {
+    return null;
+  }
+
+  if (!isConnected) {
+    return <DisconnectedState />;
+  }
+
   return (
     <BudgetProvider>
       <div className='flex flex-row gap-12'>
