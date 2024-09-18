@@ -29,8 +29,12 @@ export function useBudget(roundId: number) {
       return getRetroFundingRoundBallotById(roundId, address).then(
         (response: getRetroFundingRoundBallotByIdResponse) => {
           const ballot = response.data as Round5Ballot;
+          console.log('ballot', ballot)
           const allocations = ballot.category_allocations;
-          return allocations as RetroFundingBallotCategoriesAllocation[];
+          return {
+            budget: ballot.budget,
+            allocations: allocations as RetroFundingBallotCategoriesAllocation[]
+          };
         }
       );
     },

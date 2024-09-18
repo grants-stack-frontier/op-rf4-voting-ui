@@ -346,14 +346,18 @@ offset?: OffsetParamParameter;
 sort?: GetDelegatesSort;
 };
 
-export type RetroFunding5BallotSubmissionBallotContentProjectsAllocationItem = { [key: string]: unknown };
+export type RetroFunding5BallotSubmissionContentProjectsAllocationItem = { [key: string]: unknown };
 
-export type RetroFunding5BallotSubmissionBallotContentCategoryAllocationItem = { [key: string]: unknown };
+export type RetroFunding5BallotSubmissionContentCategoryAllocationItem = { [key: string]: unknown };
 
-export type RetroFunding5BallotSubmissionBallotContent = {
-  category_allocation?: RetroFunding5BallotSubmissionBallotContentCategoryAllocationItem[];
-  projects_allocation?: RetroFunding5BallotSubmissionBallotContentProjectsAllocationItem[];
-};
+/**
+ * @summary Fields required for ballot submission
+ */
+export interface RetroFunding5BallotSubmissionContent {
+  budget?: number;
+  category_allocation?: RetroFunding5BallotSubmissionContentCategoryAllocationItem[];
+  projects_allocation?: RetroFunding5BallotSubmissionContentProjectsAllocationItem[];
+}
 
 /**
  * An object containing the information required to submit a ballot.
@@ -365,7 +369,7 @@ export interface RetroFunding5BallotSubmission {
    * @summary Address or ENS of the ballot caster
    */
   address?: string;
-  ballot_content?: RetroFunding5BallotSubmissionBallotContent;
+  ballot_content?: RetroFunding5BallotSubmissionContent;
   /**
    * Badgeholder's signature of the contents of their ballot.
 
@@ -471,9 +475,12 @@ export interface Round5Ballot {
    * @summary Address of the voter
    */
   address?: string;
+  /** Budget allocation selected by voter. This is a integer between 2,000,000 and 8,000,000.
+ */
+  budget?: number;
   category_allocations?: RetroFundingBallotCategoriesAllocation[];
   created_at?: string;
-  distribution_method?: string;
+  payload_for_signature?: RetroFunding5BallotSubmissionContent;
   projects_allocations?: RetroFundingBallot5ProjectsAllocation[];
   /** Projects that haven't been evaluated by the voter. This is a list of project IDs.
  */
