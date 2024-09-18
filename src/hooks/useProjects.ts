@@ -1,7 +1,6 @@
 'use client';
 
 import {
-	getProjectsResponse,
 	getRetroFundingRoundProjectById,
 	getRetroFundingRoundProjectByIdResponse,
 	getRetroFundingRoundProjects,
@@ -12,9 +11,10 @@ import { GetRetroFundingRoundProjectsCategory, PageMetadata, Project, RetroFundi
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
 import { ImpactScore } from './useProjectScoring';
+import { CategoryType } from '@/data/categories';
+import { CategoryId } from '@/types/shared';
 
-const categoryMap: Record<any, string> = {
-	all: 'all',
+const categoryMap: Record<CategoryType, string> = {
 	ETHEREUM_CORE_CONTRIBUTIONS: 'eth_core',
 	OP_STACK_RESEARCH_AND_DEVELOPMENT: 'op_tooling',
 	OP_STACK_TOOLING: 'op_rnd',
@@ -36,7 +36,7 @@ export function useProjects() {
 	});
 }
 
-export function useProjectsByCategory(categoryId: GetRetroFundingRoundProjectsCategory) {
+export function useProjectsByCategory(categoryId: CategoryId) {
 	return useQuery({
 		queryKey: ['projects-by-category', categoryId],
 		queryFn: async () =>

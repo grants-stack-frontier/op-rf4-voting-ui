@@ -1,4 +1,5 @@
 "use client";
+import { GetRetroFundingRoundProjectsCategory } from "@/__generated__/api/agora.schemas";
 import { useBallotRound5Context } from "@/components/ballot/provider5";
 import { UnlockBallotDialog } from "@/components/ballot/unlock-ballot";
 import { ConflictOfInterestDialog } from "@/components/common/conflict-of-interest-dialog";
@@ -17,6 +18,7 @@ import { toast } from "@/components/ui/use-toast";
 import { HttpStatusCode } from "@/enums/http-status-codes";
 import { ImpactScore, useProjectScoring } from "@/hooks/useProjectScoring";
 import { useProjectById, useProjectsByCategory, useSaveProjectImpact } from "@/hooks/useProjects";
+import { CategoryId } from "@/types/shared";
 import { setProjectsScored } from "@/utils/localStorage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -26,7 +28,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 	const { id } = params;
 	const router = useRouter();
 	const { data: project, isPending: isProjectLoading } = useProjectById(id);
-	const { data: projects, isPending: isProjectsLoading } = useProjectsByCategory(project?.applicationCategory ?? '');
+	const { data: projects, isPending: isProjectsLoading } = useProjectsByCategory(project?.applicationCategory as CategoryId);
 	const [isNextProjectLoading, setIsNextProjectLoading] = useState(false);
 	const [isConflictOfInterestDialogOpen, setIsConflictOfInterestDialogOpen] = useState(false);
 	const { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect } = useProjectScoring(project?.applicationCategory ?? '', project?.applicationId ?? id);

@@ -1,14 +1,15 @@
 "use client";
 import { Heading } from "@/components/ui/headings";
-import { categories, Category } from "@/data/categories";
+import { categories, Category, CategoryType } from "@/data/categories";
 import { useProjectsByCategory } from "@/hooks/useProjects";
 import Image from "next/image";
 import { Markdown } from "../markdown";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
 import { useSession } from "@/hooks/useAuth";
+import { CategoryId } from "@/types/shared";
 
-export function CategoryDetails({ id }: { id: string }) {
+export function CategoryDetails({ id }: { id: CategoryId }) {
 	const category = categories?.find(cat => cat.id === id);
 	const { data: projects, isPending } = useProjectsByCategory(id);
 	const { name, image, description, eligibility, examples } = category ?? {};
