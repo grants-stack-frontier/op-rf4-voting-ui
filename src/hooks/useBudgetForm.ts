@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useCategories } from "@/hooks/useCategories";
 import { useProjects } from "@/hooks/useProjects";
 import { CategoryId } from "@/types/shared";
 import debounce from "lodash.debounce";
 import { calculateBalancedAmounts, isCloseEnough } from "@/lib/budget-helpers";
 import { useBudget } from "./useBudget";
+import { categories } from "@/data/categories";
 
 export function useBudgetForm() {
   const roundId = 5;
 
-  const categories = useCategories();
   const projects = useProjects();
   const { getBudget, saveAllocation, getBudgetAmount } = useBudget(roundId);
   const [totalBudget, setTotalBudget] = useState(8000000); // Default to 8M OP
@@ -76,7 +75,7 @@ export function useBudgetForm() {
   }, [lockedFields]);
 
   useEffect(() => {
-    if (projects.data && categories.data) {
+    if (projects.data && categories) {
       const counts = projects.data.reduce((acc, project) => {
         const categoryId = project.applicationCategory;
         if (categoryId !== undefined) {
@@ -120,10 +119,10 @@ export function useBudgetForm() {
             : prevLockedFields;
         });
       } else {
-        const defaultAllocations = getDefaultAllocations(categories.data);
+        const defaultAllocations = getDefaultAllocations(categories);
         setAllocations(defaultAllocations);
 
-        const defaultLockedFields = categories.data.reduce((acc, category) => {
+        const defaultLockedFields = categories.reduce((acc, category) => {
           acc[category.id] = false;
           return acc;
         }, {} as Record<string, boolean>);
@@ -139,16 +138,10 @@ export function useBudgetForm() {
                 Number(allocation.allocation),
               ])
             )
-          : getDefaultAllocations(categories.data)
+          : getDefaultAllocations(categories)
       );
     }
-  }, [
-    projects.data,
-    categories.data,
-    getBudget.data,
-    getDefaultAllocations,
-    checkTotalAllocation,
-  ]);
+  }, [projects.data, getBudget.data, getDefaultAllocations, checkTotalAllocation]);
 
   const debouncedSaveAllocation = useRef(
     debounce(
@@ -254,8 +247,6 @@ export function useBudgetForm() {
   const isLoading =
     getBudget.isLoading ||
     getBudget.isFetching ||
-    categories.isLoading ||
-    categories.isFetching ||
     projects.isLoading ||
     projects.isFetching ||
     getBudgetAmount.isLoading ||
@@ -263,7 +254,7 @@ export function useBudgetForm() {
     saveAllocation.isPending;
 
   return {
-    categories: categories.data,
+    categories: categories,
     countPerCategory,
     allocations,
     lockedFields,
