@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { Info, ArrowDown } from "lucide-react";
+import { RiArrowDownLine, RiErrorWarningFill } from "@remixicon/react";
+import { useRef } from "react";
 
 interface FoundationGrant {
   title: string;
@@ -52,8 +52,8 @@ export function InfoBox({
 
   return (
     <div className='relative p-6 bg-white rounded-lg border border-gray-200 h-full flex flex-col'>
-      <div className='bg-black rounded-full p-0 inline-flex items-center justify-center mb-4 w-fit'>
-        <Info className='w-5 h-5 text-white' />
+      <div className='p-0 inline-flex items-center justify-center mb-4 w-fit'>
+        <RiErrorWarningFill className='w-6 h-6' />
       </div>
       <div className='flex items-center mb-6'>
         <h2 className='text-lg font-semibold text-gray-900'>
@@ -121,7 +121,7 @@ export function InfoBox({
         <span className='text-[12px] leading-[16px] font-medium text-gray-600'>
           More
         </span>
-        <ArrowDown className='w-3 h-3 text-gray-600' />
+        <RiArrowDownLine className='w-3 h-3 text-gray-600' />
       </button>
     </div>
   );

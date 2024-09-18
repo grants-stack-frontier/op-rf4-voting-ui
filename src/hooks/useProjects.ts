@@ -48,7 +48,6 @@ export function useProjects(params?: ProjectsParams) {
 }
 
 export function useProjectsByCategory(categoryId: CategoryId) {
-	console.log({ categoryId, categoryMap: categoryMap[categoryId] });
 	return useQuery({
 		queryKey: ['projects-by-category', categoryId],
 		queryFn: async () =>

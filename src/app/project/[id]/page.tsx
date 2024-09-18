@@ -1,4 +1,5 @@
 "use client";
+import { Project } from "@/__generated__/api/agora.schemas";
 import { useBallotRound5Context } from "@/components/ballot/provider5";
 import { UnlockBallotDialog } from "@/components/ballot/unlock-ballot";
 import { ConflictOfInterestDialog } from "@/components/common/conflict-of-interest-dialog";
@@ -49,14 +50,14 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 					throw new Error("Project ID is undefined");
 				}
 				await saveProjectImpact({ projectId: project?.applicationId ?? id, impact: score }, {
-					onSuccess: async (data) => {
+					onSuccess: async (data: any) => {
 						if (data.status === HttpStatusCode.OK) {
 							const { updatedProjectsScored, allProjectsScored } = await handleScoreSelect(score, totalProjects);
 							setProjectsScored(updatedProjectsScored);
 							setIsNextProjectLoading(false);
 
 							if (!allProjectsScored && projects) {
-								const currentIndex = projects.findIndex(p => p.applicationId === id);
+								const currentIndex = projects.findIndex((p: Project) => p.applicationId === id);
 								const nextIndex = (currentIndex + 1) % totalProjects;
 								const nextProjectId = projects[nextIndex].applicationId;
 								if (nextProjectId) {
@@ -68,7 +69,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 							toast({ variant: 'destructive', title: "Error saving project impact" });
 						}
 					},
-					onError: (error) => {
+					onError: (error: Error) => {
 						if (error instanceof Error) {
 							setIsNextProjectLoading(false);
 							toast({ variant: 'destructive', title: error.message });
@@ -80,7 +81,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 				toast({ variant: 'destructive', title: 'Error saving project impact' });
 			}
 		} else if (score === 'Skip' && projects) {
-			const currentIndex = projects.findIndex(p => p.applicationId === id);
+			const currentIndex = projects.findIndex((p: Project) => p.applicationId === id);
 			const nextIndex = (currentIndex + 1) % totalProjects;
 			const nextProjectId = projects[nextIndex].applicationId;
 			if (nextProjectId) {

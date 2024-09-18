@@ -1,5 +1,5 @@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { ChevronRight } from "lucide-react";
+import { RiArrowRightSLine } from "@remixicon/react";
 import Image from "next/image";
 import { useState } from "react";
 import { Button } from "../ui/button";
@@ -40,7 +40,7 @@ export function AvatarCarousel({ images }: { images: { url: string; name: string
 					className="-ml-2 h-7 w-7 text-sm border-0 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full"
 					aria-label="Next"
 				>
-					<ChevronRight className="h-4 w-4" />
+					<RiArrowRightSLine className="h-4 w-4" />
 				</Button>
 			)}
 			<ContributorsDialog isOpen={contributorsDialogOpen} setOpen={setContributorsDialogOpen} contributors={images} />
