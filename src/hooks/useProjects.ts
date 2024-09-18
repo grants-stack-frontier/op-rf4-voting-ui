@@ -8,10 +8,17 @@ import {
 	getRetroFundingRoundProjectsResponse,
 	updateRetroFundingRoundProjectImpact,
 } from '@/__generated__/api/agora';
-import { PageMetadata, Project } from '@/__generated__/api/agora.schemas';
+import { GetRetroFundingRoundProjectsCategory, PageMetadata, Project, RetroFundingBallotCategoriesAllocationCategorySlug } from '@/__generated__/api/agora.schemas';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
 import { ImpactScore } from './useProjectScoring';
+
+const categoryMap: Record<any, string> = {
+	all: 'all',
+	ETHEREUM_CORE_CONTRIBUTIONS: 'eth_core',
+	OP_STACK_RESEARCH_AND_DEVELOPMENT: 'op_tooling',
+	OP_STACK_TOOLING: 'op_rnd',
+};
 
 export type ProjectsResponse = {
 	metadata?: PageMetadata;
@@ -22,7 +29,18 @@ export function useProjects() {
 	return useQuery({
 		queryKey: ['projects'],
 		queryFn: async () =>
-			getRetroFundingRoundProjects(5).then((results: getRetroFundingRoundProjectsResponse) => {
+			getRetroFundingRoundProjects(5, { limit: 100 }).then((results: getRetroFundingRoundProjectsResponse) => {
+				const res: ProjectsResponse = results.data;
+				return res.data;
+			}),
+	});
+}
+
+export function useProjectsByCategory(categoryId: GetRetroFundingRoundProjectsCategory) {
+	return useQuery({
+		queryKey: ['projects-by-category', categoryId],
+		queryFn: async () =>
+			getRetroFundingRoundProjects(5, { limit: 100, category: categoryMap[categoryId] as GetRetroFundingRoundProjectsCategory }).then((results: getRetroFundingRoundProjectsResponse) => {
 				const res: ProjectsResponse = results.data;
 				return res.data;
 			}),
@@ -36,17 +54,6 @@ export function useSaveProjectImpact() {
 		mutationFn: async ({ projectId, impact }: { projectId: string; impact: ImpactScore }) => {
 			return updateRetroFundingRoundProjectImpact(5, address as string, projectId, impact as number);
 		},
-	});
-}
-
-export function useProjectsByCategory(categoryId: string) {
-	return useQuery({
-		queryKey: ['projects-by-category', categoryId],
-		queryFn: async () =>
-			getRetroFundingRoundProjects(5).then((results: getRetroFundingRoundProjectsResponse) => {
-				const res: ProjectsResponse = results.data;
-				return res.data?.filter((p) => p.applicationCategory === categoryId);
-			}),
 	});
 }
 
