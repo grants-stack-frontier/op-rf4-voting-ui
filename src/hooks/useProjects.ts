@@ -25,11 +25,22 @@ export type ProjectsResponse = {
 	data?: Project[];
 };
 
-export function useProjects() {
+export interface ProjectsParams {
+	limit?: number;
+	offset?: number;
+	category?: GetRetroFundingRoundProjectsCategory;
+}
+
+export function useProjects(params?: ProjectsParams) {
+	const { limit, offset, category } = params ?? {};
 	return useQuery({
 		queryKey: ['projects'],
 		queryFn: async () =>
-			getRetroFundingRoundProjects(5, { limit: 100 }).then((results: getRetroFundingRoundProjectsResponse) => {
+			getRetroFundingRoundProjects(5, {
+				limit: limit ?? 100,
+				offset,
+				category: category ?? 'all'
+			}).then((results: getRetroFundingRoundProjectsResponse) => {
 				const res: ProjectsResponse = results.data;
 				return res.data;
 			}),

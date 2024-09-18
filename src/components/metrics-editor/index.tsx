@@ -1,8 +1,8 @@
 "use client";
 import { NumericFormat } from "react-number-format";
-import { InfoIcon, Minus, Plus, Trash2 } from "lucide-react";
+import { CheckCircle2Icon, CheckCircleIcon, CircleCheckIcon, InfoIcon, LucideCircleCheck, LucideCircleCheckBig, Minus, Plus, Trash2 } from "lucide-react";
 import { Heading } from "@/components/ui/headings";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,24 @@ import mixpanel from "@/lib/mixpanel";
 import { DistributionChart } from "../metrics/distribution-chart";
 import { Card } from "../ui/card";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-import { DistributionMethod, useDistributionMethod } from "@/hooks/useBallotRound5";
+import { DistributionMethod, getDistributionMethodFromLocalStorage, saveDistributionMethodToLocalStorage, useDistributionMethod } from "@/hooks/useBallotRound5";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+
+
+export function BlueCircleCheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path 
+        d="M6.99992 13.6673C3.31802 13.6673 0.333252 10.6825 0.333252 7.00065C0.333252 3.31875 3.31802 0.333984 6.99992 0.333984C10.6818 0.333984 13.6666 3.31875 13.6666 7.00065C13.6666 10.6825 10.6818 13.6673 6.99992 13.6673ZM6.33499 9.66732L11.0491 4.95327L10.1063 4.01046L6.33499 7.78172L4.44939 5.89605L3.50658 6.83892L6.33499 9.66732Z" 
+        fill="#3374DB"
+      />
+    </svg>
+  )
+}
 
 export function MetricsEditor({
   onAllocationMethodSelect,
@@ -26,6 +43,13 @@ export function MetricsEditor({
 }) {
   const { state, inc, dec, set, remove } = useBallotContext();
   const { mutate: saveDistributionMethod } = useDistributionMethod();
+
+  useEffect(() => {
+    const method = getDistributionMethodFromLocalStorage();
+    if (method) {
+      setSelectedMethod(method);
+    }
+  }, [!!window]);
 
   const { sorted } = useSortBallot(state);
 
@@ -54,22 +78,6 @@ export function MetricsEditor({
     }));
   };
 
-  // const distributeImpactGroups = (numPoints: number = 40): { x: number; y: number }[] => {
-  //   const initialValue = 100;
-  //   const numOfGroups = 5;
-  //   let group = 0;
-  //   return Array.from({ length: numPoints }, (_, i) => {
-  //     const mod = i % numOfGroups;
-  //     if (mod === 0) {
-  //       group++;
-  //     }
-  //     return {
-  //       x: i,
-  //       y: Math.round(linearDecline(i, initialValue))
-  //     }
-  //   });
-  // };
-
   // Dummy data for the allocation methods
   const allocationMethods = [
     {
@@ -88,43 +96,29 @@ export function MetricsEditor({
       // data: distributeImpactGroups(),
       formatChartTick: (tick: number) => `${tick}k`,
       name: "Impact groups",
-      description: "blah blah blah",
+      description: "Reward allocation is proportionate and even among projects with the same impact score.",
       method: DistributionMethod.IMPACT_GROUPS,
     },
     {
-      // data: [
-      //   {x: 0, y: 340},
-      //   {x: 10, y: 255},
-      //   {x: 20, y: 170},
-      //   {x: 30, y: 85},
-      //   {x: 40, y: 0},
-      // ],
       data: distributeTopToBottomLinear(),
       formatChartTick: (tick: number) => `${tick}k`,
       name: "Top to bottom",
-      description: "blah blah blah",
+      description: "Reward allocation is directly proportionate to stack rankings.",
       method: DistributionMethod.TOP_TO_BOTTOM,
     },
     {
-      // data: [
-      //   {x: 0, y: 400},
-      //   {x: 10, y: 100},
-      //   {x: 20, y: 50},
-      //   {x: 30, y: 30},
-      //   {x: 40, y: 20},
-      // ],
       data: distributeTopWeighted(),
       formatChartTick: (tick: number) => `${tick}k`,
       name: "Top weighted",
-      description: "blah blah blah",
+      description: "Reward allocation is weighted toward projects at the top of your ballot.",
       method: DistributionMethod.TOP_WEIGHTED,
     },
     {
       data: [],
       formatChartTick: (tick: number) => `--k`,
       name: "Custom",
-      description: "blah blah blah",
-      method: "CUSTOM", // To Do: Change to enum
+      description: "Reward allocation is weighed heavily towards projects with higher percentages.",
+      method: "CUSTOM",
     },
   ]
   const allocationAmount = "3,333,333";
@@ -146,11 +140,19 @@ export function MetricsEditor({
         <p>First, review your project rankings in the list below.</p>
         <p>Then, choose a method to easily allocate rewards across prjects. You can also customize percentages at any time.</p>
         <p>OP calculations in this ballot are based on your budget of {allocationAmount} OP</p>
+        {/* TO DO: CHANGE ALLOCATION AMOUNT TO ACTUAL BUDGET!!! */}
       </div>
 
       <div className="flex flex-row justify-between items-end">
         <p className="font-semibold mb-2">Allocation method</p>
-        <p className="font-semibold mb-2 text-sm">None selected</p>
+        {!selectedMethod && (
+          <div className="flex flex-row items-center mb-2 gap-1">
+            <BlueCircleCheckIcon />
+            <p className="font-semibold text-sm">
+              None selected
+            </p>
+          </div>
+        )}
       </div>
       <div className="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-4">
         {allocationMethods.map((method, index) => (
@@ -161,7 +163,7 @@ export function MetricsEditor({
             })}
             onClick={() => {
               setSelectedMethod(method.method);
-              // onAllocationMethodSelect(method.data);
+              saveDistributionMethodToLocalStorage(method.method);
               if (
                 method.method === DistributionMethod.IMPACT_GROUPS
                 || method.method === DistributionMethod.TOP_TO_BOTTOM
@@ -173,8 +175,18 @@ export function MetricsEditor({
           >
             <DistributionChart data={method.data} formatChartTick={method.formatChartTick} />
             <div className="mb-2 mx-4 flex flex-row justify-between items-center">
-              <p className="font-bold text-sm">{method.name}</p>
-              <InfoIcon className="h-4 w-4" />
+              <div className="flex flex-row items-center gap-1">
+                {method.method === selectedMethod && <BlueCircleCheckIcon />}
+                <p className="font-bold text-sm">{method.name}</p>
+              </div>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <InfoIcon className="h-4 w-4" />
+                </HoverCardTrigger>
+                <HoverCardContent className="border-rounded-md text-xs text-center py-1 px-2 drop-shadow-md">
+                  {method.description}
+                </HoverCardContent>
+              </HoverCard>
             </div>
           </Card>
         ))}
