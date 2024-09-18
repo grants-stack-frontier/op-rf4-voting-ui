@@ -9,17 +9,17 @@ export function ProjectHeader({ profileAvatarUrl, name, projectCoverImageUrl, or
       {projectCoverImageUrl && profileAvatarUrl ? (
         <div className="w-full h-56">
           <Image
-            className="rounded-md w-full h-[180px] object-cover"
+            className="rounded-md w-full h-[180px] object-cover border border-gray-200 bg-white"
             src={projectCoverImageUrl}
             alt={name || ''}
             width={720}
             height={180}
           />
-          <Image className="rounded-md -mt-10 ml-6" src={profileAvatarUrl} alt={name || ''} width={80} height={80} />
+          <Image className="rounded-md -mt-10 ml-6 object-cover" src={profileAvatarUrl} alt={name || ''} width={80} height={80} />
         </div>
       ) : profileAvatarUrl && (
         <div className="w-full">
-          <Image className="rounded-md" src={profileAvatarUrl} alt={name || ''} width={80} height={80} />
+          <Image className="rounded-md object-cover" src={profileAvatarUrl} alt={name || ''} width={80} height={80} />
         </div>
       )}
       {name && (

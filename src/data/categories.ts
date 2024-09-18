@@ -23,7 +23,7 @@ export type Category = {
 	examples: string[];
 	eligibility: {
 		eligible_projects: string[];
-		note: string;
+		not_eligible_projects: string[];
 	};
 	projects: {
 		name: string;
@@ -51,7 +51,11 @@ export const categories: Category[] = [
 				'Languages that are dedicated to the development of smart contracts',
 				'Research that informs Ethereum core development',
 			],
-			note: 'Projects that are used to develop or deploy contracts or apps, including in the development and deployment of Optimism contracts, may be rewarded in Retro Funding 7: Dev Tooling, and are not in scope for this category.',
+			not_eligible_projects: [
+				'Projects that are used to develop or deploy contracts or apps, including in the development and deployment of Optimism contracts, may be rewarded in Retro Funding 7: Dev Tooling, and are not in scope for this category.',
+				'Extended Ethereum related tooling that is not listed under eligibility, including analytics/data infrastructure, frontend libraries, indexers and more. These may be rewarded in Retro Funding 7: Dev Tooling and are not in scope for this category.',
+				'Generic Ethereum related research that does not inform Ethereum core development',
+			],
 		},
 		projects: [
 			{
@@ -78,7 +82,10 @@ export const categories: Category[] = [
 				'Research or development that introduces new features, improvements, or capabilities to the OP Stack.',
 				'Security audits specifically on the OP Stack or its components.',
 			],
-			note: 'Only Optimism Monorepo contributions by core devs may be rewarded within Retro Funding 5. Commits to the monorepo are currently mainly done by Optimism core devs and the core dev program is not developed enough to support outside contributions to the monorepo yet. As the core dev program evolves, more contributions to the monorepo may become eligible.',
+			not_eligible_projects: [
+				'Optimism Monorepo contributions by non-core devs: Only Optimism Monorepo 11 contributions by core devs may be rewarded within Retro Funding 5. Commits to the monorepo are currently mainly done by Optimism core devs and the core dev program is not developed enough to support outside contributions to the monorepo yet. As the core dev program evolves, more contributions to the monorepo may become eligible.',
+				'Submissions to the Optimism Bug Bounty Programs are not eligible to participate in this round.',
+			],
 		},
 		projects: [
 			{
@@ -104,7 +111,11 @@ export const categories: Category[] = [
 				'Services for deploying and hosting an OP Chain',
 				'Documentation and tutorials which aid in understanding of the OP Stack’s components and its development',
 			],
-			note: '',
+			not_eligible_projects: [
+				'Projects that are used to develop or deploy contracts or apps, including in the development and deployment of Optimism contracts, may be rewarded in Retro Funding 7: Dev Tooling, and are not in scope for this category.',
+				'Extended tooling that is not listed under eligibility, including analytics/data infrastructure, frontend libraries, indexers and more. These may be rewarded in Retro Funding 7: Dev Tooling and are not in scope for this category.',
+				'Documentation and tutorials which are not about the OP Stack’s components or development, such as non technical tutorials about Optimism.',
+			],
 		},
 		projects: [
 			{

@@ -7,17 +7,17 @@ import {
 	getRetroFundingRoundProjectsResponse,
 	updateRetroFundingRoundProjectImpact,
 } from '@/__generated__/api/agora';
-import { GetRetroFundingRoundProjectsCategory, PageMetadata, Project, RetroFundingBallotCategoriesAllocationCategorySlug } from '@/__generated__/api/agora.schemas';
+import { GetRetroFundingRoundProjectsCategory, PageMetadata, Project } from '@/__generated__/api/agora.schemas';
+import { CategoryType } from '@/data/categories';
+import { CategoryId } from '@/types/shared';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
 import { ImpactScore } from './useProjectScoring';
-import { CategoryType } from '@/data/categories';
-import { CategoryId } from '@/types/shared';
 
 const categoryMap: Record<CategoryType, string> = {
 	ETHEREUM_CORE_CONTRIBUTIONS: 'eth_core',
-	OP_STACK_RESEARCH_AND_DEVELOPMENT: 'op_tooling',
-	OP_STACK_TOOLING: 'op_rnd',
+	OP_STACK_RESEARCH_AND_DEVELOPMENT: 'op_rnd',
+	OP_STACK_TOOLING: 'op_tooling',
 };
 
 export type ProjectsResponse = {
@@ -48,10 +48,14 @@ export function useProjects(params?: ProjectsParams) {
 }
 
 export function useProjectsByCategory(categoryId: CategoryId) {
+	console.log({ categoryId, categoryMap: categoryMap[categoryId] });
 	return useQuery({
 		queryKey: ['projects-by-category', categoryId],
 		queryFn: async () =>
-			getRetroFundingRoundProjects(5, { limit: 100, category: categoryMap[categoryId] as GetRetroFundingRoundProjectsCategory }).then((results: getRetroFundingRoundProjectsResponse) => {
+			getRetroFundingRoundProjects(5, {
+				limit: 100,
+				category: categoryMap[categoryId] as GetRetroFundingRoundProjectsCategory,
+			}).then((results: getRetroFundingRoundProjectsResponse) => {
 				const res: ProjectsResponse = results.data;
 				return res.data;
 			}),
@@ -77,7 +81,7 @@ export function useProjectById(projectId: string) {
 			// 	const filtered = res.data?.filter((p) => p.projectId === projectId);
 			// 	return filtered?.[0];
 			// }),
-      getRetroFundingRoundProjectById(5, projectId).then((results: getRetroFundingRoundProjectByIdResponse) => {
+			getRetroFundingRoundProjectById(5, projectId).then((results: getRetroFundingRoundProjectByIdResponse) => {
 				return results.data;
 			}),
 	});

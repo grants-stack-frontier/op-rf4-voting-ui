@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Logo from "../../../public/logo.png";
 import { CustomAccordion } from "../custom-accordion";
+import { Heading } from "../ui/headings";
 
 interface ReposLinksContractsProps {
   github?: ProjectGithubItem[];
@@ -16,7 +17,7 @@ export function ReposLinksContracts({ github, links, contracts }: ReposLinksCont
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="font-medium">Repos, links and contracts</p>
+      <Heading variant="h1">Repos, links and contracts</Heading>
       {github?.map((repo, index) => {
         const typedRepo = repo as { name: string, url: string, description: string };
         return (

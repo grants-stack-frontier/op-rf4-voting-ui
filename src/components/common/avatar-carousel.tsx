@@ -20,7 +20,7 @@ export function AvatarCarousel({ images }: { images: { url: string; name: string
 					<TooltipProvider key={index}>
 						<Tooltip delayDuration={url ? 0 : 1000000}>
 							<TooltipTrigger asChild>
-								<Image className="rounded-full h-6 w-6" src={url ?? ''} alt={name ?? ''} width={28} height={28} />
+								<Image className="rounded-full h-6 w-6 object-cover" src={url ?? ''} alt={name ?? ''} width={28} height={28} />
 							</TooltipTrigger>
 							<TooltipContent
 								className="max-w-[300px] text-center text-xs"

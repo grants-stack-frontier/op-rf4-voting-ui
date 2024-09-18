@@ -11,21 +11,19 @@ import { Heading } from "../ui/headings";
 import { ScrollArea } from "../ui/scroll-area";
 
 import { Project } from "@/__generated__/api/agora.schemas";
-import { Category } from "@/data/categories";
 import { useProjectsByCategory } from "@/hooks/useProjects";
+import { CategoryId } from "@/types/shared";
 import Link from "next/link";
 import { ManualDialog } from "../common/manual-dialog";
 import { Skeleton } from "../ui/skeleton";
-import { CategoryId } from "@/types/shared";
 
 export function ProjectsSidebar({
   id,
-  data,
 }: {
   id: CategoryId;
-  data?: Category[];
 }) {
   const { data: projects, isPending } = useProjectsByCategory(id);
+  console.log({ id, projects })
   const intersectionRef = useRef(null);
   const intersection = useIntersection(intersectionRef, {
     root: null,
@@ -35,23 +33,22 @@ export function ProjectsSidebar({
 
   return (
     <Card
-      className={cn("w-[300px] sticky top-8", {
+      className={cn("w-[300px] h-[620px] p-6 sticky top-8", {
         ["opacity-50 animate-pulse"]: isPending,
       })}
     >
-      <div className="p-3">
-        {data && projects?.length && (
-          <>
-            {projects?.length > 1 ? (
-              <Heading variant="h3">There are {projects?.length} projects in this category</Heading>
-            ) : (
-              <Heading variant="h3">There are no projects in this category</Heading>
-            )}
-          </>
-        )}
-      </div>
+      {projects?.length && (
+        <>
+          {projects?.length > 1 ? (
+            <Heading variant="h3" className="leading-6">There are {projects?.length} projects in this category</Heading>
+          ) : (
+            <Heading variant="h3" className="leading-6">There are no projects in this category</Heading>
+          )}
+        </>
+      )}
+
       <div className="p-3 space-y-2">
-        <ScrollArea className="h-[328px] relative">
+        <ScrollArea className="h-[508px] relative">
           {isPending &&
             Array(8)
               .fill(0)
