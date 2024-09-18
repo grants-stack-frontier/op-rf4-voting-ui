@@ -65,11 +65,12 @@ function formatAllocationOPAmount(amount: number) {
 }
 
 const impactScores: { [key: number]: string } = {
-  1: "Very low",
-  2: "Low",
-  3: "Medium",
-  4: "High",
-  5: "Very high",
+  0: "Conflict of interest",
+  1: "Very low impact",
+  2: "Low impact",
+  3: "Medium impact",
+  4: "High impact",
+  5: "Very high impact",
 };
 
 const totalAllocationAmount = 3_333_333;
@@ -125,22 +126,34 @@ function YourBallot() {
   console.log({ projects });
 
   const [projectList, setProjectList] = useState<ProjectAllocationState[]>(
-    sortAndPrepProjects(ballot?.project_allocations || [])
+    sortAndPrepProjects(ballot?.project_allocations || [], 'no-conflict')
+  );
+  const [conflicts, setConflicts] = useState<ProjectAllocationState[]>(
+    sortAndPrepProjects(ballot?.project_allocations || [], 'conflict')
   );
 
   useEffect(() => {
     console.log("Ballot updated:", ballot?.project_allocations);
-    setProjectList(sortAndPrepProjects(ballot?.project_allocations || []));
+    setProjectList(sortAndPrepProjects(ballot?.project_allocations || [], 'no-conflict'));
+    setConflicts(sortAndPrepProjects(ballot?.project_allocations || [], 'conflict'));
   }, [ballot]);
 
-  function sortAndPrepProjects(newProjects: Round5ProjectAllocation[]): ProjectAllocationState[] {
-    return newProjects
+  type Filter = 'conflict' | 'no-conflict'
+  function sortAndPrepProjects(newProjects: Round5ProjectAllocation[], filter?: Filter): ProjectAllocationState[] {
+    const projects = newProjects
       .sort((a, b) => a.position - b.position)
       .map(p => ({
         ...p,
         allocationInput: p.allocation.toString(),
       })
     )
+    if (filter === 'conflict') {
+      return projects.filter(p => p.impact === 0);
+    }
+    if (filter === 'no-conflict') {
+      return projects.filter(p => p.impact !== 0);
+    }
+    return projects;
   };
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -216,7 +229,7 @@ function YourBallot() {
             return (
               <div
                 key={proj.project_id}
-                className={`flex justify-between flex-1 border-b gap-1 py-4 ${i === 0 ? "pt-0" : ""}`}
+                className={`flex justify-between flex-1 border-b gap-1 py-6 ${i === 0 ? "pt-0" : ""}`}
                 draggable='true'
                 onDragStart={(e) => {
                   e.dataTransfer.setData("text/plain", JSON.stringify({ index: i, id: proj.project_id }));
@@ -344,6 +357,49 @@ function YourBallot() {
           />
         )}
       </Card>
+      {conflicts.length > 0 && (
+        <>
+        <h1 className="text-lg font-bold pt-6">Conflicts of interest</h1>
+        {conflicts.map((proj, i) => {
+          return (
+            <div
+              key={proj.project_id}
+              className={`flex justify-between flex-1 border-b gap-1 py-6`}
+              draggable='true'
+              onDragStart={(e) => {
+                e.dataTransfer.setData("text/plain", JSON.stringify({ index: i, id: proj.project_id }));
+              }}
+            >
+              <div className='flex items-start justify-between flex-grow'>
+                <div className='flex items-start gap-1'>
+                  <div
+                    className='size-12 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0'
+                    style={{
+                      backgroundImage: `url(${proj.image})`,
+                    }}
+                  />
+                  <div className='flex flex-col gap-1 ml-4'>
+                    <div>
+                      <Link href={`/project/${proj.project_id}`}>
+                        <p className='font-semibold truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
+                          {proj.name}
+                        </p>
+                      </Link>
+                      <p className='text-sm text-gray-600 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
+                        {projects?.find(p => p.applicationId?.toLowerCase() === proj.project_id?.toLowerCase())?.description ?? "No description"}
+                      </p>
+                    </div>
+                    <div className='text-muted-foreground text-xs'>
+                      You marked: {impactScores[proj.impact]}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        </>
+      )}
     </div>
   );
 }
