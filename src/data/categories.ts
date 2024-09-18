@@ -3,10 +3,6 @@ import ethCore from '../../public/eth_core.svg';
 import opRnd from '../../public/op_rnd.svg';
 import opTooling from '../../public/op_tooling.svg';
 
-export const getCategories = async () => {
-	return categories;
-};
-
 export enum CategoryType {
 	ETHEREUM_CORE_CONTRIBUTIONS = 'ETHEREUM_CORE_CONTRIBUTIONS',
 	OP_STACK_RESEARCH_AND_DEVELOPMENT = 'OP_STACK_RESEARCH_AND_DEVELOPMENT',
@@ -35,7 +31,7 @@ export type Category = {
 	}[];
 };
 
-const categories: Category[] = [
+export const categories: Category[] = [
 	{
 		id: CategoryType.ETHEREUM_CORE_CONTRIBUTIONS,
 		name: 'Ethereum Core Contributions',

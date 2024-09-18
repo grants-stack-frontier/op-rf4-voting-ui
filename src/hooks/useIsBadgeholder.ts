@@ -1,4 +1,4 @@
-import { useSession } from "@/components/auth/sign-message";
+import { useSession } from "./useAuth";
 
 export function useIsBadgeholder() {
   const { data: session } = useSession();

@@ -1,35 +1,24 @@
 "use client";
 
-import { SiweMessage } from "siwe";
 import ky from "ky";
 import { decodeJwt } from "jose";
-import {
-  useAccount,
-  useChainId,
-  useDisconnect as useWagmiDisconnect,
-  useSignMessage,
-} from "wagmi";
+import { useAccount, useDisconnect as useWagmiDisconnect } from "wagmi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../ui/button";
 
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
 import { getToken, setToken } from "@/lib/token";
 import { useRouter } from "next/navigation";
 import mixpanel from "@/lib/mixpanel";
 import { Address } from "viem";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 
-import ApprovedEmoji from "../../../public/approved.png";
-import DeniedEmoji from "../../../public/denied.png";
-import { getVoterConfirmationView, removeVoterConfirmationView } from "./sign-message";
+import { UnifiedDialog } from "./unified-dialog";
+
+import React from "react";
+import {
+  getVoterConfirmationView,
+  removeVoterConfirmationView,
+} from "@/hooks/useAuth";
 
 export function VoterConfirmationDialog() {
   const { data: session } = useSession();
@@ -42,114 +31,95 @@ export function VoterConfirmationDialog() {
   }
 
   useEffect(() => {
-    setViewable(getVoterConfirmationView())
-  }, [address, session])
+    setViewable(getVoterConfirmationView());
+  }, [address, session]);
 
+  if (!viewable || !address || !session) return null;
+
+  if (!session.isBadgeholder) {
+    return <VoterIsNotBadgeholder onClose={closeViewable} />;
+  }
+
+  if (!session.category) {
+    return <VoterIsNotSelected onClose={closeViewable} />;
+  }
+
+  return <VoterIsSelected onClose={closeViewable} />;
+}
+
+function VoterIsSelected({ onClose }: { onClose: () => void }) {
   return (
-    <Dialog open={address && !!session && viewable}>
-      {!session?.isBadgeholder && <VoterIsNotBadgeholder onClose={closeViewable} />}
-      {(session?.isBadgeholder && !session?.category) && <VoterIsNotSelected onClose={closeViewable} />}
-      {(session?.isBadgeholder && session?.category) && <VoterIsSelected onClose={closeViewable} />}
-    </Dialog>
+    <UnifiedDialog
+      open={true}
+      onClose={onClose}
+      title="You've been selected to vote in this round of Retro Funding"
+      description="You're in a special group of badgeholders and guest voters participating in this round. Thanks in advance for your efforts."
+      emoji='✅'
+    >
+      <Button
+        type='button'
+        className='w-full'
+        variant='destructive'
+        onClick={onClose}
+      >
+        Continue
+      </Button>
+    </UnifiedDialog>
   );
 }
 
-function VoterIsSelected(props: any) {
-  return (
-    <DialogContent>
-      <DialogHeader>
-        <div className="flex justify-center items-center mb-4">
-          <Image src={ApprovedEmoji} alt="badge" width={50} height={50}/>
-        </div>
-        <DialogTitle>You&apos;ve been selected to vote in this round of Retro Funding</DialogTitle>
-        <DialogDescription>You&apos;re in a special group of badgeholders and guest voters participating in this round. Thanks in advance for your efforts.</DialogDescription>
-      </DialogHeader>
-      <div className="space-y-2">
-        <Button
-          type="button"
-          className="w-full"
-          variant={"destructive"}
-          onClick={() => {
-            props.onClose();
-          }}
-        >
-          Continue
-        </Button>
-      </div>
-    </DialogContent>
-  )
-}
-
-function VoterIsNotSelected(props: any) {
+function VoterIsNotSelected({ onClose }: { onClose: () => void }) {
   const { disconnect } = useDisconnect();
   return (
-    <DialogContent>
-      <DialogHeader>
-        <div className="flex justify-center items-center mb-4">
-          <Image src={DeniedEmoji} alt="badge" width={50} height={50}/>
-        </div>
-        <DialogTitle>You weren&apos;t selected to vote in this round of Retro Funding</DialogTitle>
-        <DialogDescription>Thanks for being a badgeholder, and we&apos;ll see you in the next round of Retro Funding.</DialogDescription>
-      </DialogHeader>
-      <div className="space-y-2">
+    <UnifiedDialog
+      open={true}
+      onClose={onClose}
+      title="You weren't selected to vote in this round of Retro Funding"
+      description="Thanks for being a badgeholder, and we'll see you in the next round of Retro Funding."
+      emoji='🛑'
+    >
+      <div className='space-y-2'>
         <Button
-          type="button"
-          className="w-full"
-          variant={"destructive"}
-          onClick={() => {
-            disconnect?.();
-          }}
+          type='button'
+          className='w-full'
+          variant='destructive'
+          onClick={() => disconnect?.()}
         >
           Disconnect wallet
         </Button>
-        <Button
-          className="w-full"
-          variant="outline"
-          onClick={() => {
-            props.onClose();
-          }}
-        >
+        <Button className='w-full' variant='outline' onClick={onClose}>
           Explore the app
         </Button>
       </div>
-    </DialogContent>
-  )
+    </UnifiedDialog>
+  );
 }
 
-function VoterIsNotBadgeholder(props: any) {
+function VoterIsNotBadgeholder({ onClose }: { onClose: () => void }) {
   const { disconnect } = useDisconnect();
   return (
-    <DialogContent>
-      <DialogHeader>
-        <div className="flex justify-center items-center mb-4">
-          <Image src={DeniedEmoji} alt="badge" width={50} height={50}/>
-        </div>
-        <DialogTitle>You&apos;re not a badgeholder</DialogTitle>
-        <DialogDescription>Feel free to explore the app, but you won&apos;t be able to use all features or submit a ballot.</DialogDescription>
-      </DialogHeader>
-      <div className="space-y-2">
+    <UnifiedDialog
+      open={true}
+      onClose={onClose}
+      title="You're not a badgeholder"
+      description="Feel free to explore the app, but you won't be able to use all features or submit a ballot."
+      emoji='🛑'
+    >
+      <div className='space-y-2'>
         <Button
-          type="button"
-          className="w-full"
-          variant={"destructive"}
-          onClick={() => {
-            disconnect?.();
-          }}
+          type='button'
+          className='w-full'
+          variant='destructive'
+          onClick={() => disconnect?.()}
         >
           Disconnect wallet
         </Button>
-        <Button
-          className="w-full"
-          variant="outline"
-          onClick={() => {
-            props.onClose();
-          }}
-        >
+        <Button className='w-full' variant='outline' onClick={onClose}>
           Explore the app
         </Button>
       </div>
-    </DialogContent>
-  )
+    </UnifiedDialog>
+  );
 }
 
 function useNonce() {
@@ -200,9 +170,11 @@ export function useSession() {
     queryFn: async () => {
       const accessToken = getToken();
       const user = accessToken
-        ? decodeJwt<{ siwe: { address: Address }; isBadgeholder?: boolean, category?: string }>(
-            accessToken
-          )
+        ? decodeJwt<{
+            siwe: { address: Address };
+            isBadgeholder?: boolean;
+            category?: string;
+          }>(accessToken)
         : null;
 
       if (user) {
