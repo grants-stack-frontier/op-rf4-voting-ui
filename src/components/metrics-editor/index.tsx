@@ -23,6 +23,9 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
+import { useVotingCategory } from "@/hooks/useVotingCategory";
+import { useBallotRound5Context } from "../ballot/provider5";
+import { useBudgetContext } from "../budget/provider";
 
 
 export function BlueCircleCheckIcon() {
@@ -36,13 +39,28 @@ export function BlueCircleCheckIcon() {
   )
 }
 
+function formatNumberWithCommas(number: number): string {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 export function MetricsEditor({
   onAllocationMethodSelect,
 }: {
   onAllocationMethodSelect?: (data: { x: number; y: number }[]) => void;
 }) {
-  const { state, inc, dec, set, remove } = useBallotContext();
+  const { ballot } = useBallotRound5Context();
   const { mutate: saveDistributionMethod } = useDistributionMethod();
+  const votingCategory = useVotingCategory();
+  const { totalBudget } = useBudgetContext();
+
+  const budget = useMemo(() => {
+    if (ballot && votingCategory) {
+      const portion = ballot.category_allocations.find((c) => c.category_slug === votingCategory)?.allocation;
+      return formatNumberWithCommas(Math.round(totalBudget * (portion || 0) / 100));
+      // return formatNumberWithCommas(totalBudget);
+    }
+    return "0";
+  }, [ballot, votingCategory]);
 
   useEffect(() => {
     const method = getDistributionMethodFromLocalStorage();
@@ -50,8 +68,6 @@ export function MetricsEditor({
       setSelectedMethod(method);
     }
   }, [!!window]);
-
-  const { sorted } = useSortBallot(state);
 
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
 
@@ -139,7 +155,7 @@ export function MetricsEditor({
       <div className=" flex flex-col gap-4 py-4 text-sm">
         <p>First, review your project rankings in the list below.</p>
         <p>Then, choose a method to easily allocate rewards across prjects. You can also customize percentages at any time.</p>
-        <p>OP calculations in this ballot are based on your budget of {allocationAmount} OP</p>
+        <p>OP calculations in this ballot are based on your budget of {budget} OP</p>
         {/* TO DO: CHANGE ALLOCATION AMOUNT TO ACTUAL BUDGET!!! */}
       </div>
 

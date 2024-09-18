@@ -42,6 +42,7 @@ import { ManualDialog } from "../../components/common/manual-dialog";
 import { MetricsEditor } from "../../components/metrics-editor";
 import { CategoryId } from "@/types/shared";
 import { useProjects } from "@/hooks/useProjects";
+import { useVotingCategory } from "@/hooks/useVotingCategory";
 
 function formatAllocationOPAmount(amount: number) {
   const value = amount.toString();
@@ -117,6 +118,7 @@ function YourBallot() {
   const { mutate: saveAllocation } = useSaveRound5Allocation();
   const { mutate: savePosition } = useSaveRound5Position();
   const { data: projects } = useProjects();
+  const votingCategory = useVotingCategory();
 
   console.log({ ballot });
   console.log({ projects });
@@ -205,8 +207,8 @@ function YourBallot() {
       {/* TO DO: Change to category based on badgeholder */}
       <p>
         Your voting category is{" "}
-        <a href={`/category/${categoryIds[0]}`} className='underline'>
-          {categoryNames[categoryIds[0]]}
+        <a href={`/category/${votingCategory}`} className='underline'>
+          {votingCategory ? categoryNames[votingCategory as CategoryId] : "Unknown"}
         </a>{" "}
         ({projectList.length} projects)
       </p>
