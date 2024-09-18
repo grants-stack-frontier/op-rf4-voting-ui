@@ -179,6 +179,30 @@ export function getDistributionMethodFromLocalStorage(): DistributionMethod | st
   return null;
 };
 
+export function useDistributionMethodFromLocalStorage() {
+  const queryClient = useQueryClient();
+
+  const getDistributionMethod = useQuery({
+    queryKey: ['distribution-method-local-storage'],
+    queryFn: () => getDistributionMethodFromLocalStorage(),
+    initialData: getDistributionMethodFromLocalStorage,
+  });
+
+  const update = useMutation({
+    mutationKey: ['update-distribution-method-local-storage'],
+    mutationFn: async (method: DistributionMethod) => {
+      saveDistributionMethodToLocalStorage(method);
+      queryClient.setQueryData(["distribution-method-local-storage"], method);
+    },
+  });
+
+  return {
+    ...getDistributionMethod,
+    update: update.mutate,
+  };
+}
+
+
 export function useDistributionMethod() {
   const { address } = useAccount();
   // return useQuery({

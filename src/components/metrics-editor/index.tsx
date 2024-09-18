@@ -17,7 +17,7 @@ import mixpanel from "@/lib/mixpanel";
 import { DistributionChart } from "../metrics/distribution-chart";
 import { Card } from "../ui/card";
 import { Separator } from "@radix-ui/react-dropdown-menu";
-import { DistributionMethod, getDistributionMethodFromLocalStorage, saveDistributionMethodToLocalStorage, useDistributionMethod } from "@/hooks/useBallotRound5";
+import { DistributionMethod, saveDistributionMethodToLocalStorage, useDistributionMethod, useDistributionMethodFromLocalStorage } from "@/hooks/useBallotRound5";
 import {
   HoverCard,
   HoverCardContent,
@@ -43,13 +43,10 @@ function formatNumberWithCommas(number: number): string {
   return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-export function MetricsEditor({
-  onAllocationMethodSelect,
-}: {
-  onAllocationMethodSelect?: (data: { x: number; y: number }[]) => void;
-}) {
+export function MetricsEditor() {
   const { ballot } = useBallotRound5Context();
   const { mutate: saveDistributionMethod } = useDistributionMethod();
+  const { data: distributionMethod, refetch } = useDistributionMethodFromLocalStorage();
   const votingCategory = useVotingCategory();
   const { totalBudget } = useBudgetContext();
 
@@ -60,16 +57,7 @@ export function MetricsEditor({
       // return formatNumberWithCommas(totalBudget);
     }
     return "0";
-  }, [ballot, votingCategory]);
-
-  useEffect(() => {
-    const method = getDistributionMethodFromLocalStorage();
-    if (method) {
-      setSelectedMethod(method);
-    }
-  }, [!!window]);
-
-  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+  }, [ballot, votingCategory, totalBudget]);
 
   const exponentialDecay = (x: number, initialValue: number = 100, decayRate: number = 0.1): number => {
     return initialValue * Math.exp(-decayRate * x);
@@ -161,7 +149,7 @@ export function MetricsEditor({
 
       <div className="flex flex-row justify-between items-end">
         <p className="font-semibold mb-2">Allocation method</p>
-        {!selectedMethod && (
+        {!distributionMethod && (
           <div className="flex flex-row items-center mb-2 gap-1">
             <BlueCircleCheckIcon />
             <p className="font-semibold text-sm">
@@ -175,10 +163,10 @@ export function MetricsEditor({
           <Card
             key={index}
             className={cn("cursor-pointer", {
-              "border-2 border-blue-500": selectedMethod === method.method
+              "border-2 border-blue-500": distributionMethod === method.method
             })}
             onClick={() => {
-              setSelectedMethod(method.method);
+              // setSelectedMethod(method.method);
               saveDistributionMethodToLocalStorage(method.method);
               if (
                 method.method === DistributionMethod.IMPACT_GROUPS
@@ -187,12 +175,13 @@ export function MetricsEditor({
               ) {
                 saveDistributionMethod(method.method);
               }
+              refetch();
             }}
           >
             <DistributionChart data={method.data} formatChartTick={method.formatChartTick} />
             <div className="mb-2 mx-4 flex flex-row justify-between items-center">
               <div className="flex flex-row items-center gap-1">
-                {method.method === selectedMethod && <BlueCircleCheckIcon />}
+                {method.method === distributionMethod && <BlueCircleCheckIcon />}
                 <p className="font-bold text-sm">{method.name}</p>
               </div>
               <HoverCard>

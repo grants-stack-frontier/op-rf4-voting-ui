@@ -29,13 +29,14 @@ import {
   useRound5BallotWeightSum,
   useSaveRound5Allocation,
   useSaveRound5Position,
+  useDistributionMethodFromLocalStorage,
 } from "@/hooks/useBallotRound5";
 import { useIsBadgeholder } from "@/hooks/useIsBadgeholder";
 import { formatDate } from "@/lib/utils";
 import { ArrowDownToLineIcon, LoaderIcon, Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { ComponentProps, useEffect, useState } from "react";
+import { ComponentProps, useEffect, useMemo, useState } from "react";
 import { NumericFormat } from "react-number-format";
 import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
 import { ManualDialog } from "../../components/common/manual-dialog";
@@ -142,16 +143,6 @@ function YourBallot() {
     )
   };
 
-  // const handleAllocationMethodSelect = (data: { x: number; y: number }[]) => {
-  //   const totalAllocation = data.reduce((sum, point) => sum + point.y, 0);
-  //   const newProjectList = projectList.map((project, index) => ({
-  //     ...project,
-  //     allocation:
-  //       index < data.length ? (data[index].y / totalAllocation) * 100 : 0,
-  //   }));
-  //   setProjectList(newProjectList);
-  // };
-
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProjects, setFilteredProjects] = useState<
     ProjectAllocationState[]
@@ -213,9 +204,7 @@ function YourBallot() {
         ({projectList.length} projects)
       </p>
       <Card className='p-6 space-y-8'>
-        <MetricsEditor
-          // onAllocationMethodSelect={handleAllocationMethodSelect}
-        />
+        <MetricsEditor />
         <SearchInput
           className='my-2'
           placeholder='Search projects...'
@@ -227,7 +216,7 @@ function YourBallot() {
             return (
               <div
                 key={proj.project_id}
-                className='flex justify-between flex-1 border-b gap-1 py-2'
+                className='flex justify-between flex-1 border-b gap-1 py-4'
                 draggable='true'
                 onDragStart={(e) => {
                   e.dataTransfer.setData("text/plain", JSON.stringify({ index: i, id: proj.project_id }));
@@ -252,7 +241,7 @@ function YourBallot() {
                           {projects?.find(p => p.id === proj.project_id)?.category}
                           {projects?.find(p => p.id === proj.project_id||p.applicationId === proj.project_id)?.applicationCategory}
                         </p> */}
-                        <p className='text-sm text-gray-400 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
+                        <p className='text-sm text-gray-600 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
                           {projects?.find(p => p.applicationId?.toLowerCase() === proj.project_id?.toLowerCase())?.description ?? "No description"}
                         </p>
                       </div>
@@ -338,11 +327,12 @@ function YourBallot() {
         {/* <OpenSourceMultiplier initialValue={ballot?.os_multiplier} /> */}
         {/* <Button onClick={() => handleImpactChange(ballot?.projects_to_be_evaluated[0] ?? "", 5)}>Score Impact</Button> */}
 
-        <div className='flex items-center gap-4'>
-          <BallotSubmitButton onClick={() => setSubmitting(true)} />
-
+        <div className='flex flex-col gap-6 mt-6'>
           <WeightsError />
-          <IsSavingBallot />
+          <div className='flex items-center gap-4'>
+            <BallotSubmitButton onClick={() => setSubmitting(true)} />
+            <IsSavingBallot />
+          </div>
         </div>
 
         {ballot?.address && (
@@ -377,7 +367,7 @@ function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
       type='submit'
       onClick={onClick}
     >
-      Submit ballot
+      Submit budget and ballot
     </Button>
   );
 }
@@ -454,12 +444,23 @@ function OpenSourceInput(props: ComponentProps<typeof Input>) {
 
 function WeightsError() {
   const allocationSum = useRound5BallotWeightSum();
+  const remainingAllocation = useMemo(() => {
+    return 100 - allocationSum;
+  }, [allocationSum]);
+
+  const { data: distributionMethod } = useDistributionMethodFromLocalStorage();
+
+  if (!distributionMethod) return (
+    <span className='text-sm text-destructive'>
+      Choose a distribution method at the top of this ballot.
+    </span>
+  );
 
   if (allocationSum === 100) return null;
 
   return (
     <span className='text-sm text-destructive'>
-      Weights must add up to 100%
+      Percentages must equal 100% ({remainingAllocation > 0 ? `add ${remainingAllocation}% to your ballot` : `remove ${Math.abs(remainingAllocation)}% from your ballot`})
     </span>
   );
 }
