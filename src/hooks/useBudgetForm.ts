@@ -7,10 +7,11 @@ import { useBudget } from "./useBudget";
 import { categories } from "@/data/categories";
 import { useAccount } from "wagmi";
 import { updateRetroFundingRoundBudgetAllocation } from "@/__generated__/api/agora";
+import { useSession } from "./useAuth";
 
 export function useBudgetForm() {
   const roundId = 5;
-
+  const { address } = useAccount();
   const projects = useProjects();
   const { getBudget, saveAllocation } = useBudget(roundId);
   const [totalBudget, setTotalBudget] = useState<number>(2000000);
@@ -20,10 +21,25 @@ export function useBudgetForm() {
     Record<string, number>
   >({});
   const [error, setError] = useState("");
-  const { address } = useAccount();
+  const session = useSession();
 
   const allocationsRef = useRef(allocations);
   const lockedFieldsRef = useRef(lockedFields);
+  const hasRefetchedRef = useRef(false);
+
+  // Effect to refetch budget data when the session (token) changes
+  useEffect(() => {
+    if (session.data && !hasRefetchedRef.current) {
+      getBudget.refetch().then(() => {
+        hasRefetchedRef.current = true;
+      });
+    }
+  }, [session.data, getBudget]);
+
+  // Reset the hasRefetchedRef when the session changes
+  useEffect(() => {
+    hasRefetchedRef.current = false;
+  }, [session.data]);
 
   const checkTotalAllocation = useCallback((allocs: Record<string, number>) => {
     const total = Object.values(allocs).reduce((sum, value) => sum + value, 0);

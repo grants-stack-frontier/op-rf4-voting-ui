@@ -24,34 +24,12 @@ interface BudgetContextType {
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
 
 export function BudgetProvider({ children }: React.PropsWithChildren) {
-  const {
-    categories,
-    countPerCategory,
-    allocations,
-    lockedFields,
-    handleValueChange,
-    toggleLock,
-    error,
-    isLoading,
-    totalBudget,
-    setTotalBudget,
-  } = useBudgetForm();
-
-  const value = {
-    categories,
-    countPerCategory,
-    allocations,
-    lockedFields,
-    handleValueChange,
-    toggleLock,
-    error,
-    isLoading,
-    totalBudget,
-    setTotalBudget,
-  };
+  const budgetForm = useBudgetForm();
 
   return (
-    <BudgetContext.Provider value={value}>{children}</BudgetContext.Provider>
+    <BudgetContext.Provider value={budgetForm}>
+      {children}
+    </BudgetContext.Provider>
   );
 }
 
