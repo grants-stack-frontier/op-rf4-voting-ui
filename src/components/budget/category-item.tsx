@@ -3,11 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Category } from "@/data/categories";
-import { RiAddLine, RiArrowRightSLine, RiLockFill, RiLockUnlockFill, RiSubtractLine } from "@remixicon/react";
+import {
+  RiAddLine,
+  RiArrowRightSLine,
+  RiLockFill,
+  RiLockUnlockFill,
+  RiSubtractLine,
+} from "@remixicon/react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useBudgetContext } from "./provider";
+import { categoryMap } from "@/hooks/useProjects";
 
 interface CategoryItemProps {
   category: Category;
@@ -19,7 +26,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
     handleValueChange,
     toggleLock,
     lockedFields,
-    countPerCategory,
+    allProjectsByCategory,
     isLoading,
     totalBudget,
   } = useBudgetContext();
@@ -28,7 +35,10 @@ export function CategoryItem({ category }: CategoryItemProps) {
 
   const allocation = allocations[category.id] || 0;
   const isLocked = lockedFields[category.id] || false;
-  const projectCount = countPerCategory[category.id] || 0;
+  const projectCount =
+    (allProjectsByCategory &&
+      allProjectsByCategory[categoryMap[category.id]].length) ||
+    0;
 
   const formatAllocation = (value: number) =>
     value.toFixed(2).replace(/\.?0+$/, "");
@@ -93,10 +103,11 @@ export function CategoryItem({ category }: CategoryItemProps) {
               type='button'
               size='icon'
               variant='ghost'
-              className={`outline-none ${isLocked
-                ? "bg-secondary hover:bg-secondary"
-                : "hover:bg-transparent"
-                }`}
+              className={`outline-none ${
+                isLocked
+                  ? "bg-secondary hover:bg-secondary"
+                  : "hover:bg-transparent"
+              }`}
               onClick={handleToggleLock}
               disabled={isLoading}
             >
