@@ -19,7 +19,7 @@ import { useDisconnect } from "@/hooks/useAuth";
 import { useVotingCategory } from "@/hooks/useVotingCategory";
 import { categoryNames } from "@/data/categories";
 import { CategoryId } from "@/types/shared";
-import PairwiseLogo from '../../../public/pairwise-logo.png';
+import PairwiseLogo from '../../../public/pairwise.svg';
 import Image from "next/image";
 import { Separator } from "../ui/separator";
 
