@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card"
 import { ImpactScore, scoreLabels } from "@/hooks/useProjectScoring"
 import { cn } from "@/lib/utils"
-import { useCallback } from "react"
+import { useCallback, useMemo } from "react"
 import { Progress } from "../ui/progress"
 
 type CardProps = React.ComponentProps<typeof Card>
@@ -38,6 +38,17 @@ export function ReviewSidebar({
 		}
 	}, [onConflictOfInterest, onScoreSelect]);
 
+	const sortedScores = useMemo(() => {
+		return (Object.entries(scoreLabels) as [ImpactScore, string][])
+			.sort(([scoreA], [scoreB]) => {
+				if (scoreA === 'Skip') return 1;
+				if (scoreB === 'Skip') return -1;
+				return Number(scoreB) - Number(scoreA);
+			})
+			.filter(([score]) => score !== 'Skip')
+			.concat([['Skip', scoreLabels['Skip']] as [ImpactScore, string]]);
+	}, []);
+
 	return (
 		<Card className={cn("w-[304px] h-[560px] sticky top-8", className)} {...props}>
 			<CardHeader>
@@ -47,7 +58,7 @@ export function ReviewSidebar({
 			</CardHeader>
 			<CardContent className="grid gap-4">
 				<div className="flex flex-col gap-2">
-					{(Object.entries(scoreLabels) as [ImpactScore, string][]).map(([score, label]) => (
+					{sortedScores.map(([score, label]) => (
 						<Button
 							key={score}
 							variant={score === "Skip" ? "link" : "outline"}

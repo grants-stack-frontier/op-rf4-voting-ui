@@ -11,7 +11,8 @@ const hostnames = [
 	'i.imgur.com',
 	'imagedelivery.net',
 	'i.seadn.io',
-	'lh3.googleusercontent.com'
+	'lh3.googleusercontent.com',
+	'pbs.twimg.com'
 ];
 
 /** @type {import('next').NextConfig} */

@@ -24,24 +24,31 @@ import { setProjectsScored } from "@/utils/localStorage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
+import { Address } from "viem";
 
 export default function ProjectDetailsPage({ params }: { params: { id: string } }) {
 	const { id } = params;
 	const router = useRouter();
+	const { data: session } = useSession();
 	const { data: project, isPending: isProjectLoading } = useProjectById(id);
 	const { data: projects, isPending: isProjectsLoading } = useProjectsByCategory(project?.applicationCategory as CategoryId);
-	const [isNextProjectLoading, setIsNextProjectLoading] = useState(false);
 	const [isConflictOfInterestDialogOpen, setIsConflictOfInterestDialogOpen] = useState(false);
-	const { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect } = useProjectScoring(project?.applicationCategory ?? '', project?.applicationId ?? id);
+
+	const walletAddress: Address | undefined = useMemo(() => session?.siwe?.address, [session?.siwe?.address]);
+	const { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect } = useProjectScoring(
+		project?.applicationCategory ?? '',
+		project?.applicationId ?? id,
+		walletAddress
+	);
+
 	const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
 	const { ballot } = useBallotRound5Context();
-	const { data: session } = useSession();
 
-	const userCategory = session?.category;
-	const isUserCategory = !!userCategory && !!project?.applicationCategory && userCategory === project?.applicationCategory;
+	const userCategory: CategoryId | undefined = useMemo(() => session?.category as CategoryId | undefined, [session?.category]);
+	const isUserCategory = useMemo(() => !!userCategory && !!project?.applicationCategory && userCategory === project?.applicationCategory, [userCategory, project?.applicationCategory]);
 
 	const handleScore = useCallback(async (score: ImpactScore) => {
-		setIsNextProjectLoading(true);
+		toast({ variant: 'default', title: 'Saving your impact score...' });
 		const totalProjects = projects?.length ?? 0;
 
 		if (score !== 'Skip' && !projectsScored.votedIds.includes(project?.applicationId ?? id)) {
@@ -53,32 +60,29 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 					onSuccess: async (data: any) => {
 						if (data.status === HttpStatusCode.OK) {
 							const { updatedProjectsScored, allProjectsScored } = await handleScoreSelect(score, totalProjects);
-							setProjectsScored(updatedProjectsScored);
-							setIsNextProjectLoading(false);
+							setProjectsScored(project?.applicationCategory ?? '', (walletAddress || undefined) as Address, updatedProjectsScored);
 
 							if (!allProjectsScored && projects) {
 								const currentIndex = projects.findIndex((p: Project) => p.applicationId === id);
 								const nextIndex = (currentIndex + 1) % totalProjects;
 								const nextProjectId = projects[nextIndex].applicationId;
 								if (nextProjectId) {
+									toast({ variant: 'default', title: 'Impact score was saved successfully!' });
 									router.push(`/project/${nextProjectId}`);
 								}
 							}
 						} else {
-							setIsNextProjectLoading(false);
-							toast({ variant: 'destructive', title: "Error saving project impact" });
+							toast({ variant: 'destructive', title: "Error saving impact score" });
 						}
 					},
 					onError: (error: Error) => {
 						if (error instanceof Error) {
-							setIsNextProjectLoading(false);
 							toast({ variant: 'destructive', title: error.message });
 						}
 					}
 				});
 			} catch (error) {
-				setIsNextProjectLoading(false);
-				toast({ variant: 'destructive', title: 'Error saving project impact' });
+				toast({ variant: 'destructive', title: 'Error saving impact score' });
 			}
 		} else if (score === 'Skip' && projects) {
 			const currentIndex = projects.findIndex((p: Project) => p.applicationId === id);
@@ -87,22 +91,18 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 			if (nextProjectId) {
 				router.push(`/project/${nextProjectId}`);
 			}
-			setIsNextProjectLoading(false);
 		} else {
-			setIsNextProjectLoading(false);
 		}
-	}, [projects, project, id, router, handleScoreSelect, saveProjectImpact, projectsScored]);
+	}, [projects, project, id, router, handleScoreSelect, saveProjectImpact, projectsScored, walletAddress]);
 
 	const handleConflictOfInterest = useCallback(() => {
 		setIsConflictOfInterestDialogOpen(true);
 	}, []);
 
 	const handleConflictOfInterestConfirm = useCallback(() => {
-		setIsNextProjectLoading(true);
 		setIsConflictOfInterestDialogOpen(false);
 		handleScore(0);
-		setIsNextProjectLoading(false);
-	}, [handleScore, setIsNextProjectLoading]);
+	}, [handleScore]);
 
 	const currentProject = project;
 	const isLoading = isProjectsLoading || isProjectLoading || !currentProject;
@@ -148,11 +148,10 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 					setOpen={setIsConflictOfInterestDialogOpen}
 					onConfirm={handleConflictOfInterestConfirm}
 				/>
-				<LoadingDialog isOpen={isNextProjectLoading} setOpen={setIsNextProjectLoading} message="Loading next project" />
 				<ProjectDetails data={currentProject} isPending={false} />
 				<PageView title={'project-details'} />
 			</section>
-			{isUserCategory && (
+			{isUserCategory && walletAddress && (
 				<aside className="max-w-[304px]">
 					<ReviewSidebar {...sidebarProps} />
 				</aside>
