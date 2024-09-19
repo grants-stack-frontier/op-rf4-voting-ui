@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useProjects } from "@/hooks/useProjects";
+import { useAllProjectsByCategory, useProjects } from "@/hooks/useProjects";
 import { CategoryId } from "@/types/shared";
 import debounce from "lodash.debounce";
 import { calculateBalancedAmounts, isCloseEnough } from "@/lib/budget-helpers";
@@ -12,14 +12,11 @@ import { useSession } from "./useAuth";
 export function useBudgetForm() {
   const roundId = 5;
   const { address } = useAccount();
-  const projects = useProjects();
+  const allProjectsByCategory = useAllProjectsByCategory();
   const { getBudget, saveAllocation } = useBudget(roundId);
   const [totalBudget, setTotalBudget] = useState<number>(2000000);
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [lockedFields, setLockedFields] = useState<Record<string, boolean>>({});
-  const [countPerCategory, setCountPerCategory] = useState<
-    Record<string, number>
-  >({});
   const [error, setError] = useState("");
   const session = useSession();
 
@@ -96,17 +93,7 @@ export function useBudgetForm() {
   }, [lockedFields]);
 
   useEffect(() => {
-    if (projects.data && categories) {
-      const counts = projects.data.reduce((acc, project) => {
-        const categoryId = project.applicationCategory;
-        if (categoryId !== undefined) {
-          acc[categoryId] = (acc[categoryId] ?? 0) + 1;
-        }
-        return acc;
-      }, {} as Record<string, number>);
-      setCountPerCategory(counts);
-
-      console.log("getBudget?.data", getBudget?.data);
+    if (categories) {
       if (
         getBudget?.data?.allocations &&
         getBudget?.data?.allocations.length > 0
@@ -167,7 +154,6 @@ export function useBudgetForm() {
       );
     }
   }, [
-    projects.data,
     getBudget?.data?.allocations,
     getDefaultAllocations,
     checkTotalAllocation,
@@ -294,13 +280,13 @@ export function useBudgetForm() {
   const isLoading =
     getBudget.isLoading ||
     getBudget.isFetching ||
-    projects.isLoading ||
-    projects.isFetching ||
+    allProjectsByCategory.isLoading ||
+    allProjectsByCategory.isFetching ||
     saveAllocation.isPending;
 
   return {
     categories,
-    countPerCategory,
+    allProjectsByCategory: allProjectsByCategory.data,
     allocations,
     budget: getBudget.data?.budget,
     lockedFields,

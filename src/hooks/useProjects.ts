@@ -18,7 +18,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 import { ImpactScore } from "./useProjectScoring";
 
-const categoryMap: Record<CategoryType, string> = {
+export const categoryMap: Record<CategoryType, string> = {
   ETHEREUM_CORE_CONTRIBUTIONS: "eth_core",
   OP_STACK_RESEARCH_AND_DEVELOPMENT: "op_rnd",
   OP_STACK_TOOLING: "op_tooling",
@@ -122,15 +122,52 @@ export function useProjectById(projectId: string) {
   return useQuery({
     queryKey: ["projects-by-id", projectId],
     queryFn: async () =>
-      // getRetroFundingRoundProjects(5).then((results: getProjectsResponse) => {
-      // 	const res: ProjectsResponse = results.data;
-      // 	const filtered = res.data?.filter((p) => p.projectId === projectId);
-      // 	return filtered?.[0];
-      // }),
       getRetroFundingRoundProjectById(5, projectId).then(
         (results: getRetroFundingRoundProjectByIdResponse) => {
           return results.data;
         }
       ),
+  });
+}
+
+export function useAllProjectsByCategory() {
+  return useQuery({
+    queryKey: ["all-projects-by-category"],
+    queryFn: async () => {
+      const categories = Object.values(categoryMap);
+      const projectsByCategory: Record<string, Project[]> = {};
+
+      for (const category of categories) {
+        let allProjects: Project[] = [];
+        let currentOffset = 0;
+        const pageLimit = 100;
+
+        while (true) {
+          const results: getRetroFundingRoundProjectsResponse =
+            await getRetroFundingRoundProjects(5, {
+              limit: pageLimit,
+              offset: currentOffset,
+              category: category as GetRetroFundingRoundProjectsCategory,
+            });
+
+          const res: ProjectsResponse = results.data;
+
+          if (!res.data || res.data.length === 0) {
+            break;
+          }
+
+          allProjects.push(...res.data);
+          currentOffset += pageLimit;
+
+          if (res.data.length < pageLimit) {
+            break;
+          }
+        }
+
+        projectsByCategory[category] = allProjects;
+      }
+
+      return projectsByCategory;
+    },
   });
 }

@@ -3,10 +3,11 @@ import React, { createContext, useContext } from "react";
 import { Category } from "@/data/categories";
 import { CategoryId } from "@/types/shared";
 import { useBudgetForm } from "@/hooks/useBudgetForm";
+import { Project } from "@/__generated__/api/agora.schemas";
 
 interface BudgetContextType {
   categories: Category[] | undefined;
-  countPerCategory: Record<string, number>;
+  allProjectsByCategory?: Record<string, Project[]>;
   allocations: Record<string, number>;
   lockedFields: Record<string, boolean>;
   handleValueChange: (
