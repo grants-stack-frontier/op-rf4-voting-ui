@@ -17,8 +17,8 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
         const formattedAmount = amount && Number(amount) > 0 ? new Intl.NumberFormat('en-US').format(Number(amount)) : amount;
         if (!details) {
           return (
-            <Card key={index} className="flex flex-col gap-2">
-              <CardContent className="px-2.5 py-3">
+            <Card key={index}>
+              <CardContent className="flex items-center gap-2 px-2.5 py-3">
                 {grant && <p className="truncate max-w-[200px] text-sm">Grant: {grant}</p>}
                 {link && (
                   <Link href={link} className="flex items-center gap-2 hover:underline" target="_blank">
@@ -81,8 +81,8 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
         grantsAndFunding.ventureFunding?.map(({ amount, details, year }, index) => {
           if (!details) {
             return (
-              <Card key={index} className="flex flex-col gap-2">
-                <CardContent className="px-2.5 py-3">
+              <Card key={index}>
+                <CardContent className="flex items-center gap-2 px-2.5 py-3">
                   <span>Funding:</span>
                   <div className="flex items-center gap-2">
                     <RiMoneyDollarCircleFill className="h-4 w-4" /> <p>{amount || ''}</p>
@@ -119,8 +119,8 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
         grantsAndFunding.revenue?.map(({ amount, details }, index) => {
           if (!details) {
             return (
-              <Card key={index} className="flex flex-col gap-2">
-                <CardContent className="px-2.5 py-3">
+              <Card key={index}>
+                <CardContent className="flex items-center gap-2 px-2.5 py-3">
                   <span>Revenue:</span>
                   <div className="flex items-center gap-2">
                     <RiMoneyDollarCircleFill className="h-4 w-4" /> <p>{amount || ''}</p>

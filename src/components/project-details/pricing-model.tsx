@@ -5,20 +5,18 @@ import { Card, CardContent } from "../ui/card";
 export function PricingModel({ pricingModel }: { pricingModel?: string }) {
 	if (!pricingModel) return null;
 
-	if (pricingModel === 'free') {
-		return (
-			<Card className="flex flex-col gap-2 mb-12">
-				<CardContent className="px-2.5 py-3">
-					<div className="capitalize text-sm font-medium leading-5">
-						{pricingModel?.replace(/_/g, ' ') ?? 'N/A'}
-					</div>
-				</CardContent>
-			</Card>
-		);
-	} else {
-		return (
-			<div className="flex flex-col gap-2 mb-12">
-				<Heading variant="h1">Pricing Model</Heading>
+	return (
+		<div className="flex flex-col gap-2 mb-12">
+			<Heading variant="h1">Pricing Model</Heading>
+			{pricingModel === 'free' ? (
+				<Card className="mb-12">
+					<CardContent className="px-2.5 py-3">
+						<div className="capitalize text-sm font-medium leading-5">
+							{pricingModel?.replace(/_/g, ' ') ?? 'N/A'}
+						</div>
+					</CardContent>
+				</Card>
+			) : (
 				<CustomAccordion
 					value={pricingModel ?? ''}
 					trigger={
@@ -27,7 +25,7 @@ export function PricingModel({ pricingModel }: { pricingModel?: string }) {
 						</div>
 					}
 				/>
-			</div>
-		);
-	}
+			)}
+		</div>
+	);
 }

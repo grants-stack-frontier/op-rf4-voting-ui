@@ -13,7 +13,11 @@ interface ReposLinksContractsProps {
 }
 
 export function ReposLinksContracts({ github, links, contracts }: ReposLinksContractsProps) {
-  if ((!github || github.length === 0) && (!links || links.length === 0) && (!contracts || contracts.length === 0)) return null;
+  if (
+    (!github || github.length === 0 || (github.length === 1 && github[0] === '')) &&
+    (!links || links.length === 0) &&
+    (!contracts || contracts.length === 0)
+  ) return null;
 
   return (
     <div className="flex flex-col gap-2">
