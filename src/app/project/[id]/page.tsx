@@ -44,7 +44,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 	const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
 	const { ballot } = useBallotRound5Context();
 
-	const userCategory: CategoryId | undefined = useMemo(() => session?.category, [session?.category]);
+	const userCategory: CategoryId | undefined = useMemo(() => session?.category as CategoryId | undefined, [session?.category]);
 	const isUserCategory = useMemo(() => !!userCategory && !!project?.applicationCategory && userCategory === project?.applicationCategory, [userCategory, project?.applicationCategory]);
 
 	const handleScore = useCallback(async (score: ImpactScore) => {
