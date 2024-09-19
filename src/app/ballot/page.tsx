@@ -42,7 +42,7 @@ import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
 import { ManualDialog } from "../../components/common/manual-dialog";
 import { MetricsEditor } from "../../components/metrics-editor";
 import { CategoryId } from "@/types/shared";
-import { useProjects } from "@/hooks/useProjects";
+import { useProjects, useProjectsByCategory } from "@/hooks/useProjects";
 import { useVotingCategory } from "@/hooks/useVotingCategory";
 
 function formatAllocationOPAmount(amount: number) {
@@ -119,11 +119,13 @@ function YourBallot() {
   const { ballot } = useBallotRound5Context();
   const { mutate: saveAllocation } = useSaveRound5Allocation();
   const { mutate: savePosition } = useSaveRound5Position();
-  const { data: projects } = useProjects();
+  // const { data: projects } = useProjects();
   const votingCategory = useVotingCategory();
+  const { data: projects } = useProjectsByCategory(votingCategory as CategoryId);
 
   console.log({ ballot });
   console.log({ projects });
+  console.log("Diff:", projects?.filter(p => !ballot?.project_allocations.find(p2 => p2.project_id?.toLowerCase() === p.applicationId?.toLowerCase())))
 
   const [projectList, setProjectList] = useState<ProjectAllocationState[]>(
     sortAndPrepProjects(ballot?.project_allocations || [], 'no-conflict')
