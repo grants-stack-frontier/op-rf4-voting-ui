@@ -24,6 +24,7 @@ import { setProjectsScored } from "@/utils/localStorage";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
+import { Address } from "viem";
 
 export default function ProjectDetailsPage({ params }: { params: { id: string } }) {
 	const { id } = params;
@@ -33,7 +34,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 	const { data: projects, isPending: isProjectsLoading } = useProjectsByCategory(project?.applicationCategory as CategoryId);
 	const [isConflictOfInterestDialogOpen, setIsConflictOfInterestDialogOpen] = useState(false);
 
-	const walletAddress = session?.siwe?.address;
+	const walletAddress: Address | undefined = useMemo(() => session?.siwe?.address, [session?.siwe?.address]);
 	const { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect } = useProjectScoring(
 		project?.applicationCategory ?? '',
 		project?.applicationId ?? id,
@@ -43,8 +44,8 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 	const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
 	const { ballot } = useBallotRound5Context();
 
-	const userCategory = session?.category;
-	const isUserCategory = !!userCategory && !!project?.applicationCategory && userCategory === project?.applicationCategory;
+	const userCategory: CategoryId | undefined = useMemo(() => session?.category, [session?.category]);
+	const isUserCategory = useMemo(() => !!userCategory && !!project?.applicationCategory && userCategory === project?.applicationCategory, [userCategory, project?.applicationCategory]);
 
 	const handleScore = useCallback(async (score: ImpactScore) => {
 		toast({ variant: 'default', title: 'Saving your impact score...' });
@@ -59,7 +60,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 					onSuccess: async (data: any) => {
 						if (data.status === HttpStatusCode.OK) {
 							const { updatedProjectsScored, allProjectsScored } = await handleScoreSelect(score, totalProjects);
-							setProjectsScored(project?.applicationCategory ?? '', walletAddress ?? '', updatedProjectsScored);
+							setProjectsScored(project?.applicationCategory ?? '', (walletAddress || undefined) as Address, updatedProjectsScored);
 
 							if (!allProjectsScored && projects) {
 								const currentIndex = projects.findIndex((p: Project) => p.applicationId === id);
