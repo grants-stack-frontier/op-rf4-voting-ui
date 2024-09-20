@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "../ui/button";
 
 export function ProjectDescription({ description }: { description?: string }) {
@@ -67,7 +67,7 @@ export function ProjectDescription({ description }: { description?: string }) {
 
   return (
     <div className='my-6' ref={containerRef}>
-      <div className='dark:text-white'>
+      <div className='leading-6 dark:text-white'>
         {isExpanded ? description : truncatedText}
         {isClampable && (
           <Button

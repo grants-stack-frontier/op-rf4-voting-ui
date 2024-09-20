@@ -12,12 +12,12 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
 
   return (
     <div className="flex flex-col gap-2">
-      <Heading variant="h1">Grants & Investments</Heading>
+      <Heading className="text-sm font-medium leading-5" variant="h1">Grants & Investment</Heading>
       {grantsAndFunding.grants?.map(({ grant, amount, date, details, link }, index) => {
         const formattedAmount = amount && Number(amount) > 0 ? new Intl.NumberFormat('en-US').format(Number(amount)) : amount;
         if (!details) {
           return (
-            <Card key={index}>
+            <Card className="shadow-none" key={index}>
               <CardContent className="flex items-center gap-2 px-2.5 py-3">
                 {grant && <p className="truncate max-w-[200px] text-sm">Grant: {grant}</p>}
                 {link && (
@@ -81,7 +81,7 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
         grantsAndFunding.ventureFunding?.map(({ amount, details, year }, index) => {
           if (!details) {
             return (
-              <Card key={index}>
+              <Card className="shadow-none" key={index}>
                 <CardContent className="flex items-center gap-2 px-2.5 py-3">
                   <span>Funding:</span>
                   <div className="flex items-center gap-2">
@@ -119,7 +119,7 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
         grantsAndFunding.revenue?.map(({ amount, details }, index) => {
           if (!details) {
             return (
-              <Card key={index}>
+              <Card className="shadow-none" key={index}>
                 <CardContent className="flex items-center gap-2 px-2.5 py-3">
                   <span>Revenue:</span>
                   <div className="flex items-center gap-2">
