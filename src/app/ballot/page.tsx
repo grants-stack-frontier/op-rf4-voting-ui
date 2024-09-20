@@ -146,7 +146,7 @@ function YourBallot() {
       .sort((a, b) => a.position - b.position)
       .map(p => ({
         ...p,
-        allocationInput: p.allocation.toString(),
+        allocationInput: p.allocation?.toString() ?? '',
       })
     )
     if (filter === 'conflict') {

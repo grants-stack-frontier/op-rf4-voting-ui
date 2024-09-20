@@ -15,6 +15,7 @@ import debounce from "lodash.debounce";
 import { useRef } from "react";
 import { useBallotRound5Context } from "@/components/ballot/provider5";
 import { CategoryId } from "@/types/shared";
+import { Loader2 } from "lucide-react";
 
 
 export type Round5CategoryAllocation = {
@@ -228,6 +229,9 @@ export function useDistributionMethod() {
         return res;
     },
     // onSuccess: debounceToast,
+    onMutate: () => toast({
+      title: "Loading...",
+    }),
     onError: () =>
       toast({ variant: "destructive", title: "Error setting distribution method" }),
   });
