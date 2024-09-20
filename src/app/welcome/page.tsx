@@ -24,7 +24,7 @@ export default function Welcome() {
         {
             title: "First, you’ll propose the overall budget",
             description:
-                "There are three project categories. You’ll decide how much of the overall budget should go to each category.",
+                "You’ll propose the budget for the entire round, then you’ll decide how much of that budget should go to each category.",
             image: onboard2,
         },
         {
