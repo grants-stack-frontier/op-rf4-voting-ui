@@ -15,6 +15,7 @@ import debounce from "lodash.debounce";
 import { useRef } from "react";
 import { useBallotRound5Context } from "@/components/ballot/provider5";
 import { CategoryId } from "@/types/shared";
+import { Loader2 } from "lucide-react";
 
 
 export type Round5CategoryAllocation = {
@@ -80,10 +81,10 @@ export function useSaveRound5Allocation() {
       const res = await request
         .post(`${agoraRoundsAPI}/ballots/${address}/projects/${allocation.project_id}/allocation/${allocation.allocation}`, {})
         .json<Round5Ballot>()
-        // .then((r) => {
-        //   queryClient.setQueryData(["ballot-round5", address], r);
-        //   return r;
-        // });
+        .then((r) => {
+          queryClient.setQueryData(["ballot-round5", address], r);
+          return r;
+        });
         console.log("Allocation response:", res);
         return res;
     },
@@ -228,6 +229,9 @@ export function useDistributionMethod() {
         return res;
     },
     // onSuccess: debounceToast,
+    onMutate: () => toast({
+      title: "Loading...",
+    }),
     onError: () =>
       toast({ variant: "destructive", title: "Error setting distribution method" }),
   });

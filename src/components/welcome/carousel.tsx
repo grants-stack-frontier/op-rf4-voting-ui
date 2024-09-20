@@ -38,7 +38,7 @@ export function WelcomeCarousel({
   const { title, description } = slides[current - 1] ?? {};
   return (
     <div className="flex flex-col items-center">
-      <Carousel setApi={setApi} className="w-full max-w-[450px]">
+      <Carousel setApi={setApi} className="w-full max-w-[550px] h-[280px]">
         <CarouselContent>
           {slides.map(({ image }, index) => (
             <CarouselItem key={index} className="flex flex-col items-center">

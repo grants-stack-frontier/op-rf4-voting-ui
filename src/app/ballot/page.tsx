@@ -28,6 +28,7 @@ import {
   useSaveRound5Allocation,
   useSaveRound5Position,
   useDistributionMethodFromLocalStorage,
+  DistributionMethod,
 } from "@/hooks/useBallotRound5";
 import { useIsBadgeholder } from "@/hooks/useIsBadgeholder";
 import { formatDate } from "@/lib/utils";
@@ -38,7 +39,7 @@ import { ComponentProps, useEffect, useMemo, useState } from "react";
 import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
 import { MetricsEditor } from "../../components/metrics-editor";
 import { CategoryId } from "@/types/shared";
-import { useProjects } from "@/hooks/useProjects";
+import { useProjects, useProjectsByCategory } from "@/hooks/useProjects";
 import { useVotingCategory } from "@/hooks/useVotingCategory";
 
 function formatAllocationOPAmount(amount?: number) {
@@ -139,11 +140,14 @@ function YourBallot() {
   const { ballot } = useBallotRound5Context();
   const { mutate: saveAllocation } = useSaveRound5Allocation();
   const { mutate: savePosition } = useSaveRound5Position();
-  const { data: projects } = useProjects();
+  // const { data: projects } = useProjects();
   const votingCategory = useVotingCategory();
+  const { data: projects } = useProjectsByCategory(votingCategory as CategoryId);
+  const { data: distributionMethod, update: saveDistributionMethod } = useDistributionMethodFromLocalStorage();
 
   console.log({ ballot });
   console.log({ projects });
+  console.log("Diff:", projects?.filter(p => !ballot?.project_allocations.find(p2 => p2.project_id?.toLowerCase() === p.applicationId?.toLowerCase())))
 
   const [projectList, setProjectList] = useState<ProjectAllocationState[]>(
     sortAndPrepProjects(ballot?.project_allocations || [], "no-conflict")
@@ -161,6 +165,24 @@ function YourBallot() {
       sortAndPrepProjects(ballot?.project_allocations || [], "conflict")
     );
   }, [ballot]);
+
+  type Filter = 'conflict' | 'no-conflict'
+  function sortAndPrepProjects(newProjects: Round5ProjectAllocation[], filter?: Filter): ProjectAllocationState[] {
+    const projects = newProjects
+      .sort((a, b) => a.position - b.position)
+      .map(p => ({
+        ...p,
+        allocationInput: p.allocation?.toString() ?? '',
+      })
+    )
+    if (filter === 'conflict') {
+      return projects.filter(p => p.impact === 0);
+    }
+    if (filter === 'no-conflict') {
+      return projects.filter(p => p.impact !== 0);
+    }
+    return projects;
+  };
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProjects, setFilteredProjects] = useState<
@@ -222,7 +244,7 @@ function YourBallot() {
             ? categoryNames[votingCategory as CategoryId]
             : "Unknown"}
         </a>{" "}
-        ({projectList.length} projects)
+        ({ballot?.total_projects} projects)
       </p>
       <Card className='p-6 space-y-8'>
         <MetricsEditor />
@@ -330,6 +352,7 @@ function YourBallot() {
                           : newAllocation;
                         newProjectList[i].allocationInput = e.target.value;
                         setProjectList(newProjectList);
+                        saveDistributionMethod(DistributionMethod.CUSTOM);
                       }}
                       onBlur={() => {
                         saveAllocation({
