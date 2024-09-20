@@ -23,7 +23,6 @@ export function ProjectsSidebar({
   id: CategoryId;
 }) {
   const { data: projects, isPending } = useProjectsByCategory(id);
-  console.log({ id, projects })
   const intersectionRef = useRef(null);
   const intersection = useIntersection(intersectionRef, {
     root: null,

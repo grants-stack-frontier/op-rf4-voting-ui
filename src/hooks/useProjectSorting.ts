@@ -8,7 +8,7 @@ export function useProjectSorting(
 	projects: Project[] | undefined,
 	ballot: Round5Ballot | undefined,
 	projectsScored: ProjectsScored,
-	id: string
+	currentId: string
 ) {
 	const router = useRouter();
 
@@ -27,42 +27,42 @@ export function useProjectSorting(
 			const aSkipped = projectsScored.skippedIds.includes(aId);
 			const bSkipped = projectsScored.skippedIds.includes(bId);
 
-			if ((aVoted || aSkipped) === (bVoted || bSkipped)) return 0;
-			if (aVoted || aSkipped) return 1;
-			if (bVoted || bSkipped) return -1;
-			return 0;
+			if (aVoted !== bVoted) return aVoted ? 1 : -1;
+			if (aSkipped !== bSkipped) return aSkipped ? 1 : -1;
+			return (a.name ?? '').localeCompare(b.name ?? '');
 		});
 	}, [projects, ballot, projectsScored.votedIds, projectsScored.skippedIds]);
 
 	const isVoted = useMemo(() => {
 		if (!ballot || !projects) return false;
-		const project = projects.find((p) => p.applicationId === id);
+		const project = projects.find((p) => p.applicationId === currentId);
 		return (
 			ballot.project_allocations.some((p) => p.project_id === project?.applicationId) ||
-			projectsScored.votedIds.includes(project?.applicationId ?? id)
+			projectsScored.votedIds.includes(project?.applicationId ?? currentId)
 		);
-	}, [ballot, projects, projectsScored, id]);
+	}, [ballot, projects, projectsScored, currentId]);
 
 	const handleNavigation = useCallback(() => {
 		if (sortedProjects.length > 0) {
-			const currentIndex = sortedProjects.findIndex((p) => p.applicationId === id);
-			let nextIndex = (currentIndex + 1) % sortedProjects.length;
-
-			while (nextIndex !== currentIndex) {
-				const nextProject = sortedProjects[nextIndex];
-				const nextId = nextProject.applicationId ?? '';
-				if (
+			const nextProject = sortedProjects.find((p) => {
+				const nextId = p.applicationId ?? '';
+				return (
+					nextId !== currentId &&
 					!projectsScored.votedIds.includes(nextId) &&
 					!projectsScored.skippedIds.includes(nextId) &&
-					!ballot?.project_allocations.some((p) => p.project_id === nextId)
-				) {
-					router.push(`/project/${nextId}`);
-					return;
-				}
-				nextIndex = (nextIndex + 1) % sortedProjects.length;
+						!ballot?.project_allocations.some((allocation) => allocation.project_id === nextId)
+				);
+			});
+
+			if (nextProject) {
+				router.push(`/project/${nextProject.applicationId}`);
+			} else {
+				// If no next project is found, you might want to handle this case
+				console.log('No more projects to vote on');
+				// Optionally, redirect to a summary page or show a message
 			}
 		}
-	}, [sortedProjects, id, projectsScored, ballot, router]);
+	}, [sortedProjects, projectsScored, ballot, router, currentId]);
 
 	return { sortedProjects, isVoted, handleNavigation };
 }

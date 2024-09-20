@@ -1,4 +1,3 @@
-import { Project } from '@/__generated__/api/agora.schemas';
 import {
 	ProjectsScored,
 	addScoredProject,
@@ -8,7 +7,6 @@ import {
 } from '@/utils/localStorage';
 import { useCallback, useEffect, useState } from 'react';
 import { Address } from 'viem';
-import { Round5Ballot } from './useBallotRound5';
 
 export type ImpactScore = 0 | 1 | 2 | 3 | 4 | 5 | 'Skip';
 
@@ -23,13 +21,7 @@ export const scoreLabels: Record<ImpactScore, string> = {
 };
 
 // Custom hook for project scoring logic
-export const useProjectScoring = (
-	category: string,
-	id: string,
-	walletAddress: Address | undefined,
-	ballot: Round5Ballot | undefined,
-	projects: Project[] | undefined
-) => {
+export const useProjectScoring = (category: string, id: string, walletAddress: Address | undefined) => {
 	const [projectsScored, setProjectsScored] = useState<ProjectsScored>({
 		votedCount: 0,
 		votedIds: [],
@@ -40,29 +32,10 @@ export const useProjectScoring = (
 
 	useEffect(() => {
 		if (walletAddress) {
-			let storedProjectsScored = getProjectsScored(category, walletAddress);
-
-			// Compare project_allocations with projects and update votedIds and votedCount
-			if (ballot && ballot.project_allocations && projects) {
-				const allocatedIds = ballot.project_allocations.map((allocation: any) => allocation.project_id);
-				const projectIds = projects.map((project: any) => project.applicationId);
-
-				const newVotedIds = projectIds.filter((id: string) => allocatedIds.includes(id));
-
-				if (newVotedIds.length > 0) {
-					const updatedVotedIds = Array.from(new Set([...storedProjectsScored.votedIds, ...newVotedIds]));
-					storedProjectsScored = {
-						...storedProjectsScored,
-						votedCount: updatedVotedIds.length,
-						votedIds: updatedVotedIds,
-					};
-					setProjectsScored(storedProjectsScored);
-				}
-			}
-
+			const storedProjectsScored = getProjectsScored(category, walletAddress);
 			setProjectsScored(storedProjectsScored);
 		}
-	}, [category, walletAddress, ballot, projects]);
+	}, [category, walletAddress]);
 
 	const handleScoreSelect = useCallback(
 		async (score: ImpactScore, totalVotedProjects: number) => {
@@ -71,15 +44,15 @@ export const useProjectScoring = (
 				return { updatedProjectsScored: projectsScored, allProjectsScored: false };
 			}
 
-			let updatedProjectsScored = projectsScored;
+			let updatedProjectsScored = { ...projectsScored };
 
 			if (score === 'Skip') {
 				updatedProjectsScored = addSkippedProject(category, id, walletAddress);
-				setProjectsScored(updatedProjectsScored);
 			} else if (!updatedProjectsScored.votedIds.includes(id)) {
 				updatedProjectsScored = addScoredProject(category, id, walletAddress);
-				setProjectsScored(updatedProjectsScored);
 			}
+
+			setProjectsScored(updatedProjectsScored);
 
 			const allProjectsScored = updatedProjectsScored.votedCount === totalVotedProjects;
 

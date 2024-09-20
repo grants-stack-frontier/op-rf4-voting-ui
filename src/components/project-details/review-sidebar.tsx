@@ -1,15 +1,16 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
 	CardFooter,
 	CardHeader,
 	CardTitle
-} from "@/components/ui/card"
-import { ImpactScore, scoreLabels } from "@/hooks/useProjectScoring"
-import { cn } from "@/lib/utils"
-import { Dispatch, SetStateAction, useCallback, useMemo } from "react"
-import { Progress } from "../ui/progress"
+} from "@/components/ui/card";
+import { ImpactScore, scoreLabels } from "@/hooks/useProjectScoring";
+import { cn } from "@/lib/utils";
+import { RiCheckLine } from "@remixicon/react";
+import { Dispatch, SetStateAction, useCallback, useMemo } from "react";
+import { Progress } from "../ui/progress";
 
 type CardProps = React.ComponentProps<typeof Card>
 
@@ -19,6 +20,8 @@ interface ReviewSidebarProps extends CardProps {
 	totalProjects: number
 	projectsScored: number
 	isVoted: boolean
+	currentProjectScore?: ImpactScore
+	onLocalScoreUpdate: (score: ImpactScore) => void
 }
 
 export function ReviewSidebar({
@@ -28,6 +31,8 @@ export function ReviewSidebar({
 	totalProjects,
 	projectsScored,
 	isVoted,
+	currentProjectScore,
+	onLocalScoreUpdate,
 	...props
 }: ReviewSidebarProps) {
 	const handleScore = useCallback((score: ImpactScore) => {
@@ -35,8 +40,9 @@ export function ReviewSidebar({
 			onConflictOfInterest(true);
 		} else {
 			onScoreSelect(score);
+			onLocalScoreUpdate(score);
 		}
-	}, [onConflictOfInterest, onScoreSelect]);
+	}, [onConflictOfInterest, onScoreSelect, onLocalScoreUpdate]);
 
 	const sortedScores = useMemo(() => {
 		return (Object.entries(scoreLabels) as [ImpactScore, string][])
@@ -62,10 +68,20 @@ export function ReviewSidebar({
 						<Button
 							key={score}
 							variant={score === "Skip" ? "link" : "outline"}
+							className={cn(
+								label === "Conflict of interest" ? "hover:bg-red-200 hover:text-red-600" :
+									label !== "Skip" ? "hover:bg-green-200 hover:text-green-600" :
+										"",
+								isVoted && currentProjectScore === Number(score) ? "bg-green-200 text-green-600" : "",
+								""
+							)}
 							onClick={() => handleScore(score)}
 						// disabled={isVoted && score !== "Skip"}
 						>
-							{label}
+							{(isVoted && currentProjectScore === Number(score)) &&
+								<RiCheckLine className="h-5 w-5 mr-2" />
+							}
+							<span>{label}</span>
 						</Button>
 					))}
 				</div>

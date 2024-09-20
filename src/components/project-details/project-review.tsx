@@ -5,7 +5,7 @@ import { HttpStatusCode } from "@/enums/http-status-codes";
 import { ImpactScore } from "@/hooks/useProjectScoring";
 import { useSaveProjectImpact } from "@/hooks/useProjects";
 import { ProjectsScored, setProjectsScored } from "@/utils/localStorage";
-import { Dispatch, SetStateAction, useCallback } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import { Address } from "viem";
 
 export function ProjectReview({
@@ -16,26 +16,36 @@ export function ProjectReview({
 	isVoted,
 	handleNavigation,
 	currentProject,
-	walletAddress
+	walletAddress,
+	currentProjectScore
 }: {
 	onScoreSelect: (score: ImpactScore, totalVotedProjects: number) => Promise<{
 		updatedProjectsScored: ProjectsScored;
 		allProjectsScored: boolean;
 	}>;
 	onConflictOfInterest: Dispatch<SetStateAction<boolean>>;
-	projectsScored: number;
+	projectsScored: ProjectsScored;
 	totalProjects: number;
 	isVoted: boolean;
 	handleNavigation: () => void;
 	currentProject: Project | undefined;
 	walletAddress: Address | undefined;
+	currentProjectScore?: ImpactScore;
 }) {
+
+	const [localProjectsScored, setLocalProjectsScored] = useState(projectsScored.votedCount);
+	const [localCurrentProjectScore, setLocalCurrentProjectScore] = useState(currentProjectScore);
+
+	useEffect(() => {
+		setLocalProjectsScored(projectsScored.votedCount);
+	}, [projectsScored]);
 
 	const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
 
 	const handleScore = useCallback(async (score: ImpactScore) => {
 		if (score === 'Skip') {
-			await onScoreSelect(score, totalProjects);
+			const { updatedProjectsScored } = await onScoreSelect(score, totalProjects);
+			setLocalProjectsScored(updatedProjectsScored.votedCount);
 			handleNavigation();
 		} else {
 			toast({ variant: 'default', title: 'Saving your impact score...' });
@@ -48,6 +58,7 @@ export function ProjectReview({
 						if (data.status === HttpStatusCode.OK) {
 							const { updatedProjectsScored, allProjectsScored } = await onScoreSelect(score, totalProjects);
 							setProjectsScored(currentProject.applicationCategory ?? '', walletAddress as Address, updatedProjectsScored);
+							setLocalProjectsScored(updatedProjectsScored.votedCount);
 
 							if (!allProjectsScored) {
 								toast({ variant: 'default', title: 'Impact score was saved successfully!' });
@@ -73,9 +84,11 @@ export function ProjectReview({
 		<ReviewSidebar
 			onScoreSelect={handleScore}
 			onConflictOfInterest={onConflictOfInterest}
-			projectsScored={projectsScored}
+			projectsScored={localProjectsScored}
 			totalProjects={totalProjects}
 			isVoted={isVoted}
+			currentProjectScore={localCurrentProjectScore}
+			onLocalScoreUpdate={setLocalCurrentProjectScore}
 		/>
 	);
 }

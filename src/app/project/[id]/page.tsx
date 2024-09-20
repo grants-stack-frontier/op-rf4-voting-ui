@@ -9,6 +9,7 @@ import { ProjectBreadcrumb } from "@/components/project-details/project-breadcru
 import { ProjectReview } from "@/components/project-details/project-review";
 import { useSession } from "@/hooks/useAuth";
 import { useConflictOfInterest } from "@/hooks/useConflictOfInterest";
+import { ImpactScore } from "@/hooks/useProjectImpact";
 import { useProjectScoring } from "@/hooks/useProjectScoring";
 import { useProjectSorting } from "@/hooks/useProjectSorting";
 import { useProjectById, useProjectsByCategory } from "@/hooks/useProjects";
@@ -31,13 +32,22 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 	const { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect } = useProjectScoring(
 		currentProject?.applicationCategory ?? '',
 		currentProject?.applicationId ?? '',
-		walletAddress,
-		ballot,
-		projects
+		walletAddress
 	);
 
-	const { sortedProjects, isVoted, handleNavigation } = useProjectSorting(projects, ballot, projectsScored, id);
+	const { sortedProjects, isVoted, handleNavigation } = useProjectSorting(
+		projects,
+		ballot,
+		projectsScored,
+		currentProject?.applicationId ?? id
+	);
 	const { isConflictOfInterestDialogOpen, setIsConflictOfInterestDialogOpen, handleConflictOfInterestConfirm } = useConflictOfInterest(projectsScored.votedCount, handleScoreSelect);
+
+	const currentProjectScore = useMemo(() => {
+		if (!ballot || !currentProject) return undefined;
+		const allocation = ballot.project_allocations.find(p => p.project_id === currentProject.applicationId);
+		return allocation ? allocation.impact as ImpactScore : undefined;
+	}, [ballot, currentProject]);
 
 	const isLoading = useMemo(() => isProjectsLoading || isProjectLoading || !currentProject, [isProjectsLoading, isProjectLoading, currentProject]);
 
@@ -63,12 +73,13 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 					<ProjectReview
 						onScoreSelect={handleScoreSelect}
 						onConflictOfInterest={setIsConflictOfInterestDialogOpen}
-						projectsScored={projectsScored.votedCount}
+						projectsScored={projectsScored}
 						totalProjects={sortedProjects.length}
 						isVoted={isVoted}
 						handleNavigation={handleNavigation}
 						currentProject={currentProject}
 						walletAddress={walletAddress}
+						currentProjectScore={currentProjectScore}
 					/>
 				</aside>
 			)}

@@ -1,20 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
 import { Logo } from "@/components/common/logo";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 
 import { badgeholderManualUrl, votingEndDate } from "@/config";
+import { hasSeenIntro } from "@/utils/localStorage";
 import mixpanel from "mixpanel-browser";
 import { ConnectButton } from "../auth/connect-button";
 import { SignMessage } from "../auth/sign-message";
 import { VoterConfirmationDialog } from "../auth/voter-confirmation";
+import { ModeToggle } from "../dark-mode-toggle";
 import { Separator } from "../ui/separator";
 import { VotingEndsIn } from "../voting-ends-in";
-import { hasSeenIntro } from "@/utils/localStorage";
 
 export function Header() {
   const { address } = useAccount();
@@ -52,7 +53,7 @@ export function Header() {
         </Link>
       </div>
       <div className='flex items-center gap-2'>
-        {/* <ModeToggle /> */}
+        <ModeToggle />
         <Separator orientation='vertical' />
         <div className='hidden sm:block'>
           <ConnectButton />
