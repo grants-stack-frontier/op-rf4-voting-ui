@@ -17,24 +17,24 @@ export default function Home() {
     {
       title: "Welcome badgeholders and guest voters",
       description:
-        "In this round of voting, you'll propose the overall budget, score projects from high to low impact, and allocate rewards.",
+        "In this round of voting, you’ll propose the overall budget, score projects from high to low impact, and allocate rewards.",
       image: onboard1,
     },
     {
-      title: "First, you'll propose the overall budget",
+      title: "First, you’ll propose the budget",
       description:
-        "You'll propose the budget for the entire round, then you'll decide how much of that budget should go to each category.",
+        "You’ll propose the budget for the entire round, then you’ll decide how much of that budget should go to each category.",
       image: onboard2,
     },
     {
-      title: "Then, you'll score projects in one category",
+      title: "Then, you’ll score projects in one category",
       description:
-        "Within one of the categories (randomly assigned), you'll score projects from high to low impact. If you have a conflict of interest, you'll declare it rather than scoring the project.",
+        "Within one of the categories (randomly assigned), you’ll score projects from high to low impact. If you have a conflict of interest, you’ll declare it rather than scoring the project.",
       image: onboard3,
     },
     {
-      title: "Lastly, you'll allocate rewards",
-      description: `Now that you're familiar with the projects in your category, you can allocate rewards across them.`,
+      title: "Lastly, you’ll allocate rewards",
+      description: `Now that you’re familiar with the projects in your category, you can allocate rewards across them.`,
       image: onboard4,
     },
   ];
