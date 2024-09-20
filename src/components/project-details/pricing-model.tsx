@@ -7,9 +7,9 @@ export function PricingModel({ pricingModel }: { pricingModel?: string }) {
 
 	return (
 		<div className="flex flex-col gap-2 mb-12">
-			<Heading variant="h1">Pricing Model</Heading>
+			<Heading className="text-sm font-medium leading-5" variant="h1">Pricing Model</Heading>
 			{pricingModel === 'free' ? (
-				<Card className="mb-12">
+				<Card className="shadow-none">
 					<CardContent className="px-2.5 py-3">
 						<div className="capitalize text-sm font-medium leading-5">
 							{pricingModel?.replace(/_/g, ' ') ?? 'N/A'}

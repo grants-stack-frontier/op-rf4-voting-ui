@@ -8,14 +8,14 @@ import {
 } from "@/components/ui/card"
 import { ImpactScore, scoreLabels } from "@/hooks/useProjectScoring"
 import { cn } from "@/lib/utils"
-import { useCallback, useMemo } from "react"
+import { Dispatch, SetStateAction, useCallback, useMemo } from "react"
 import { Progress } from "../ui/progress"
 
 type CardProps = React.ComponentProps<typeof Card>
 
 interface ReviewSidebarProps extends CardProps {
 	onScoreSelect: (score: ImpactScore) => void
-	onConflictOfInterest: () => void
+	onConflictOfInterest: Dispatch<SetStateAction<boolean>>
 	totalProjects: number
 	projectsScored: number
 	isVoted: boolean
@@ -32,7 +32,7 @@ export function ReviewSidebar({
 }: ReviewSidebarProps) {
 	const handleScore = useCallback((score: ImpactScore) => {
 		if (Number(score) === 0) {
-			onConflictOfInterest();
+			onConflictOfInterest(true);
 		} else {
 			onScoreSelect(score);
 		}
@@ -63,7 +63,7 @@ export function ReviewSidebar({
 							key={score}
 							variant={score === "Skip" ? "link" : "outline"}
 							onClick={() => handleScore(score)}
-							disabled={isVoted && score !== "Skip"}
+						// disabled={isVoted && score !== "Skip"}
 						>
 							{label}
 						</Button>

@@ -3,15 +3,17 @@ import { Address } from "viem";
 const PROJECTS_SCORED_KEY = 'projectsScored';
 
 export type ProjectsScored = {
-	count: number;
+	votedCount: number;
 	votedIds: string[];
+	skippedCount: number;
+	skippedIds: string[];
 };
 
 export const getProjectsScored = (category: string, walletAddress: Address): ProjectsScored => {
-	if (typeof window === 'undefined') return { count: 0, votedIds: [] };
+	if (typeof window === 'undefined') return { votedCount: 0, votedIds: [], skippedCount: 0, skippedIds: [] };
 	const stored = localStorage.getItem(PROJECTS_SCORED_KEY);
 	const allData = stored ? JSON.parse(stored) : {};
-	return allData[walletAddress]?.[category] || { count: 0, votedIds: [] };
+	return allData[walletAddress]?.[category] || { votedCount: 0, votedIds: [], skippedCount: 0, skippedIds: [] };
 };
 
 export const setProjectsScored = (category: string, walletAddress: Address, data: ProjectsScored): void => {
@@ -28,8 +30,18 @@ export const setProjectsScored = (category: string, walletAddress: Address, data
 export const addScoredProject = (category: string, projectId: string, walletAddress: Address): ProjectsScored => {
 	const current = getProjectsScored(category, walletAddress);
 	if (!current.votedIds.includes(projectId)) {
-		current.count += 1;
+		current.votedCount += 1;
 		current.votedIds.push(projectId);
+		setProjectsScored(category, walletAddress, current);
+	}
+	return current;
+};
+
+export const addSkippedProject = (category: string, projectId: string, walletAddress: Address): ProjectsScored => {
+	const current = getProjectsScored(category, walletAddress);
+	if (!current.skippedIds.includes(projectId)) {
+		current.skippedCount += 1;
+		current.skippedIds.push(projectId);
 		setProjectsScored(category, walletAddress, current);
 	}
 	return current;
