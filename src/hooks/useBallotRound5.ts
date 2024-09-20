@@ -81,10 +81,10 @@ export function useSaveRound5Allocation() {
       const res = await request
         .post(`${agoraRoundsAPI}/ballots/${address}/projects/${allocation.project_id}/allocation/${allocation.allocation}`, {})
         .json<Round5Ballot>()
-        // .then((r) => {
-        //   queryClient.setQueryData(["ballot-round5", address], r);
-        //   return r;
-        // });
+        .then((r) => {
+          queryClient.setQueryData(["ballot-round5", address], r);
+          return r;
+        });
         console.log("Allocation response:", res);
         return res;
     },
