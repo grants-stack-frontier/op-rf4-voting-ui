@@ -30,6 +30,7 @@ import {
   useSaveRound5Allocation,
   useSaveRound5Position,
   useDistributionMethodFromLocalStorage,
+  DistributionMethod,
 } from "@/hooks/useBallotRound5";
 import { useIsBadgeholder } from "@/hooks/useIsBadgeholder";
 import { formatDate } from "@/lib/utils";
@@ -122,6 +123,7 @@ function YourBallot() {
   // const { data: projects } = useProjects();
   const votingCategory = useVotingCategory();
   const { data: projects } = useProjectsByCategory(votingCategory as CategoryId);
+  const { data: distributionMethod, update: saveDistributionMethod } = useDistributionMethodFromLocalStorage();
 
   console.log({ ballot });
   console.log({ projects });
@@ -216,7 +218,7 @@ function YourBallot() {
         <a href={`/category/${votingCategory}`} className='underline'>
           {votingCategory ? categoryNames[votingCategory as CategoryId] : "Unknown"}
         </a>{" "}
-        ({projectList.length} projects)
+        ({ballot?.total_projects} projects)
       </p>
       <Card className='p-6 space-y-8'>
         <MetricsEditor />
@@ -311,6 +313,7 @@ function YourBallot() {
                           : newAllocation;
                         newProjectList[i].allocationInput = e.target.value;
                         setProjectList(newProjectList);
+                        saveDistributionMethod(DistributionMethod.CUSTOM);
                       }}
                       onBlur={() => {
                         saveAllocation({
