@@ -1,6 +1,7 @@
 import { Address } from "viem";
 
 const PROJECTS_SCORED_KEY = 'projectsScored';
+const INTRO_SEEN_KEY = 'introSeen';
 
 export type ProjectsScored = {
 	votedCount: number;
@@ -60,3 +61,18 @@ export function clearProjectsScored(category: string, walletAddress: Address): v
 		localStorage.setItem(PROJECTS_SCORED_KEY, JSON.stringify(allData));
 	}
 }
+
+export const hasSeenIntro = (walletAddress: Address): boolean => {
+  if (typeof window === 'undefined') return false;
+  const stored = localStorage.getItem(INTRO_SEEN_KEY);
+  const allData = stored ? JSON.parse(stored) : {};
+  return !!allData[walletAddress];
+};
+
+export const markIntroAsSeen = (walletAddress: Address): void => {
+  if (typeof window === 'undefined') return;
+  const stored = localStorage.getItem(INTRO_SEEN_KEY);
+  const allData = stored ? JSON.parse(stored) : {};
+  allData[walletAddress] = true;
+  localStorage.setItem(INTRO_SEEN_KEY, JSON.stringify(allData));
+};

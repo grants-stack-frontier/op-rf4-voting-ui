@@ -74,7 +74,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
 
   return (
     <div key={category.id}>
-      <div className='flex items-flex-start gap-3 py-6'>
+      <div className='flex items-start gap-3 py-6'>
         <Image
           src={category.image}
           alt={category.name}
@@ -97,59 +97,57 @@ export function CategoryItem({ category }: CategoryItemProps) {
             {projectCount} project{projectCount !== 1 ? "s" : ""}
           </Badge>
         </div>
-        <div className='flex flex-col items-center gap-2'>
-          <div className='flex items-center gap-2'>
+        <div className='grid grid-cols-[auto_1fr] gap-2 items-center'>
+          <Button
+            type='button'
+            size='icon'
+            variant='ghost'
+            className={`outline-none ${
+              isLocked
+                ? "bg-secondary hover:bg-secondary"
+                : "hover:bg-transparent"
+            }`}
+            onClick={handleToggleLock}
+            disabled={isLoading}
+          >
+            {isLocked ? (
+              <RiLockFill className='h-4 w-4' />
+            ) : (
+              <RiLockUnlockFill className='h-4 w-4' />
+            )}
+          </Button>
+          <div className='flex rounded-lg bg-transparent border'>
             <Button
-              type='button'
               size='icon'
+              type='button'
               variant='ghost'
-              className={`outline-none ${
-                isLocked
-                  ? "bg-secondary hover:bg-secondary"
-                  : "hover:bg-transparent"
-              }`}
-              onClick={handleToggleLock}
-              disabled={isLoading}
+              className='w-12 outline-none hover:bg-transparent'
+              onClick={handleDecrement}
+              disabled={allocation === 0 || isLoading}
             >
-              {isLocked ? (
-                <RiLockFill className='h-4 w-4' />
-              ) : (
-                <RiLockUnlockFill className='h-4 w-4' />
-              )}
+              <RiSubtractLine className='h-4 w-4' />
             </Button>
-            <div className='flex rounded-lg bg-transparent border'>
-              <Button
-                size='icon'
-                type='button'
-                variant='ghost'
-                className='w-12 outline-none hover:bg-transparent'
-                onClick={handleDecrement}
-                disabled={allocation === 0 || isLoading}
-              >
-                <RiSubtractLine className='h-4 w-4' />
-              </Button>
-              <Input
-                type='text'
-                value={inputValue || `${formatAllocation(allocation)}%`}
-                onChange={handleInputChange}
-                onBlur={handleInputBlur}
-                onKeyDown={handleInputKeyDown}
-                className='w-16 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-center p-0'
-                disabled={isLoading}
-              />
-              <Button
-                size='icon'
-                type='button'
-                variant='ghost'
-                className='w-12 outline-none hover:bg-transparent'
-                onClick={handleIncrement}
-                disabled={allocation === 100 || isLoading}
-              >
-                <RiAddLine className='h-4 w-4' />
-              </Button>
-            </div>
+            <Input
+              type='text'
+              value={inputValue || `${formatAllocation(allocation)}%`}
+              onChange={handleInputChange}
+              onBlur={handleInputBlur}
+              onKeyDown={handleInputKeyDown}
+              className='w-16 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-center p-0'
+              disabled={isLoading}
+            />
+            <Button
+              size='icon'
+              type='button'
+              variant='ghost'
+              className='w-12 outline-none hover:bg-transparent'
+              onClick={handleIncrement}
+              disabled={allocation === 100 || isLoading}
+            >
+              <RiAddLine className='h-4 w-4' />
+            </Button>
           </div>
-          <div className='text-sm text-muted-foreground text-center mt-1'>
+          <div className='col-start-2 text-sm text-muted-foreground text-center'>
             {Math.round((allocation / 100) * totalBudget).toLocaleString()} OP
           </div>
         </div>

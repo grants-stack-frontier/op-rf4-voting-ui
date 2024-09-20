@@ -21,24 +21,11 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  if (isConnecting) {
-    return (
-      <div className='flex justify-center items-center h-screen'>
-        <Loader2 className='h-8 w-8 animate-spin' />
-      </div>
-    );
-  }
-
-  if (!isConnected) {
-    return <DisconnectedState />;
-  }
-
   return (
     <main className=''>
       <Header />
       <div className='sm:hidden h-screen -mt-16 px-4 flex flex-col gap-4 justify-center items-center'>
         <Image src={SunnySVG} alt='Sunny' />
-
         <div className='text-center'>
           The mobile version of this website isn&apos;t ready yet. Please use
           your desktop computer.
@@ -48,7 +35,15 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         <Callouts />
       </div>
       <div className='hidden sm:flex gap-8 max-w-[1072px] mx-auto py-16 justify-center'>
-        {children}
+        {isConnecting ? (
+          <div className='flex justify-center items-center h-screen'>
+            <Loader2 className='h-8 w-8 animate-spin' />
+          </div>
+        ) : isConnected ? (
+          children
+        ) : (
+          <DisconnectedState />
+        )}
       </div>
     </main>
   );
