@@ -1,19 +1,20 @@
-import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { Category } from "@/data/categories";
 import {
-  ChevronRight,
-  LockKeyhole,
-  LockKeyholeOpen,
-  Minus,
-  Plus,
-} from "lucide-react";
+  RiAddLine,
+  RiArrowRightSLine,
+  RiLockFill,
+  RiLockUnlockFill,
+  RiSubtractLine,
+} from "@remixicon/react";
 import Image from "next/image";
 import Link from "next/link";
-import { Category } from "@/data/categories";
+import React, { useState } from "react";
 import { useBudgetContext } from "./provider";
+import { categoryMap } from "@/hooks/useProjects";
 
 interface CategoryItemProps {
   category: Category;
@@ -25,7 +26,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
     handleValueChange,
     toggleLock,
     lockedFields,
-    countPerCategory,
+    allProjectsByCategory,
     isLoading,
     totalBudget,
   } = useBudgetContext();
@@ -34,7 +35,10 @@ export function CategoryItem({ category }: CategoryItemProps) {
 
   const allocation = allocations[category.id] || 0;
   const isLocked = lockedFields[category.id] || false;
-  const projectCount = countPerCategory[category.id] || 0;
+  const projectCount =
+    (allProjectsByCategory &&
+      allProjectsByCategory[categoryMap[category.id]].length) ||
+    0;
 
   const formatAllocation = (value: number) =>
     value.toFixed(2).replace(/\.?0+$/, "");
@@ -85,7 +89,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
               className='flex items-center gap-2'
             >
               <span className='font-medium'>{category.name}</span>
-              <ChevronRight className='h-4 w-4' />
+              <RiArrowRightSLine className='h-4 w-4' />
             </Link>
           </Button>
           <p className='text-[14px] font-small mb-2'>{category.description}</p>
@@ -101,16 +105,16 @@ export function CategoryItem({ category }: CategoryItemProps) {
               variant='ghost'
               className={`outline-none ${
                 isLocked
-                  ? "bg-black text-white hover:bg-black"
+                  ? "bg-secondary hover:bg-secondary"
                   : "hover:bg-transparent"
               }`}
               onClick={handleToggleLock}
               disabled={isLoading}
             >
               {isLocked ? (
-                <LockKeyhole className='h-4 w-4' />
+                <RiLockFill className='h-4 w-4' />
               ) : (
-                <LockKeyholeOpen className='h-4 w-4' />
+                <RiLockUnlockFill className='h-4 w-4' />
               )}
             </Button>
             <div className='flex rounded-lg bg-transparent border'>
@@ -122,7 +126,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
                 onClick={handleDecrement}
                 disabled={allocation === 0 || isLoading}
               >
-                <Minus className='h-4 w-4' />
+                <RiSubtractLine className='h-4 w-4' />
               </Button>
               <Input
                 type='text'
@@ -141,7 +145,7 @@ export function CategoryItem({ category }: CategoryItemProps) {
                 onClick={handleIncrement}
                 disabled={allocation === 100 || isLoading}
               >
-                <Plus className='h-4 w-4' />
+                <RiAddLine className='h-4 w-4' />
               </Button>
             </div>
           </div>

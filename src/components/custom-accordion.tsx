@@ -4,7 +4,7 @@ export function CustomAccordion({ value, trigger, children, collapsible = true }
 	return (
 		<Accordion className="border border-gray-200 rounded-lg" type="single" collapsible={collapsible}>
 			<AccordionItem className="border-b-0" value={value}>
-				<AccordionTrigger className="flex flex-1 p-2 hover:no-underline">
+				<AccordionTrigger className="hover:no-underline px-2.5 py-3">
 					<div className="flex items-center gap-2">
 						{trigger}
 					</div>

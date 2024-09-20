@@ -3,10 +3,11 @@ import React, { createContext, useContext } from "react";
 import { Category } from "@/data/categories";
 import { CategoryId } from "@/types/shared";
 import { useBudgetForm } from "@/hooks/useBudgetForm";
+import { Project } from "@/__generated__/api/agora.schemas";
 
 interface BudgetContextType {
   categories: Category[] | undefined;
-  countPerCategory: Record<string, number>;
+  allProjectsByCategory?: Record<string, Project[]>;
   allocations: Record<string, number>;
   lockedFields: Record<string, boolean>;
   handleValueChange: (
@@ -24,34 +25,12 @@ interface BudgetContextType {
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
 
 export function BudgetProvider({ children }: React.PropsWithChildren) {
-  const {
-    categories,
-    countPerCategory,
-    allocations,
-    lockedFields,
-    handleValueChange,
-    toggleLock,
-    error,
-    isLoading,
-    totalBudget,
-    setTotalBudget,
-  } = useBudgetForm();
-
-  const value = {
-    categories,
-    countPerCategory,
-    allocations,
-    lockedFields,
-    handleValueChange,
-    toggleLock,
-    error,
-    isLoading,
-    totalBudget,
-    setTotalBudget,
-  };
+  const budgetForm = useBudgetForm();
 
   return (
-    <BudgetContext.Provider value={value}>{children}</BudgetContext.Provider>
+    <BudgetContext.Provider value={budgetForm}>
+      {children}
+    </BudgetContext.Provider>
   );
 }
 

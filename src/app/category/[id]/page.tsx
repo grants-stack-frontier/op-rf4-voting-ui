@@ -19,8 +19,8 @@ export default function CategoryDetailsPage({ params: { id = "" } }) {
 
     return (
         <>
-            <section className="flex-1 space-y-6">
-                <Breadcrumb className="mb-6">
+            <section className="flex-1">
+                <Breadcrumb className="mb-2">
                     <BreadcrumbList>
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
@@ -50,15 +50,16 @@ export default function CategoryDetailsPage({ params: { id = "" } }) {
                     </TabsList>
                     {categories.map(({ id: categoryType, ...category }) => (
                         <TabsContent className="pt-10" key={categoryType} value={categoryType}>
-                            <section className="flex items-start justify-between">
-                                <CategoryDetails {...category} id={categoryType} />
-                                <aside>
+                            <div className="flex gap-12 mx-auto">
+                                <section className="flex-1 max-w-[720px]">
+                                    <CategoryDetails {...category} id={categoryType} />
+                                </section>
+                                <aside className="max-w-[304px]">
                                     <ProjectsSidebar
                                         id={categoryType}
-                                        {...category}
                                     />
                                 </aside>
-                            </section>
+                            </div>
                         </TabsContent>
                     ))}
                 </Tabs>

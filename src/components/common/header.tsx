@@ -10,7 +10,6 @@ import mixpanel from "mixpanel-browser";
 import { ConnectButton } from "../auth/connect-button";
 import { SignMessage } from "../auth/sign-message";
 import { VoterConfirmationDialog } from "../auth/voter-confirmation";
-import { ModeToggle } from "../dark-mode-toggle";
 import { Separator } from "../ui/separator";
 import { VotingEndsIn } from "../voting-ends-in";
 
@@ -39,7 +38,7 @@ export function Header() {
         </Link>
       </div>
       <div className="flex items-center gap-2">
-        <ModeToggle />
+        {/* <ModeToggle /> */}
         <Separator orientation="vertical" />
         <div className="hidden sm:block">
           <ConnectButton />
