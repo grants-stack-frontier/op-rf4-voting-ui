@@ -1,59 +1,21 @@
 "use client";
-import {ChevronDown} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
-import {useBallotContext} from "../ballot/provider";
-import {useSortBallot} from "@/hooks/useBallotEditor";
-import {decode, encode, sortLabels} from "@/hooks/useFilter";
-import {exportBallot, ImportBallotDialog} from "./import-ballot";
 import {useState} from "react";
+import { useBallotRound5Context } from "./provider5";
+import { exportRound5Ballot, ImportBallotDialog } from "./import-ballot5";
 
 export function BallotFilter() {
   const [isOpen, setOpen] = useState(false);
-  const { state, ballot } = useBallotContext();
-  const { filter, setFilter } = useSortBallot(state);
+  const { state, ballot } = useBallotRound5Context();
 
   return (
     <div className="flex gap-2">
-      {/* <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button variant="secondary" iconRight={ChevronDown}>
-            {sortLabels[encode(filter)]}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuLabel>Sort by name</DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={encode(filter)}
-            onValueChange={(value) => setFilter(decode(value))}
-          >
-            {(["name_asc", "name_desc"] as const).map((value) => (
-              <DropdownMenuRadioItem key={value} value={value}>
-                {sortLabels[value]}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-          <DropdownMenuLabel>Sort by weight</DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={encode(filter)}
-            onValueChange={(value) => setFilter(decode(value))}
-          >
-            {(["allocation_asc", "allocation_desc"] as const).map((value) => (
-              <DropdownMenuRadioItem key={value} value={value}>
-                {sortLabels[value]}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu> */}
       <DropdownMenu>
         <DropdownMenuTrigger>
           <Button variant={"secondary"}>...</Button>
@@ -63,7 +25,7 @@ export function BallotFilter() {
             Import ballot
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => exportBallot(ballot?.allocations ?? [])}
+            onClick={() => exportRound5Ballot(ballot?.project_allocations ?? [])}
           >
             Export ballot
           </DropdownMenuItem>
@@ -72,4 +34,5 @@ export function BallotFilter() {
       <ImportBallotDialog isOpen={isOpen} onOpenChange={setOpen} />
     </div>
   );
+
 }
