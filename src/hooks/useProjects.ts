@@ -17,10 +17,13 @@ import {
 } from "@/__generated__/api/agora.schemas";
 import { CategoryType } from "@/data/categories";
 import { CategoryId } from "@/types/shared";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 import { ImpactScore } from "./useProjectScoring";
 import { toast } from "@/components/ui/use-toast";
+import { request } from "@/lib/request";
+import { agoraRoundsAPI } from "@/config";
+import { Round5Ballot } from "./useBallotRound5";
 
 export const categoryMap: Record<CategoryType, string> = {
   ETHEREUM_CORE_CONTRIBUTIONS: "eth_core",
@@ -124,6 +127,8 @@ export function useSaveProjectImpact() {
 
 export function useSaveProjects() {
   const {address} = useAccount()
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationKey: ["save-projects"],
     mutationFn: async (projects: {
@@ -131,17 +136,23 @@ export function useSaveProjects() {
       allocation: number,
       impact: ImpactScore
     }[]) => {
-      return updateRetroFundingRoundProjects(
-        5, 
-        address as string, 
-        {
-          projects: projects.map(p => ({
-            project_id: p.project_id,
-            allocation: p.allocation.toString(),
-            impact: p.impact
-          })) as UpdateRetroFundingRoundProjectsBodyProjectsItem[]
-        }
-      )
+      await request
+        .post(`${agoraRoundsAPI}/ballots/${address}/projects`, {
+          json: {
+            projects: projects.map(p => ({
+              project_id: p.project_id,
+              allocation: p.allocation.toString(),
+              impact: p.impact
+            }))
+          }
+
+        })
+        .json<Round5Ballot>()
+        .then((r) => {
+          console.log(r)
+          queryClient.setQueryData(["ballot-round5", address], r);
+          return r;
+        });
     },
     onMutate: () => {
       toast({ title: "Saving projects..." });
