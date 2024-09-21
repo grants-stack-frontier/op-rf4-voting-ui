@@ -40,7 +40,6 @@ export function ImportBallotDialog({
 function ImportBallotButton() {
   const save = useSaveRound5Allocation();
   const editor = useBallotRound5Context();
-  // const { data: metricIds } = useMetricIds();
 
   const ref = useRef<HTMLInputElement>(null);
 
@@ -50,20 +49,22 @@ function ImportBallotButton() {
       // Parse CSV and build the ballot data (remove name column)
       const { data } = parse<Round5ProjectAllocation>(csvString);
       const allocations = data
-        // .map(({ category_slug, allocation, locked }) => ({
-        //   category_slug,
-        //   allocation: Number(allocation),
-        //   // Only the string "true" and "1" will be matched as locked
-        //   locked: ["true", "1"].includes(String(locked)) ? true : false,
-        // }))
-        // .filter((m) => metricIds?.includes(m.category_slug));
+        .map(({ project_id, allocation }) => ({
+          project_id,
+          name: editor.ballot?.project_allocations.find(p => p.project_id === project_id)?.name,
+          image: editor.ballot?.project_allocations.find(p => p.project_id === project_id)?.image,
+          position: editor.ballot?.project_allocations.find(p => p.project_id === project_id)?.position,
+          allocation: Number(allocation),
+          impact: editor.ballot?.project_allocations.find(p => p.project_id === project_id)?.impact,
+        }) as Round5ProjectAllocation)
 
       if (allocations.length !== data.length) {
         alert(
-          "One or more of the metric IDs were not correct and have been removed."
+          "One or more of the project IDs were not correct and have been removed."
         );
       }
       console.log(allocations);
+
       editor.reset(allocations);
 
       mixpanel.track("Import CSV", { ballotSize: allocations.length });
@@ -101,7 +102,16 @@ function ExportBallotButton() {
   // const emptyBallot: Round5Allocation[] = [
   //   { category_slug: 'ETHEREUM_CORE_CONTRIBUTIONS', allocation: 0, locked: false },
   // ];
-  const emptyBallot: Round5ProjectAllocation[] = [];
+  const {ballot} = useBallotRound5Context()
+  const emptyBallot: any[] = ballot ? 
+    ballot.project_allocations.map(alloc => ({
+      project_id: alloc.project_id,
+      name: alloc.name,
+      allocation: 0,
+    }))
+    : [
+      { project_id: "0x0", name: "Some project", allocation: 0 },
+    ];
 
   return (
     <Button variant="outline" onClick={() => exportRound5Ballot(emptyBallot)}>
@@ -112,12 +122,11 @@ function ExportBallotButton() {
 
 export function exportRound5Ballot(ballot: Round5ProjectAllocation[]) {
   const csv = format(
-    ballot,
-    // ballot.map((alloc) => ({
-    //   category_slug: alloc.category_slug,
-    //   allocation: alloc.allocation,
-    //   locked: alloc.locked,
-    // })),
+    ballot.filter(alloc => alloc.impact !== 0).map((alloc) => ({
+      project_id: alloc.project_id,
+      name: alloc.name,
+      allocation: alloc.allocation,
+    })),
     {}
   );
   console.log(csv);
