@@ -4,7 +4,7 @@ import { request } from "@/lib/request";
 import { useMutation } from "@tanstack/react-query";
 import { useAccount } from "wagmi";
 
-export type ImpactScore = 1 | 2 | 3 | 4 | 5;
+export type ImpactScore = 0 | 1 | 2 | 3 | 4 | 5;
 
 export function useSaveProjectImpact() {
   const { toast } = useToast();

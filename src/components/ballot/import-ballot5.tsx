@@ -10,9 +10,13 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { format, parse } from "@/lib/csv";
-import { Round5ProjectAllocation, useSaveRound5Allocation } from "@/hooks/useBallotRound5";
+import { Round5ProjectAllocation, useRound5Ballot, useSaveRound5Allocation } from "@/hooks/useBallotRound5";
 import mixpanel from "@/lib/mixpanel";
 import { useBallotRound5Context } from "./provider5";
+import { useSaveProjects } from "@/hooks/useProjects";
+import { ImpactScore } from "@/hooks/useProjectImpact";
+import { useAccount } from "wagmi";
+import { toast } from "../ui/use-toast";
 
 export function ImportBallotDialog({
   isOpen,
@@ -38,8 +42,10 @@ export function ImportBallotDialog({
 }
 
 function ImportBallotButton() {
-  const save = useSaveRound5Allocation();
   const editor = useBallotRound5Context();
+  const {mutateAsync: saveProjects} = useSaveProjects()
+  const {address} = useAccount()
+  const { refetch } = useRound5Ballot(address)
 
   const ref = useRef<HTMLInputElement>(null);
 
@@ -49,14 +55,11 @@ function ImportBallotButton() {
       // Parse CSV and build the ballot data (remove name column)
       const { data } = parse<Round5ProjectAllocation>(csvString);
       const allocations = data
-        .map(({ project_id, allocation }) => ({
+        .map(({ project_id, allocation, impact }) => ({
           project_id,
-          name: editor.ballot?.project_allocations.find(p => p.project_id === project_id)?.name,
-          image: editor.ballot?.project_allocations.find(p => p.project_id === project_id)?.image,
-          position: editor.ballot?.project_allocations.find(p => p.project_id === project_id)?.position,
           allocation: Number(allocation),
-          impact: editor.ballot?.project_allocations.find(p => p.project_id === project_id)?.impact,
-        }) as Round5ProjectAllocation)
+          impact: Number(impact) as ImpactScore,
+        }))
 
       if (allocations.length !== data.length) {
         alert(
@@ -65,11 +68,24 @@ function ImportBallotButton() {
       }
       console.log(allocations);
 
-      editor.reset(allocations);
+      editor.reset(allocations.map(alloc => ({
+        project_id: alloc.project_id,
+        allocation: alloc.allocation,
+        impact: alloc.impact,
+        name: editor.ballot?.project_allocations.find(p => p.project_id === alloc.project_id)?.name,
+        image: editor.ballot?.project_allocations.find(p => p.project_id === alloc.project_id)?.image,
+        position: editor.ballot?.project_allocations.find(p => p.project_id === alloc.project_id)?.position
+      })) as Round5ProjectAllocation[])
 
       mixpanel.track("Import CSV", { ballotSize: allocations.length });
 
-      allocations.forEach((allocation) => save.mutate(allocation));
+      saveProjects(allocations).then(() => refetch()).catch(e => {
+        console.log(e)
+        toast({
+          title: "Error importing ballot",
+          variant: "destructive"
+        })
+      })
     },
     [editor]
   );
@@ -108,9 +124,10 @@ function ExportBallotButton() {
       project_id: alloc.project_id,
       name: alloc.name,
       allocation: 0,
+      impact: alloc.impact
     }))
     : [
-      { project_id: "0x0", name: "Some project", allocation: 0 },
+      { project_id: "0x0", name: "Some project", allocation: 0, impact: 0 },
     ];
 
   return (
@@ -122,10 +139,11 @@ function ExportBallotButton() {
 
 export function exportRound5Ballot(ballot: Round5ProjectAllocation[]) {
   const csv = format(
-    ballot.filter(alloc => alloc.impact !== 0).map((alloc) => ({
+    ballot.map((alloc) => ({
       project_id: alloc.project_id,
       name: alloc.name,
       allocation: alloc.allocation,
+      impact: alloc.impact
     })),
     {}
   );
