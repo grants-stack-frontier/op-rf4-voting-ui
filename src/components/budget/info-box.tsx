@@ -1,37 +1,10 @@
 import { RiArrowDownLine, RiErrorWarningFill } from "@remixicon/react";
 import { useRef } from "react";
+import { useProjects } from "@/hooks/useProjects";
 
-interface FoundationGrant {
-  title: string;
-  description: string;
-  bounty: number;
-  durationMonths: number;
-}
-
-interface InfoBoxProps {
-  totalBudget: number;
-  roundNumber: number;
-  previousRoundProjects: number;
-  previousRoundBudget: number;
-  currentProjects: number;
-  foundationGrants: FoundationGrant[];
-  totalFoundationProjects: number;
-  totalFoundationBudget: number;
-  groupCallDate: string;
-}
-
-export function InfoBox({
-  totalBudget,
-  roundNumber,
-  previousRoundProjects,
-  previousRoundBudget,
-  currentProjects,
-  foundationGrants,
-  totalFoundationProjects,
-  totalFoundationBudget,
-  groupCallDate,
-}: InfoBoxProps) {
+export function InfoBox() {
   const contentRef = useRef<HTMLDivElement>(null);
+  const projects = useProjects();
 
   const handleScroll = () => {
     if (contentRef.current) {
@@ -57,7 +30,7 @@ export function InfoBox({
       </div>
       <div className='flex items-center mb-6'>
         <h2 className='text-lg font-semibold text-gray-900'>
-          Helpful information for Round {roundNumber} budgeting
+          Helpful information for Round 5 budgeting
         </h2>
       </div>
 
@@ -67,49 +40,43 @@ export function InfoBox({
       >
         <div className='space-y-6 pr-1 pb-12'>
           <p>
-            Optimism Foundation initially set the Round {roundNumber} budget to{" "}
-            {totalBudget.toLocaleString()} OP. They decided on this budget after
-            reviewing the results from Round {roundNumber - 2}—where{" "}
-            {previousRoundProjects} OP Stack projects were allocated{" "}
-            {previousRoundBudget.toLocaleString()} OP by voters.
+            The Optimism Foundation initially set the Round 5 budget to 8M OP.
+            They decided on this budget after reviewing the results from Round
+            3—where 40+ OP Stack projects were allocated 6.5M+ OP by voters.
           </p>
           <p>
-            Estimating that more OP Stack projects would apply in Round{" "}
-            {roundNumber}, the Foundation set a higher budget of{" "}
-            {totalBudget.toLocaleString()} OP.
+            Estimating that the impact within the OP Stack category has
+            increased since round 3, the Foundation set a higher budget of 8M
+            OP.
           </p>
           <p>
-            However, fewer projects have applied than expected. There are{" "}
-            {currentProjects} eligible projects, compared to{" "}
-            {previousRoundProjects} rewarded projects in Round {roundNumber - 2}
-            .
+            However, less projects have qualified for the round than expected.
+            In total, there are {projects.data?.length} eligible projects across
+            all categories.
           </p>
           <p className='font-bold text-gray-900'>Additional context</p>
           <p>
-            To help you determine a Round {roundNumber} budget, it’s useful to
-            understand how other OP Stack projects are valued. We can look at
-            two existing Optimism Foundation Grants for example.
+            To help you determine a Round 5 budget, it&apos;s useful to
+            reference existing data on Optimism allocations towards grants:
           </p>
-          {foundationGrants.map((grant, index) => (
-            <p key={index}>
-              {grant.title} is {grant.description}. The bounty on this work is
-              set to {grant.bounty.toLocaleString()} OP and expected to take
-              approximately {grant.durationMonths} months.
-            </p>
-          ))}
-          <p>
-            In total, over the last year, the Foundation has requested{" "}
-            {totalFoundationProjects} projects for a total of{" "}
-            {totalFoundationBudget.toLocaleString()} OP.
-          </p>
+          <ul className='list-disc pl-5 space-y-2'>
+            <li>
+              Retro Funding 4 allocated 10M OP among 207 Onchain builders for
+              driving the adoption of Optimism
+            </li>
+            <li>
+              The Token House has allocated 1M OP+ since Jan 2023 to 20+
+              proactive grants for OP Stack contributions
+            </li>
+            <li>
+              The Foundation has issued a 250k OP grant to build Zero Knowledge
+              proofs for the OP Stack
+            </li>
+          </ul>
           <p>
             Responsible allocation of OP enables the Collective to fund more
             builders, and to sustainably pursue Retro Funding into the future.
             Any unallocated OP will be used to reward impact in future rounds.
-          </p>
-          <p>
-            The Foundation will hold a group call on {groupCallDate} to discuss
-            the round budgeting step.
           </p>
         </div>
       </div>
