@@ -172,6 +172,7 @@ function YourBallot() {
       .sort((a, b) => a.position - b.position)
       .map(p => ({
         ...p,
+        allocation: p.allocation ?? 0,
         allocationInput: p.allocation?.toString() ?? '',
       })
     )
