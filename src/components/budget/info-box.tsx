@@ -57,24 +57,24 @@ export function InfoBox() {
           <p className='font-bold text-gray-900'>Additional context</p>
           <p>
             To help you determine a Round 5 budget, it&apos;s useful to
-            reference existing data on Optimism allocations towards grants:
+            reference existing data on Optimism grant allocations:
           </p>
-          <ul className='list-disc pl-5 space-y-2'>
+          <ol className='list-decimal pl-5 space-y-2'>
             <li>
               Retro Funding 4 allocated 10M OP among 207 Onchain builders for
               driving the adoption of Optimism
             </li>
             <li>
-              The Token House has allocated 1M OP+ since Jan 2023 to 20+
+              The Token House has allocated 1M+ OP since Jan 2023 to 20+
               proactive grants for OP Stack contributions
             </li>
             <li>
-              The Foundation has issued a 250k OP grant to build Zero Knowledge
+              The Foundation has made a 250k OP grant to build Zero Knowledge
               proofs for the OP Stack
             </li>
-          </ul>
+          </ol>
           <p>
-            Responsible allocation of OP enables the Collective to fund more
+            Responsible allocation of OP enables the Collective to support more
             builders, and to sustainably pursue Retro Funding into the future.
             Any unallocated OP will be used to reward impact in future rounds.
           </p>
