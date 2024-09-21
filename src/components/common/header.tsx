@@ -2,19 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { useAccount } from "wagmi";
-import { Logo } from "@/components/common/logo";
-import { Button } from "@/components/ui/button";
-import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import mixpanel from "mixpanel-browser";
+import { ArrowUpRight } from "lucide-react";
 
 import { badgeholderManualUrl, votingEndDate } from "@/config";
-import mixpanel from "mixpanel-browser";
+import { hasSeenIntro } from "@/utils/localStorage";
+
+import logo from "../../../public/logo.svg";
+
+import { Button } from "@/components/ui/button";
+import { Separator } from "../ui/separator";
 import { ConnectButton } from "../auth/connect-button";
 import { SignMessage } from "../auth/sign-message";
 import { VoterConfirmationDialog } from "../auth/voter-confirmation";
-import { Separator } from "../ui/separator";
 import { VotingEndsIn } from "../voting-ends-in";
-import { hasSeenIntro } from "@/utils/localStorage";
 
 export function Header() {
   const { address } = useAccount();
@@ -31,7 +34,7 @@ export function Header() {
   return (
     <header className='h-20 px-4 flex justify-between items-center'>
       <Link href={homeHref}>
-        <Logo />
+        <Image src={logo} alt='Logo' />
       </Link>
       <div className='hidden sm:flex items-center gap-2 divide-x space-x-2 text-sm'>
         <div className='flex flex-col lg:flex-row items-center h-8'>
