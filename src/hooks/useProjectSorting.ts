@@ -7,13 +7,13 @@ import { Round5Ballot } from './useBallotRound5';
 export function useProjectSorting(
 	projects: Project[] | undefined,
 	ballot: Round5Ballot | undefined,
-	projectsScored: ProjectsScored,
+	projectsScored: ProjectsScored | undefined,
 	currentId: string
 ) {
 	const router = useRouter();
 
 	const sortedProjects = useMemo(() => {
-		if (!projects || !ballot) return [];
+		if (!projects || !ballot || !projectsScored) return [];
 
 		return [...projects].sort((a, b) => {
 			const aId = a.applicationId ?? '';
@@ -31,10 +31,10 @@ export function useProjectSorting(
 			if (aSkipped !== bSkipped) return aSkipped ? 1 : -1;
 			return (a.name ?? '').localeCompare(b.name ?? '');
 		});
-	}, [projects, ballot, projectsScored.votedIds, projectsScored.skippedIds]);
+	}, [projects, ballot, projectsScored]);
 
 	const isVoted = useMemo(() => {
-		if (!ballot || !projects) return false;
+		if (!ballot || !projects || !projectsScored) return false;
 		const project = projects.find((p) => p.applicationId === currentId);
 		return (
 			ballot.project_allocations.some((p) => p.project_id === project?.applicationId) ||
@@ -43,6 +43,7 @@ export function useProjectSorting(
 	}, [ballot, projects, projectsScored, currentId]);
 
 	const handleNavigation = useCallback(() => {
+		if (!projectsScored) return;
 		if (sortedProjects.length > 0) {
 			const nextProject = sortedProjects.find((p) => {
 				const nextId = p.applicationId ?? '';
@@ -50,7 +51,7 @@ export function useProjectSorting(
 					nextId !== currentId &&
 					!projectsScored.votedIds.includes(nextId) &&
 					!projectsScored.skippedIds.includes(nextId) &&
-						!ballot?.project_allocations.some((allocation) => allocation.project_id === nextId)
+					!ballot?.project_allocations.some((allocation) => allocation.project_id === nextId)
 				);
 			});
 

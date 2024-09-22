@@ -597,7 +597,10 @@ export interface Project {
   name?: string;
   organization?: Organization;
   packages?: string[];
-  pricingModel?: string;
+  pricingModel?: {
+		type: string;
+		details: string;
+	};
   pricingModelDetails?: string;
   profileAvatarUrl?: string;
   projectCoverImageUrl?: string;

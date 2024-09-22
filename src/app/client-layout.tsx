@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
-import { Loader2 } from "lucide-react";
+import { Callouts } from "@/components/common/callouts";
 import { DisconnectedState } from "@/components/common/disconnected-state";
 import { Header } from "@/components/common/header";
-import { Callouts } from "@/components/common/callouts";
-import SunnySVG from "../../public/sunny.svg";
+import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
+import SunnySVG from "../../public/sunny.svg";
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [hasMounted, setHasMounted] = useState(false);

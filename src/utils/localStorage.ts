@@ -1,4 +1,4 @@
-import { Address } from "viem";
+import { Address } from 'viem';
 
 const PROJECTS_SCORED_KEY = 'projectsScored';
 const INTRO_SEEN_KEY = 'introSeen';
@@ -63,16 +63,44 @@ export function clearProjectsScored(category: string, walletAddress: Address): v
 }
 
 export const hasSeenIntro = (walletAddress: Address): boolean => {
-  if (typeof window === 'undefined') return false;
-  const stored = localStorage.getItem(INTRO_SEEN_KEY);
-  const allData = stored ? JSON.parse(stored) : {};
-  return !!allData[walletAddress];
+	if (typeof window === 'undefined') return false;
+	const stored = localStorage.getItem(INTRO_SEEN_KEY);
+	const allData = stored ? JSON.parse(stored) : {};
+	return !!allData[walletAddress];
 };
 
 export const markIntroAsSeen = (walletAddress: Address): void => {
-  if (typeof window === 'undefined') return;
-  const stored = localStorage.getItem(INTRO_SEEN_KEY);
-  const allData = stored ? JSON.parse(stored) : {};
-  allData[walletAddress] = true;
-  localStorage.setItem(INTRO_SEEN_KEY, JSON.stringify(allData));
+	if (typeof window === 'undefined') return;
+	const stored = localStorage.getItem(INTRO_SEEN_KEY);
+	const allData = stored ? JSON.parse(stored) : {};
+	allData[walletAddress] = true;
+	localStorage.setItem(INTRO_SEEN_KEY, JSON.stringify(allData));
 };
+
+export function updateVotedProjectsFromAllocations(
+	category: string,
+	walletAddress: Address,
+	allocations: { project_id: string }[] | undefined
+): ProjectsScored {
+	const current = getProjectsScored(category, walletAddress);
+
+	if (allocations && allocations.length > 0) {
+		const votedIds = Array.from(new Set(allocations.map((a) => a.project_id)));
+		const newVotedIdsString = JSON.stringify(votedIds.sort());
+		const currentVotedIdsString = JSON.stringify(current.votedIds.sort());
+
+		if (newVotedIdsString !== currentVotedIdsString) {
+			const updatedData: ProjectsScored = {
+				...current,
+				votedCount: votedIds.length,
+				votedIds: votedIds,
+			};
+
+			setProjectsScored(category, walletAddress, updatedData);
+
+			return updatedData;
+		}
+	}
+
+	return current;
+}
