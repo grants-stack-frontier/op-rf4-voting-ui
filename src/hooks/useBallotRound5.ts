@@ -16,6 +16,8 @@ import { useRef } from "react";
 import { useBallotRound5Context } from "@/components/ballot/provider5";
 import { CategoryId } from "@/types/shared";
 import { Loader2 } from "lucide-react";
+import { RetroFunding5BallotSubmissionContent } from "@/__generated__/api/agora.schemas";
+import { submitRetroFundingBallot } from "@/__generated__/api/agora";
 
 
 export type Round5CategoryAllocation = {
@@ -47,6 +49,7 @@ export type Round5Ballot = {
   projects_to_be_evaluated: string[];
   total_projects: number;
   distribution_method?: string;
+  budget?: number;
 }
 
 export function useRound5Ballot(address?: string) {
@@ -102,25 +105,38 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
   return useMutation({
     mutationFn: async () => {
       const { data: ballot } = await refetch();
-      const allocations = ballot?.category_allocations.map((alloc: any) => ({
-        [alloc.category_slug]: alloc.allocation,
-      }));
-      const ballot_content = {
-        allocations,
+      const ballot_content: RetroFunding5BallotSubmissionContent = {
+        budget: ballot?.budget,
+        category_allocation: ballot?.category_allocations.map(({ category_slug, allocation, locked }) => ({
+          category_slug,
+          allocation,
+          locked,
+        })),
+        projects_allocation: ballot?.project_allocations.map(({ project_id, allocation, impact }) => ({
+          project_id,
+          allocation,
+          impact,
+        }))
       };
       const signature = await signMessageAsync({
         message: JSON.stringify(ballot_content),
       });
 
-      return request
-        .post(`${agoraRoundsAPI}/ballots/${address}/submit`, {
-          json: {
-            address,
-            ballot_content,
-            signature,
-          },
-        })
-        .json();
+      return await submitRetroFundingBallot(5, address!, {
+        address,
+        ballot_content,
+        signature,
+      });
+
+      // return request
+      //   .post(`${agoraRoundsAPI}/ballots/${address}/submit`, {
+      //     json: {
+      //       address,
+      //       ballot_content,
+      //       signature,
+      //     },
+      //   })
+      //   .json();
     },
     onSuccess,
     onError: () =>

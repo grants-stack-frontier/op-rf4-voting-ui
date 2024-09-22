@@ -142,12 +142,24 @@ function YourBallot() {
   const { mutate: savePosition } = useSaveRound5Position();
   // const { data: projects } = useProjects();
   const votingCategory = useVotingCategory();
-  const { data: projects } = useProjectsByCategory(votingCategory as CategoryId);
-  const { data: distributionMethod, update: saveDistributionMethod } = useDistributionMethodFromLocalStorage();
+  const { data: projects } = useProjectsByCategory(
+    votingCategory as CategoryId
+  );
+  const { data: distributionMethod, update: saveDistributionMethod } =
+    useDistributionMethodFromLocalStorage();
 
   console.log({ ballot });
   console.log({ projects });
-  console.log("Diff:", projects?.filter(p => !ballot?.project_allocations.find(p2 => p2.project_id?.toLowerCase() === p.applicationId?.toLowerCase())))
+  console.log(
+    "Diff:",
+    projects?.filter(
+      (p) =>
+        !ballot?.project_allocations.find(
+          (p2) =>
+            p2.project_id?.toLowerCase() === p.applicationId?.toLowerCase()
+        )
+    )
+  );
 
   const [projectList, setProjectList] = useState<ProjectAllocationState[]>(
     sortAndPrepProjects(ballot?.project_allocations || [], "no-conflict")
@@ -166,11 +178,14 @@ function YourBallot() {
     );
   }, [ballot]);
 
-  type Filter = 'conflict' | 'no-conflict'
-  function sortAndPrepProjects(newProjects: Round5ProjectAllocation[], filter?: Filter): ProjectAllocationState[] {
+  type Filter = "conflict" | "no-conflict";
+  function sortAndPrepProjects(
+    newProjects: Round5ProjectAllocation[],
+    filter?: Filter
+  ): ProjectAllocationState[] {
     const projects = newProjects
       .sort((a, b) => a.position - b.position)
-      .map(p => ({
+      .map((p) => ({
         ...p,
         allocation: p.allocation ?? 0,
         allocationInput: p.allocation?.toString() ?? '',
@@ -179,11 +194,11 @@ function YourBallot() {
     if (filter === 'conflict') {
       return projects.filter(p => p.impact === 0);
     }
-    if (filter === 'no-conflict') {
-      return projects.filter(p => p.impact !== 0);
+    if (filter === "no-conflict") {
+      return projects.filter((p) => p.impact !== 0);
     }
     return projects;
-  };
+  }
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProjects, setFilteredProjects] = useState<
@@ -487,7 +502,7 @@ function WeightsError() {
   if (!distributionMethod)
     return (
       <span className='text-sm text-destructive'>
-        Choose a distribution method at the top of this ballot.
+        Choose an allocation method at the top of this ballot.
       </span>
     );
 

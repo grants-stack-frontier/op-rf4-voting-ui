@@ -567,6 +567,16 @@ export interface SocialLinks {
   website?: string;
 }
 
+export type ProjectPricingModel = {
+  details?: string;
+  type?: string;
+};
+
+export type ProjectImpactStatementStatement = {
+  answer?: string;
+  question?: string;
+};
+
 export type ProjectImpactStatement = {
   category?: string;
   statement?: ProjectImpactStatementStatement;
@@ -597,22 +607,13 @@ export interface Project {
   name?: string;
   organization?: Organization;
   packages?: string[];
-  pricingModel?: {
-		type: string;
-		details: string;
-	};
-  pricingModelDetails?: string;
+  pricingModel?: ProjectPricingModel;
   profileAvatarUrl?: string;
   projectCoverImageUrl?: string;
   projectId?: string;
   socialLinks?: SocialLinks;
   team?: string[];
 }
-
-export type ProjectImpactStatementStatement = {
-  answer?: string;
-  question?: string;
-};
 
 export type ProjectGrantsAndFundingVentureFundingItem = {
   amount?: string;
