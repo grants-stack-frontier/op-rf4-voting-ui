@@ -1,15 +1,12 @@
 import { Heading } from "@/components/ui/headings";
 import { CustomAccordion } from "../custom-accordion";
 import { Card, CardContent } from "../ui/card";
+import { ProjectPricingModel } from "@/__generated__/api/agora.schemas";
 
-interface PricingModelProps {
-  pricingModel?: {
-    type: string;
-    details: string;
-  };
-}
 
-export function PricingModel({ pricingModel }: PricingModelProps) {
+export function PricingModel({ pricingModel }: {
+  pricingModel?: ProjectPricingModel;
+}) {
   if (!pricingModel) return null;
 
   const { type, details } = pricingModel;
@@ -32,16 +29,16 @@ export function PricingModel({ pricingModel }: PricingModelProps) {
         <Card className='shadow-none'>
           <CardContent className='px-2.5 py-3'>
             <div className='capitalize text-sm font-medium leading-5'>
-              {formatType(type)}
+              {formatType(type ?? "")}
             </div>
           </CardContent>
         </Card>
       ) : (
         <CustomAccordion
-          value={type}
+          value={type ?? ""}
           trigger={
             <div className='capitalize text-sm font-medium leading-5'>
-              {formatType(type)}
+              {formatType(type ?? "")}
             </div>
           }
         >
