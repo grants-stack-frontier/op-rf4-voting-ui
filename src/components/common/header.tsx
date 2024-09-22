@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
-import Link from "next/link";
-import Image from "next/image";
-import mixpanel from "mixpanel-browser";
 import { ArrowUpRight } from "lucide-react";
+import mixpanel from "mixpanel-browser";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 
 import { badgeholderManualUrl, votingEndDate } from "@/config";
 import { hasSeenIntro } from "@/utils/localStorage";
@@ -13,10 +13,11 @@ import { hasSeenIntro } from "@/utils/localStorage";
 import logo from "../../../public/logo.svg";
 
 import { Button } from "@/components/ui/button";
-import { Separator } from "../ui/separator";
 import { ConnectButton } from "../auth/connect-button";
 import { SignMessage } from "../auth/sign-message";
 import { VoterConfirmationDialog } from "../auth/voter-confirmation";
+import { ModeToggle } from "../dark-mode-toggle";
+import { Separator } from "../ui/separator";
 import { VotingEndsIn } from "../voting-ends-in";
 
 export function Header() {
