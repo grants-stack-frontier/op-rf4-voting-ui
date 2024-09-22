@@ -184,7 +184,7 @@ function YourBallot() {
     filter?: Filter
   ): ProjectAllocationState[] {
     const projects = newProjects
-      .sort((a, b) => a.position - b.position)
+      .sort((a, b) => distributionMethod === DistributionMethod.CUSTOM ? Number(b.allocation) - Number(a.allocation) : a.position - b.position)
       .map((p) => ({
         ...p,
         allocation: p.allocation ?? 0,
