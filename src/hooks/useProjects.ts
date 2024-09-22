@@ -133,21 +133,15 @@ export function useSaveProjects() {
     mutationKey: ["save-projects"],
     mutationFn: async (projects: {
       project_id: string,
-      allocation: number,
-      impact: ImpactScore
+      allocation: string,
+      impact: 0 | 1 | 2 | 3 | 4 | 5
     }[]) => {
+      console.log("Saving projects from import:", projects, projects.length)
       await request
         .post(`${agoraRoundsAPI}/ballots/${address}/projects`, {
-          json: {
-            projects: projects.map(p => ({
-              project_id: p.project_id,
-              allocation: p.allocation.toString(),
-              impact: p.impact
-            }))
-          }
-
+          json: { projects }
         })
-        .json<Round5Ballot>()
+        .json<any>()
         .then((r) => {
           console.log(r)
           queryClient.setQueryData(["ballot-round5", address], r);

@@ -13,10 +13,12 @@ import { format, parse } from "@/lib/csv";
 import { Round5ProjectAllocation, useRound5Ballot, useSaveRound5Allocation } from "@/hooks/useBallotRound5";
 import mixpanel from "@/lib/mixpanel";
 import { useBallotRound5Context } from "./provider5";
-import { useSaveProjects } from "@/hooks/useProjects";
+import { useProjects, useProjectsByCategory, useSaveProjects } from "@/hooks/useProjects";
 import { ImpactScore } from "@/hooks/useProjectImpact";
 import { useAccount } from "wagmi";
 import { toast } from "../ui/use-toast";
+import { useSession } from "@/hooks/useAuth";
+import { CategoryId } from "@/types/shared";
 
 export function ImportBallotDialog({
   isOpen,
@@ -33,7 +35,7 @@ export function ImportBallotDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-2">
-          <ImportBallotButton />
+          <ImportBallotButton onClose={() => onOpenChange?.(false)} />
           <ExportBallotButton />
         </div>
       </DialogContent>
@@ -41,11 +43,13 @@ export function ImportBallotDialog({
   );
 }
 
-function ImportBallotButton() {
+function ImportBallotButton({ onClose }: { onClose: () => void }) {
   const editor = useBallotRound5Context();
   const {mutateAsync: saveProjects} = useSaveProjects()
   const {address} = useAccount()
   const { refetch } = useRound5Ballot(address)
+  const { data: session } = useSession()
+  const { data: projects } = useProjectsByCategory(session?.category as CategoryId)
 
   const ref = useRef<HTMLInputElement>(null);
 
@@ -57,7 +61,7 @@ function ImportBallotButton() {
       const allocations = data
         .map(({ project_id, allocation, impact }) => ({
           project_id,
-          allocation: Number(allocation),
+          allocation: Number(allocation).toString(),
           impact: Number(impact) as ImpactScore,
         }))
 
@@ -70,7 +74,7 @@ function ImportBallotButton() {
 
       editor.reset(allocations.map(alloc => ({
         project_id: alloc.project_id,
-        allocation: alloc.allocation,
+        allocation: Number(alloc.allocation),
         impact: alloc.impact,
         name: editor.ballot?.project_allocations.find(p => p.project_id === alloc.project_id)?.name,
         image: editor.ballot?.project_allocations.find(p => p.project_id === alloc.project_id)?.image,
@@ -79,13 +83,22 @@ function ImportBallotButton() {
 
       mixpanel.track("Import CSV", { ballotSize: allocations.length });
 
-      saveProjects(allocations).then(() => refetch()).catch(e => {
-        console.log(e)
-        toast({
-          title: "Error importing ballot",
-          variant: "destructive"
+      saveProjects(allocations.filter(alloc => !!projects?.find(p => p.applicationId === alloc.project_id)))
+        .then(() => {
+          refetch()
+          toast({
+            title: "Ballot imported successfully",
+            variant: "default"
+          })
+          onClose()
         })
-      })
+        .catch(e => {
+          console.log(e)
+          toast({
+            title: "Error importing ballot",
+            variant: "destructive"
+          })
+        })
     },
     [editor]
   );
