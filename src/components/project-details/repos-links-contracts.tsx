@@ -40,7 +40,7 @@ export function ReposLinksContracts({ github, links, contracts }: ReposLinksCont
           )
         }
         const typedRepo = repo as { name: string, url: string, description: string, metrics: ProjectGithubItemOneOf };
-        const { age_of_project_years, num_contributors, num_trusted_contributors, num_contributors_last_6_months, num_forks, num_trusted_forks, num_stars, num_trusted_stars } = typedRepo.metrics;
+        const { age_of_project_years, num_contributors, num_trusted_contributors, num_contributors_last_6_months, num_forks, num_trusted_forks, num_stars, num_trusted_stars } = typedRepo.metrics ?? {};
         if (!typedRepo.description) {
           return (
             <Card className="shadow-none" key={index}>
@@ -71,32 +71,34 @@ export function ReposLinksContracts({ github, links, contracts }: ReposLinksCont
             <div className="p-2">
               {typedRepo.description ?? 'No description'}
             </div>
-            <div className="grid grid-cols-3 gap-2 p-2">
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiTimeFill className="h-4 w-4" /> <span>{formatProjectAge(Number(age_of_project_years) ?? 0)} old</span>
+            {typedRepo.metrics && (
+              <div className="grid grid-cols-3 gap-2 p-2">
+                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                  <RiTimeFill className="h-4 w-4" /> <span>{formatProjectAge(Number(age_of_project_years) ?? 0)} old</span>
+                </div>
+                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                  <RiUserFill className="h-4 w-4" /> <span>{Number(num_contributors)} contributors</span>
+                </div>
+                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                  <RiUserStarFill className="h-4 w-4" /> <span>{Number(num_trusted_contributors)} trusted contributors</span>
+                </div>
+                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                  <RiUserFill className="h-4 w-4" /> <span>{Number(num_contributors_last_6_months)} contributors last 6 months</span>
+                </div>
+                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                  <RiGitForkFill className="h-4 w-4" /> <span>{Number(num_forks)} forks</span>
+                </div>
+                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                  <RiGitForkFill className="h-4 w-4" /> <span>{Number(num_trusted_forks)} trusted forks</span>
+                </div>
+                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                  <RiStarFill className="h-4 w-4" /> <span>{Number(num_stars)} stars</span>
+                </div>
+                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                  <RiStarFill className="h-4 w-4" /> <span>{Number(num_trusted_stars)} trusted stars</span>
+                </div>
               </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiUserFill className="h-4 w-4" /> <span>{Number(num_contributors)} contributors</span>
-              </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiUserStarFill className="h-4 w-4" /> <span>{Number(num_trusted_contributors)} trusted contributors</span>
-              </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiUserFill className="h-4 w-4" /> <span>{Number(num_contributors_last_6_months)} contributors last 6 months</span>
-              </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiGitForkFill className="h-4 w-4" /> <span>{Number(num_forks)} forks</span>
-              </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiGitForkFill className="h-4 w-4" /> <span>{Number(num_trusted_forks)} trusted forks</span>
-              </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiStarFill className="h-4 w-4" /> <span>{Number(num_stars)} stars</span>
-              </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiStarFill className="h-4 w-4" /> <span>{Number(num_trusted_stars)} trusted stars</span>
-              </div>
-            </div>
+            )}
           </CustomAccordion>
         );
       })}

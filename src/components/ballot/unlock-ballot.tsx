@@ -1,5 +1,5 @@
 "use client";
-import { LockKeyholeOpen } from "lucide-react";
+import { RiLockUnlockFill } from "@remixicon/react";
 import { useRouter } from "next/navigation";
 import { ComponentProps, useState } from "react";
 import { LoadingDialog } from "../common/loading-dialog";
@@ -27,9 +27,9 @@ export function UnlockBallotDialog({
 			<AlertDialog open={isOpen} onOpenChange={setOpen}>
 				<AlertDialogContent>
 					<AlertDialogHeader className="flex flex-col items-center gap-4">
-						<AlertDialogTitle><LockKeyholeOpen className="w-16 h-16 text-black" /></AlertDialogTitle>
-						<AlertDialogDescription className="text-xl font-medium">Nice work! You&apos;re ready to unlock your ballot and allocate rewards</AlertDialogDescription>
-						<p className="text-sm text-muted-foreground">We&apos;ll use your scores to position projects in your unlocked ballot.</p>
+						<AlertDialogTitle><RiLockUnlockFill className="w-16 h-16" /></AlertDialogTitle>
+						<AlertDialogDescription className="text-center text-xl font-medium">Nice work! You&apos;re ready to unlock your ballot and allocate rewards</AlertDialogDescription>
+						<p className="text-sm">We&apos;ll use your scores to position projects in your unlocked ballot.</p>
 						<Button className="w-full" variant="destructive" onClick={handleUnlock} disabled={isUnlockedLoading}>Unlock ballot</Button>
 					</AlertDialogHeader>
 				</AlertDialogContent>

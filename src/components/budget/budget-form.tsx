@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { CardContent, CardFooter } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { Slider } from "../ui/slider";
 import { CategoryItem } from "./category-item";
 import { useBudgetContext } from "./provider";
-import { useRouter } from "next/navigation";
-import { Slider } from "../ui/slider";
-import { Skeleton } from "@/components/ui/skeleton";
 
 export function BudgetForm() {
   const { categories, error, isLoading, totalBudget, setTotalBudget } =
@@ -65,7 +65,7 @@ export function BudgetForm() {
                 thumbClassName='border-gray-600'
               />
               <span className='text-sm'>8M</span>
-              <div className='flex rounded-lg bg-[#F2F3F8] border ml-4'>
+              <div className='flex rounded-lg bg-[#F2F3F8] dark:bg-secondary border ml-4'>
                 <input
                   type='text'
                   value={`${totalBudget.toLocaleString()} OP`}
