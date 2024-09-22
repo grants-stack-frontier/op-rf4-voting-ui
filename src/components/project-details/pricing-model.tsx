@@ -1,7 +1,7 @@
+import { ProjectPricingModel } from "@/__generated__/api/agora.schemas";
 import { Heading } from "@/components/ui/headings";
 import { CustomAccordion } from "../custom-accordion";
 import { Card, CardContent } from "../ui/card";
-import { ProjectPricingModel } from "@/__generated__/api/agora.schemas";
 
 
 export function PricingModel({ pricingModel }: {
@@ -42,7 +42,9 @@ export function PricingModel({ pricingModel }: {
             </div>
           }
         >
-          {details}
+          <div className="p-2">
+            {details}
+          </div>
         </CustomAccordion>
       )}
     </div>

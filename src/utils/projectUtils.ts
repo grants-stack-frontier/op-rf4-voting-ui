@@ -12,3 +12,12 @@ export function getBadgeClassName(category: CategoryType | undefined): string {
       return 'bg-blue-500/25 text-blue-600';
   }
 }
+
+export function formatProjectAge(years: number): string {
+  if (years < 1) {
+    const months = Math.round(years * 12);
+    return `${months} month${months !== 1 ? 's' : ''}`;
+  } else {
+    return `${years.toFixed(1)} year${years !== 1 ? 's' : ''}`;
+  }
+}

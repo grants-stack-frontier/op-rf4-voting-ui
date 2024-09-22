@@ -651,6 +651,17 @@ export type ProjectGithubItemOneOf = {
   star_count?: number;
   starred_by_top_devs?: number;
   starred_events?: number;
+  trust_rank_for_repo_in_category?: string;
+  num_contributors?: string;
+  num_trusted_contributors?: string;
+  num_contributors_last_6_months?: string;
+  num_stars?: string;
+  num_trusted_stars?: string;
+  trust_weighted_stars?: string;
+  num_forks?: string;
+  num_trusted_forks?: string;
+  trust_weighted_forks?: string;
+  license?: string;
 };
 
 export type ProjectGithubItem = string | ProjectGithubItemOneOf;

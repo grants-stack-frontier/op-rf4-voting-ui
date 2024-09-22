@@ -11,11 +11,11 @@ export function ImpactStatement({ impactStatement }: { impactStatement?: Project
 			<div className="flex flex-col gap-6 mb-12">
 				<Heading className="text-xl font-medium" variant="h3">Impact Statement</Heading>
 				<div>
-					<div className="flex items-start gap-2 text-gray-700">
+					<div className="flex items-start gap-2 text-gray-700 dark:text-gray-300">
 						<Heading variant="h1">Category:</Heading>
 						<p>{impactStatement?.category ? categoryNames[impactStatement.category] : 'N/A'}</p>
 					</div>
-					<div className="flex items-start gap-2 text-gray-700">
+					<div className="flex items-start gap-2 text-gray-700 dark:text-gray-300">
 						<Heading variant="h1">Subcategory:</Heading>
 						<p>{impactStatement?.subcategory?.join(', ') ?? 'N/A'}</p>
 					</div>
@@ -29,7 +29,7 @@ export function ImpactStatement({ impactStatement }: { impactStatement?: Project
 					{impactStatement.statement.map((statement, index) => (
 						<div key={index} className="flex flex-col gap-6 mb-12">
 							<p className="border-l-4 pl-2 border-red-500 font-semibold">{statement.question}</p>
-							<Markdown>{statement.answer}</Markdown>
+							<Markdown className="text-gray-700 dark:text-gray-300">{statement.answer}</Markdown>
 						</div>
 					))}
 				</>

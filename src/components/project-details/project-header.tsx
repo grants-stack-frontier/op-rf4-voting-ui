@@ -7,7 +7,7 @@ export function ProjectHeader({ profileAvatarUrl, name, projectCoverImageUrl, or
   return (
     <div className="flex flex-col gap-6">
       {projectCoverImageUrl && profileAvatarUrl ? (
-        <div className="w-full h-56">
+        <div className="w-full h-56 relative">
           <Image
             priority
             className="rounded-md w-full h-[180px] object-cover border border-gray-200 bg-white"
@@ -16,11 +16,11 @@ export function ProjectHeader({ profileAvatarUrl, name, projectCoverImageUrl, or
             width={720}
             height={180}
           />
-          <Image priority className="rounded-md -mt-10 ml-6 object-cover" src={profileAvatarUrl} alt={name || ''} width={80} height={80} />
+          <Image priority className="rounded-md -mt-10 ml-6 object-cover bg-white absolute z-10" src={profileAvatarUrl} alt={name || ''} width={80} height={80} />
         </div>
       ) : profileAvatarUrl && (
         <div className="w-full">
-          <Image priority className="rounded-md object-cover" src={profileAvatarUrl} alt={name || ''} width={80} height={80} />
+          <Image priority className="rounded-md object-cover bg-white" src={profileAvatarUrl} alt={name || ''} width={80} height={80} />
         </div>
       )}
       {name && (
@@ -30,7 +30,7 @@ export function ProjectHeader({ profileAvatarUrl, name, projectCoverImageUrl, or
         <div className="flex items-center gap-2">
           <p className="font-medium">By</p>
           {organizationAvatarUrl && (
-            <Image priority className="rounded-full" src={organizationAvatarUrl} alt={orgName || ''} width={30} height={30} />
+            <Image priority className="rounded-full bg-white" src={organizationAvatarUrl} alt={orgName || ''} width={30} height={30} />
           )}
           {orgName && (
             <p className="font-medium">{orgName}</p>

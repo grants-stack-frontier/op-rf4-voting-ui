@@ -1,14 +1,18 @@
 import { Project } from '@/__generated__/api/agora.schemas';
+import { toast } from '@/components/ui/use-toast';
+import { HttpStatusCode } from '@/enums/http-status-codes';
+import { useSaveProjectImpact } from '@/hooks/useProjects';
 import {
 	ProjectsScored,
 	addScoredProject,
 	addSkippedProject,
 	clearProjectsScored,
 	getProjectsScored,
+	updateVotedProjectsFromAllocations,
 } from '@/utils/localStorage';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Address } from 'viem';
-import { Round5Ballot } from './useBallotRound5';
+import { Round5ProjectAllocation } from './useBallotRound5';
 
 export type ImpactScore = 0 | 1 | 2 | 3 | 4 | 5 | 'Skip';
 
@@ -27,72 +31,83 @@ export const useProjectScoring = (
 	category: string,
 	id: string,
 	walletAddress: Address | undefined,
-	ballot: Round5Ballot | undefined,
-	projects: Project[] | undefined
+	allocations: Round5ProjectAllocation[] | undefined,
+	projects: Project[] | undefined,
+	projectsScored: ProjectsScored | undefined,
+	setProjectsScored: React.Dispatch<React.SetStateAction<ProjectsScored | undefined>>
 ) => {
-	const [projectsScored, setProjectsScored] = useState<ProjectsScored>({
-		votedCount: 0,
-		votedIds: [],
-		skippedCount: 0,
-		skippedIds: [],
-	});
 	const [isUnlocked, setIsUnlocked] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
+	const [isSaving, setIsSaving] = useState(false);
+	const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
+
+	// Calculate initial state during render
+	const initialProjectsScored = useMemo(() => {
+		if (!walletAddress || !category || !allocations) {
+			return undefined;
+		}
+		const storedProjectsScored = getProjectsScored(category, walletAddress);
+		const allocationsLength = allocations.length;
+		if (storedProjectsScored.votedCount === 0 || storedProjectsScored.votedCount > allocationsLength) {
+			return storedProjectsScored;
+		} else {
+			return updateVotedProjectsFromAllocations(category, walletAddress, allocations);
+		}
+	}, [category, walletAddress, allocations]);
 
 	useEffect(() => {
-		if (walletAddress) {
-			let storedProjectsScored = getProjectsScored(category, walletAddress);
-
-			// Compare project_allocations with projects and update votedIds and votedCount
-			if (ballot && ballot.project_allocations && projects) {
-				const allocatedIds = ballot.project_allocations.map((allocation: any) => allocation.project_id);
-				const projectIds = projects.map((project: any) => project.applicationId);
-
-				const newVotedIds = projectIds.filter((id: string) => allocatedIds.includes(id));
-
-				if (newVotedIds.length > 0) {
-					const updatedVotedIds = Array.from(new Set([...storedProjectsScored.votedIds, ...newVotedIds]));
-					storedProjectsScored = {
-						...storedProjectsScored,
-						votedCount: updatedVotedIds.length,
-						votedIds: updatedVotedIds,
-					};
-					setProjectsScored(storedProjectsScored);
-				}
-			}
-
-			setProjectsScored(storedProjectsScored);
+		if (initialProjectsScored) {
+			setProjectsScored(initialProjectsScored);
+			setIsLoading(false);
 		}
-	}, [category, walletAddress, ballot, projects]);
+	}, [initialProjectsScored, setProjectsScored, setIsLoading]);
+
+	const totalProjects = useMemo(() => projects?.length ?? 0, [projects]);
 
 	const handleScoreSelect = useCallback(
-		async (score: ImpactScore, totalVotedProjects: number) => {
+		async (score: ImpactScore) => {
 			if (!walletAddress) {
 				console.warn('Wallet address not available');
 				return { updatedProjectsScored: projectsScored, allProjectsScored: false };
 			}
 
-			let updatedProjectsScored = projectsScored;
+			let updatedProjectsScored: ProjectsScored;
 
 			if (score === 'Skip') {
 				updatedProjectsScored = addSkippedProject(category, id, walletAddress);
-				setProjectsScored(updatedProjectsScored);
-			} else if (!updatedProjectsScored.votedIds.includes(id)) {
-				updatedProjectsScored = addScoredProject(category, id, walletAddress);
-				setProjectsScored(updatedProjectsScored);
+			} else {
+				setIsSaving(true);
+				toast({ variant: 'default', title: 'Saving your impact score...' });
+				try {
+					const result = await saveProjectImpact({ projectId: id, impact: score });
+					if (result.status === HttpStatusCode.OK) {
+						updatedProjectsScored = addScoredProject(category, id, walletAddress);
+						toast({ variant: 'default', title: 'Impact score was saved successfully!' });
+					} else {
+						throw new Error('Error saving impact score');
+					}
+				} catch (error) {
+					toast({ variant: 'destructive', title: 'Error saving impact score' });
+					return { updatedProjectsScored: projectsScored, allProjectsScored: false };
+				} finally {
+					setIsSaving(false);
+				}
 			}
 
-			const allProjectsScored = updatedProjectsScored.votedCount === totalVotedProjects;
+			const allProjectsScored = updatedProjectsScored.votedCount === totalProjects;
 
 			if (allProjectsScored) {
 				setIsUnlocked(true);
 				clearProjectsScored(category, walletAddress);
-				setProjectsScored({ votedCount: 0, votedIds: [], skippedCount: 0, skippedIds: [] });
+				updatedProjectsScored = { votedCount: 0, votedIds: [], skippedCount: 0, skippedIds: [] };
 			}
+
+			setProjectsScored(updatedProjectsScored);
 
 			return { updatedProjectsScored, allProjectsScored };
 		},
-		[category, id, projectsScored, walletAddress]
+		[category, id, projectsScored, walletAddress, totalProjects, saveProjectImpact, setProjectsScored]
 	);
 
-	return { projectsScored, isUnlocked, setIsUnlocked, handleScoreSelect };
+	return { isUnlocked, setIsUnlocked, handleScoreSelect, isLoading, isSaving };
 };

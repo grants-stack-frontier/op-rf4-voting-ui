@@ -1,7 +1,7 @@
 "use client";
+import { votingEndDate } from "@/config";
 import { useIsBadgeholder } from "@/hooks/useIsBadgeholder";
 import { useAccount } from "wagmi";
-import { votingEndDate } from "@/config";
 import { useVotingTimeLeft } from "../voting-ends-in";
 
 export function Callouts() {
@@ -12,7 +12,7 @@ export function Callouts() {
 
   if (Number(seconds) < 0) {
     return (
-      <div className="bg-accent-foreground dark:text-black text-center p-3 text-white">
+      <div className="bg-accent-foreground text-center p-3 text-white dark:text-black">
         Voting in Retro Funding Round 5 has closed
       </div>
     );
@@ -23,7 +23,7 @@ export function Callouts() {
   if (isBadgeholder) return null;
 
   return (
-    <div className="bg-accent-foreground text-center p-3 text-white">
+    <div className="bg-accent-foreground text-center p-3 text-white dark:text-black">
       Demo mode: You&apos;re not a badgeholder
     </div>
   );
