@@ -187,10 +187,12 @@ function YourBallot() {
       .sort((a, b) => a.position - b.position)
       .map((p) => ({
         ...p,
-        allocationInput: p.allocation?.toString() ?? "",
-      }));
-    if (filter === "conflict") {
-      return projects.filter((p) => p.impact === 0);
+        allocation: p.allocation ?? 0,
+        allocationInput: p.allocation?.toString() ?? '',
+      })
+    )
+    if (filter === 'conflict') {
+      return projects.filter(p => p.impact === 0);
     }
     if (filter === "no-conflict") {
       return projects.filter((p) => p.impact !== 0);
