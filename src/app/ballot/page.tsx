@@ -41,6 +41,7 @@ import { MetricsEditor } from "../../components/metrics-editor";
 import { CategoryId } from "@/types/shared";
 import { useProjects, useProjectsByCategory } from "@/hooks/useProjects";
 import { useVotingCategory } from "@/hooks/useVotingCategory";
+import { NumberInput } from "@/components/ui/number-input";
 
 function formatAllocationOPAmount(amount?: number) {
   if (amount === undefined) return 0;
@@ -355,18 +356,13 @@ function YourBallot() {
                 </div>
                 <div className='flex flex-col justify-start items-center gap-1'>
                   <div className='relative'>
-                    <Input
-                      type='number'
+                    <NumberInput
                       placeholder='--'
-                      className='text-center'
-                      value={proj.allocationInput}
-                      onChange={(e) => {
-                        const newAllocation = parseFloat(e.target.value);
+                      className='text-center w-[112px]'
+                      value={proj.allocation}
+                      onChange={(newValue) => {
                         const newProjectList = [...projectList];
-                        newProjectList[i].allocation = isNaN(newAllocation)
-                          ? 0
-                          : newAllocation;
-                        newProjectList[i].allocationInput = e.target.value;
+                        newProjectList[i].allocation = newValue;
                         setProjectList(newProjectList);
                         saveDistributionMethod(DistributionMethod.CUSTOM);
                       }}
@@ -376,8 +372,11 @@ function YourBallot() {
                           allocation: proj.allocation,
                         });
                       }}
+                      min={0}
+                      max={100}
+                      step={1}
                     />
-                    <span className='absolute right-10 top-1/2 transform -translate-y-1/2 pointer-events-none'>
+                    <span className='absolute right-8 top-1/2 transform -translate-y-1/2 pointer-events-none'>
                       %
                     </span>
                   </div>
