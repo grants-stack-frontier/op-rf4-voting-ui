@@ -19,7 +19,7 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
           return (
             <Card className="shadow-none" key={index}>
               <CardContent className="flex items-center gap-2 px-2.5 py-3">
-                {grant && <p className="truncate max-w-[200px] text-sm">Grant: {grant}</p>}
+                {grant && grant !== 'retroFunding' ? <p className="truncate max-w-[200px] text-sm">Grant: {grant}</p> : <p className="truncate max-w-[200px] text-sm">Retro Funding</p>}
                 {link && (
                   <Link href={link} className="flex items-center gap-2 hover:underline" target="_blank">
                     <RiLink className="h-5 w-5" /> <p className="truncate max-w-[200px] text-sm font-medium leading-5">{link}</p>
@@ -48,7 +48,7 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
             value={grant ?? ''}
             trigger={
               <>
-                {grant && <p className="truncate max-w-[200px] text-sm">Grant: {grant}</p>}
+                {grant && grant !== 'retroFunding' ? <p className="truncate max-w-[200px] text-sm">Grant: {grant}</p> : <p className="truncate max-w-[200px] text-sm">Retro Funding</p>}
                 {link && (
                   <Link href={link} className="flex items-center gap-2 hover:underline" target="_blank">
                     <RiLink className="h-5 w-5" /> <p className="truncate max-w-[200px] text-sm font-medium leading-5">{link}</p>
@@ -83,7 +83,7 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
             return (
               <Card className="shadow-none" key={index}>
                 <CardContent className="flex items-center gap-2 px-2.5 py-3">
-                  <span>Funding:</span>
+                  <p className="text-sm">Funding</p>
                   <div className="flex items-center gap-2">
                     <RiMoneyDollarCircleFill className="h-4 w-4" /> <p>{amount || ''}</p>
                   </div>
@@ -97,12 +97,44 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
           return (
             <CustomAccordion key={index} value={amount || ''} trigger={
               <>
-                <span>Funding:</span>
+                <p className="text-sm">Funding</p>
                 <div className="flex items-center gap-2">
                   <RiMoneyDollarCircleFill className="h-4 w-4" /> <p>{amount || ''}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <RiTimeFill className="h-5 w-5" /> <p>{year}</p>
+                </div>
+              </>
+            }>
+              {details && (
+                <div className="p-2">
+                  {details}
+                </div>
+              )}
+            </CustomAccordion>
+          );
+        })
+      }
+      {
+        grantsAndFunding.investment?.map(({ amount, details }, index) => {
+          if (!details) {
+            return (
+              <Card className="shadow-none" key={index}>
+                <CardContent className="flex items-center gap-2 px-2.5 py-3">
+                  <p className="text-sm">Investment</p>
+                  <div className="flex items-center gap-2">
+                    <RiMoneyDollarCircleFill className="h-4 w-4" /> <p>{amount || ''}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          };
+          return (
+            <CustomAccordion key={index} value={amount || ''} trigger={
+              <>
+                <p className="text-sm">Revenue</p>
+                <div className="flex items-center gap-2">
+                  <RiMoneyDollarCircleFill className="h-4 w-4" /> <p>{amount || ''}</p>
                 </div>
               </>
             }>

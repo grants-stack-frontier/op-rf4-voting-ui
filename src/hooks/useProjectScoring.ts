@@ -41,19 +41,29 @@ export const useProjectScoring = (
 	const [isSaving, setIsSaving] = useState(false);
 	const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
 
+	const totalProjects = useMemo(() => projects?.length ?? 0, [projects]);
+
 	// Calculate initial state during render
 	const initialProjectsScored = useMemo(() => {
 		if (!walletAddress || !category || !allocations) {
 			return undefined;
 		}
 		const storedProjectsScored = getProjectsScored(category, walletAddress);
-		const allocationsLength = allocations.length;
-		if (storedProjectsScored.votedCount === 0 || storedProjectsScored.votedCount > allocationsLength) {
+		const totalAllocations = allocations.length;
+		console.log({ totalAllocations });
+		if (
+			(storedProjectsScored.votedCount === 0 && totalAllocations !== totalProjects) ||
+			storedProjectsScored.votedCount > totalAllocations
+		) {
 			return storedProjectsScored;
 		} else {
+			const allProjectsScored = storedProjectsScored.votedCount === totalProjects;
+			if (allProjectsScored) {
+				setIsUnlocked(true);
+			}
 			return updateVotedProjectsFromAllocations(category, walletAddress, allocations);
 		}
-	}, [category, walletAddress, allocations]);
+	}, [category, walletAddress, allocations, totalProjects]);
 
 	useEffect(() => {
 		if (initialProjectsScored) {
@@ -61,8 +71,6 @@ export const useProjectScoring = (
 			setIsLoading(false);
 		}
 	}, [initialProjectsScored, setProjectsScored, setIsLoading]);
-
-	const totalProjects = useMemo(() => projects?.length ?? 0, [projects]);
 
 	const handleScoreSelect = useCallback(
 		async (score: ImpactScore) => {

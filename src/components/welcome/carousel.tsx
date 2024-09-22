@@ -1,5 +1,4 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -7,12 +6,13 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
+import { markIntroAsSeen } from "@/utils/localStorage";
 import Image from "next/image";
 import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
+import { useAccount } from "wagmi";
 import { Button } from "../ui/button";
 import { Heading } from "../ui/headings";
-import { markIntroAsSeen } from "@/utils/localStorage";
-import { useAccount } from "wagmi";
 
 export function WelcomeCarousel({
   slides,

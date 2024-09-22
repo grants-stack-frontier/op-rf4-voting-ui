@@ -54,13 +54,13 @@ export function CategoryDetails({ id }: { id: CategoryId }) {
 								)}
 							</div>
 						</div>
-						<div className="flex items-start gap-2 text-gray-700">
+						<div className="flex items-start gap-2 text-gray-700 dark:text-white">
 							<Heading variant="h1">Examples:</Heading>
 							<p>
 								{examples?.join(", ")}
 							</p>
 						</div>
-						<div className="flex flex-col items-start gap-6 text-gray-700">
+						<div className="flex flex-col items-start gap-6 text-gray-700 dark:text-white">
 							<div className="flex items-start gap-2">
 								<Heading variant="h1">Eligibility: </Heading>
 								<p>The following types of projects are eligible.</p>

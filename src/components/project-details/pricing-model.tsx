@@ -8,11 +8,7 @@ export function PricingModel({ pricingModel }: {
   pricingModel?: ProjectPricingModel;
 }) {
   if (!pricingModel) return null;
-
   const { type, details } = pricingModel;
-
-  console.log("pricingModel", pricingModel);
-
   const formatType = (type: string) => {
     if (type === "pay_to_use") {
       return type.replace(/_/g, "-");

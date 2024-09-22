@@ -1,10 +1,10 @@
 "use client";
+import { PageView } from "@/components/common/page-view";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { WelcomeCarousel } from "@/components/welcome/carousel";
-import { useAccount } from "wagmi";
 import { redirect } from "next/navigation";
-import { PageView } from "@/components/common/page-view";
+import { useAccount } from "wagmi";
 
 import onboard1 from "../../public/onboard1.svg";
 import onboard2 from "../../public/onboard2.svg";
@@ -47,7 +47,7 @@ export default function Home() {
     <div className='max-w-screen-md mx-auto flex flex-1'>
       <Background />
       <PageView title='Welcome' />
-      <Card className='w-full bg-white px-8 py-16 flex flex-col items-center rounded-3xl gap-6'>
+      <Card className='w-full bg-white dark:bg-card px-8 py-16 flex flex-col items-center rounded-3xl gap-6'>
         <Badge variant='secondary'>Welcome</Badge>
         <WelcomeCarousel slides={slides} />
       </Card>
@@ -57,6 +57,6 @@ export default function Home() {
 
 function Background() {
   return (
-    <div className='w-screen h-screen fixed inset-0 -z-10 bg-cover bg-gray-100' />
+    <div className='w-screen h-screen fixed inset-0 -z-10 bg-cover bg-gray-100 dark:bg-black' />
   );
 }

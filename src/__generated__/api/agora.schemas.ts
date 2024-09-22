@@ -638,6 +638,10 @@ export type ProjectGrantsAndFunding = {
   grants?: ProjectGrantsAndFundingGrantsItem[];
   revenue?: ProjectGrantsAndFundingRevenueItem[];
   ventureFunding?: ProjectGrantsAndFundingVentureFundingItem[];
+  investment?: {
+    amount?: string;
+    details?: string;
+  }[];
 };
 
 export type ProjectGithubItemOneOf = {
