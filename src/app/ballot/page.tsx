@@ -184,7 +184,7 @@ function YourBallot() {
     filter?: Filter
   ): ProjectAllocationState[] {
     const projects = newProjects
-      .sort((a, b) => a.position - b.position)
+      .sort((a, b) => distributionMethod === DistributionMethod.CUSTOM ? Number(b.allocation) - Number(a.allocation) : a.position - b.position)
       .map((p) => ({
         ...p,
         allocation: p.allocation ?? 0,
@@ -285,6 +285,31 @@ function YourBallot() {
                     JSON.stringify({ index: i, id: proj.project_id })
                   );
                 }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const data = e.dataTransfer.getData("text/plain");
+                  if (data) {
+                    const { index: draggedIndex, id: draggedId } =
+                      JSON.parse(data);
+                    const newIndex = i;
+                    if (draggedIndex !== newIndex) {
+                      const newProjects = [...projectList];
+                      const [removed] = newProjects.splice(
+                        draggedIndex,
+                        1
+                      );
+                      newProjects.splice(newIndex, 0, removed);
+                      setProjectList(newProjects);
+                      savePosition({
+                        id: draggedId,
+                        position: newIndex,
+                      });
+                    }
+                  }
+                }}
               >
                 <div className='flex items-start justify-between flex-grow'>
                   <div className='flex items-start gap-1'>
@@ -320,31 +345,6 @@ function YourBallot() {
                     </div>
                     <div
                       className='flex justify-center items-center rounded-md w-[42px] h-[40px] cursor-move bg-[#F2F3F8] text-[#636779]'
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                      }}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        const data = e.dataTransfer.getData("text/plain");
-                        if (data) {
-                          const { index: draggedIndex, id: draggedId } =
-                            JSON.parse(data);
-                          const newIndex = i;
-                          if (draggedIndex !== newIndex) {
-                            const newProjects = [...projectList];
-                            const [removed] = newProjects.splice(
-                              draggedIndex,
-                              1
-                            );
-                            newProjects.splice(newIndex, 0, removed);
-                            setProjectList(newProjects);
-                            savePosition({
-                              id: draggedId,
-                              position: newIndex,
-                            });
-                          }
-                        }
-                      }}
                     >
                       <Menu />
                     </div>
@@ -353,7 +353,7 @@ function YourBallot() {
                 <div className='px-1'>
                   <Separator orientation='vertical' className='h-10' />
                 </div>
-                <div className='flex flex-col justify-start items-center gap-1'>
+                <div className='flex flex-col justify-start items-center gap-1 max-w-[112px]'>
                   <div className='relative'>
                     <Input
                       type='number'
@@ -377,7 +377,7 @@ function YourBallot() {
                         });
                       }}
                     />
-                    <span className='absolute right-10 top-1/2 transform -translate-y-1/2 pointer-events-none'>
+                    <span className='absolute right-6 top-1/2 transform -translate-y-1/2 pointer-events-none'>
                       %
                     </span>
                   </div>
