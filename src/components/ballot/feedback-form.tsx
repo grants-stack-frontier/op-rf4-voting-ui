@@ -198,10 +198,10 @@ function createQuestions(
         />
       ),
     },
-    {
-      title: `Did you observe any behavior among your fellow badgeholders that could be considered one of the following (select all that apply)?`,
-      children: <Behaviors />,
-    },
+    // {
+    //   title: `Did you observe any behavior among your fellow badgeholders that could be considered one of the following (select all that apply)?`,
+    //   children: <Behaviors />,
+    // },
     {
       title:
         "How worried are you about detrimental behavior among badgeholders influencing the allocation of Retro Funding in this round?",
@@ -230,7 +230,7 @@ function createQuestions(
     },
     {
       title:
-        "Given the design of this round, how confident do you feel that rewards will be allocated efficiently to the most deserving projects?",
+        "Given the design of this round, how confident do you feel that OP rewards will be allocated efficiently to the most deserving projects?",
       children: (
         <SelectForm
           key="confidence"
@@ -253,28 +253,45 @@ function createQuestions(
       ),
     },
     {
-      title: "To what extent do you trust the opinions of other badgeholders?",
+      title: 'To what extent did the “Grants and investment” information influence your token allocation among projects?',
       children: (
         <SelectForm
-          key="trust"
-          name="trust"
+          key="influence"
+          name="influence"
           options={Array(7)
             .fill(0)
             .map((_, index) => ({
               label: `${index + 1} ${
-                index === 0
-                  ? "(very low trust)"
-                  : index === 3
-                  ? "(some trust)"
-                  : index === 6
-                  ? "(very high trust)"
-                  : ""
+                index === 0 ? "(did not influence my token allocation)" : index === 6 ? "(had a large influence on my token allocation)" : ""
               }`,
               value: String(index + 1),
             }))}
         />
       ),
     },
+    // {
+    //   title: "To what extent do you trust the opinions of other badgeholders?",
+    //   children: (
+    //     <SelectForm
+    //       key="trust"
+    //       name="trust"
+    //       options={Array(7)
+    //         .fill(0)
+    //         .map((_, index) => ({
+    //           label: `${index + 1} ${
+    //             index === 0
+    //               ? "(very low trust)"
+    //               : index === 3
+    //               ? "(some trust)"
+    //               : index === 6
+    //               ? "(very high trust)"
+    //               : ""
+    //           }`,
+    //           value: String(index + 1),
+    //         }))}
+    //     />
+    //   ),
+    // },
     // QUESTION: Are we keeping the rest of these questions?
     // {
     //   title:
