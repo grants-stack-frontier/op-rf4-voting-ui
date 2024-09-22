@@ -24,8 +24,8 @@ export function useProjectSorting(
 			const bVoted =
 				ballot.project_allocations.some((p) => p.project_id === bId) || projectsScored.votedIds.includes(bId);
 
-			const aSkipped = projectsScored.skippedIds.includes(aId);
-			const bSkipped = projectsScored.skippedIds.includes(bId);
+			const aSkipped = projectsScored?.skippedIds?.includes(aId) ?? false;
+			const bSkipped = projectsScored?.skippedIds?.includes(bId) ?? false;
 
 			if (aVoted !== bVoted) return aVoted ? 1 : -1;
 			if (aSkipped !== bSkipped) return aSkipped ? 1 : -1;
@@ -49,9 +49,9 @@ export function useProjectSorting(
 				const nextId = p.applicationId ?? '';
 				return (
 					nextId !== currentId &&
-					!projectsScored.votedIds.includes(nextId) &&
-					!projectsScored.skippedIds.includes(nextId) &&
-					!ballot?.project_allocations.some((allocation) => allocation.project_id === nextId)
+					!projectsScored?.votedIds?.includes(nextId) &&
+					!projectsScored?.skippedIds?.includes(nextId) &&
+					!ballot?.project_allocations?.some((allocation) => allocation.project_id === nextId)
 				);
 			});
 
