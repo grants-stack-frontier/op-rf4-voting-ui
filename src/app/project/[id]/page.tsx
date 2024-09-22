@@ -56,9 +56,9 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 				const nextId = p.applicationId ?? '';
 				return (
 					nextId !== currentProject?.applicationId &&
-					!projectsScored.votedIds.includes(nextId) &&
-					!projectsScored.skippedIds.includes(nextId) &&
-					!ballot?.project_allocations.some((allocation) => allocation.project_id === nextId)
+					!projectsScored?.votedIds?.includes(nextId) &&
+					!projectsScored?.skippedIds?.includes(nextId) &&
+					!ballot?.project_allocations?.some((allocation) => allocation.project_id === nextId)
 				);
 			});
 

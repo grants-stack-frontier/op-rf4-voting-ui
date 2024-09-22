@@ -40,7 +40,7 @@ export const addScoredProject = (category: string, projectId: string, walletAddr
 
 export const addSkippedProject = (category: string, projectId: string, walletAddress: Address): ProjectsScored => {
 	const current = getProjectsScored(category, walletAddress);
-	if (!current.skippedIds.includes(projectId)) {
+	if (!current.skippedIds?.includes(projectId)) {
 		current.skippedCount += 1;
 		current.skippedIds.push(projectId);
 		setProjectsScored(category, walletAddress, current);
