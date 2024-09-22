@@ -11,21 +11,6 @@ import { DisconnectedState } from "@/components/common/disconnected-state";
 import { useAccount } from "wagmi";
 import { Loader2 } from "lucide-react";
 
-const foundationGrants = [
-  {
-    title: "Foundation Grant A",
-    description: "a project focusing on improving scalability",
-    bounty: 20000,
-    durationMonths: 2,
-  },
-  {
-    title: "Foundation Grant B",
-    description: "a project focusing on enhancing security",
-    bounty: 20000,
-    durationMonths: 2,
-  },
-];
-
 export default function BudgetBallotPage() {
   const { isConnecting, isConnected } = useAccount();
   const [hasMounted, setHasMounted] = useState(false);
@@ -74,17 +59,7 @@ export default function BudgetBallotPage() {
           <PageView title={"budget-ballot"} />
         </section>
         <aside className='w-[304px] sticky top-4 h-[60vh]'>
-          <InfoBox
-            totalBudget={8000000}
-            roundNumber={5}
-            previousRoundProjects={100}
-            previousRoundBudget={6500000}
-            currentProjects={65}
-            foundationGrants={foundationGrants}
-            totalFoundationProjects={10}
-            totalFoundationBudget={1000000}
-            groupCallDate='September 20 at 10 AM UTC'
-          />
+          <InfoBox />
         </aside>
       </div>
     </BudgetProvider>
