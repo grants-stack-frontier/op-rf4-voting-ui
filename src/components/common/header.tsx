@@ -2,15 +2,12 @@
 
 import { ArrowUpRight } from "lucide-react";
 import mixpanel from "mixpanel-browser";
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
 import { badgeholderManualUrl, votingEndDate } from "@/config";
 import { hasSeenIntro } from "@/utils/localStorage";
-
-import logo from "../../../public/logo.svg";
 
 import { Button } from "@/components/ui/button";
 import { ConnectButton } from "../auth/connect-button";
@@ -19,6 +16,7 @@ import { VoterConfirmationDialog } from "../auth/voter-confirmation";
 import { ModeToggle } from "../dark-mode-toggle";
 import { Separator } from "../ui/separator";
 import { VotingEndsIn } from "../voting-ends-in";
+import { Logo } from "./logo";
 
 export function Header() {
   const { address } = useAccount();
@@ -35,7 +33,7 @@ export function Header() {
   return (
     <header className='h-20 px-4 flex justify-between items-center'>
       <Link href={homeHref}>
-        <Image src={logo} alt='Logo' />
+        <Logo />
       </Link>
       <div className='hidden sm:flex items-center gap-2 divide-x space-x-2 text-sm'>
         <div className='flex flex-col lg:flex-row items-center h-8'>
