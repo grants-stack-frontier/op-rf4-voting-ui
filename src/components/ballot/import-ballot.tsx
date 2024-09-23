@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { format, parse } from "@/lib/csv";
-import { Allocation, useSaveAllocation } from "@/hooks/useBallot";
+import { Round4Allocation, useSaveAllocation } from "@/hooks/useBallot";
 import { useBallotContext } from "./provider";
 import { useMetricIds } from "@/hooks/useMetrics";
 import mixpanel from "@/lib/mixpanel";
@@ -49,7 +49,7 @@ function ImportBallotButton() {
     (csvString: string) => {
       console.log("import csv");
       // Parse CSV and build the ballot data (remove name column)
-      const { data } = parse<Allocation>(csvString);
+      const { data } = parse<Round4Allocation>(csvString);
       const allocations = data
         .map(({ metric_id, allocation, locked }) => ({
           metric_id,
@@ -110,7 +110,7 @@ function ExportBallotButton() {
   );
 }
 
-export function exportBallot(ballot: Allocation[]) {
+export function exportBallot(ballot: Round4Allocation[]) {
   const csv = format(
     ballot.map((alloc) => ({
       metric_id: alloc.metric_id,

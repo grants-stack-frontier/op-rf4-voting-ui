@@ -1,181 +1,241 @@
 "use client";
-import { NumericFormat } from "react-number-format";
-import { Minus, Plus, Trash2 } from "lucide-react";
 import { Heading } from "@/components/ui/headings";
 
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useMemo } from "react";
-import { useBallotContext } from "../ballot/provider";
-import { useSortBallot } from "@/hooks/useBallotEditor";
 import { BallotFilter } from "../ballot/ballot-filter";
-import { Metric } from "@/hooks/useMetrics";
-import Link from "next/link";
-import { Skeleton } from "../ui/skeleton";
-import mixpanel from "@/lib/mixpanel";
+import { DistributionChart } from "../metrics/distribution-chart";
+import { Card } from "../ui/card";
+import {
+  DistributionMethod,
+  saveDistributionMethodToLocalStorage,
+  useDistributionMethod,
+  useDistributionMethodFromLocalStorage,
+} from "@/hooks/useBallotRound5";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { useVotingCategory } from "@/hooks/useVotingCategory";
+import { useBallotRound5Context } from "../ballot/provider5";
+import { useBudgetContext } from "../budget/provider";
 
-export function MetricsEditor({
-  metrics = [],
-  isLoading,
-}: {
-  metrics?: Metric[];
-  isLoading: boolean;
-}) {
-  const { state, inc, dec, set, remove } = useBallotContext();
-
-  const { sorted } = useSortBallot(state);
-
-  const count = useMemo(() => Object.keys(state).length, [state]);
-  const metricById = useMemo(
-    () => Object.fromEntries(metrics.map((m) => [m["metric_id"], m])),
-    [metrics]
+export function BlueCircleCheckIcon() {
+  return (
+    <svg
+      width='14'
+      height='14'
+      viewBox='0 0 14 14'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+    >
+      <path
+        d='M6.99992 13.6673C3.31802 13.6673 0.333252 10.6825 0.333252 7.00065C0.333252 3.31875 3.31802 0.333984 6.99992 0.333984C10.6818 0.333984 13.6666 3.31875 13.6666 7.00065C13.6666 10.6825 10.6818 13.6673 6.99992 13.6673ZM6.33499 9.66732L11.0491 4.95327L10.1063 4.01046L6.33499 7.78172L4.44939 5.89605L3.50658 6.83892L6.33499 9.66732Z'
+        fill='#3374DB'
+      />
+    </svg>
   );
+}
+
+function formatNumberWithCommas(number: number): string {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+export function MetricsEditor() {
+  const { ballot } = useBallotRound5Context();
+  const { mutate: saveDistributionMethod } = useDistributionMethod();
+  const { data: distributionMethod, refetch } =
+    useDistributionMethodFromLocalStorage();
+  const votingCategory = useVotingCategory();
+  const { totalBudget } = useBudgetContext();
+
+  const budget = useMemo(() => {
+    if (ballot && votingCategory) {
+      const portion = ballot.category_allocations.find(
+        (c) => c.category_slug === votingCategory
+      )?.allocation;
+      return formatNumberWithCommas(
+        Math.round((totalBudget * (portion || 0)) / 100)
+      );
+      // return formatNumberWithCommas(totalBudget);
+    }
+    return "0";
+  }, [ballot, votingCategory, totalBudget]);
+
+  const exponentialDecay = (
+    x: number,
+    initialValue: number = 100,
+    decayRate: number = 0.1
+  ): number => {
+    return initialValue * Math.exp(-decayRate * x);
+  };
+
+  const distributeTopWeighted = (
+    numPoints: number = 40
+  ): { x: number; y: number }[] => {
+    return Array.from({ length: numPoints }, (_, i) => ({
+      x: i,
+      y: Math.round(exponentialDecay(i)),
+    }));
+  };
+
+  const linearDecline = (
+    x: number,
+    initialValue: number = 100,
+    slope: number = 2.5
+  ): number => {
+    const y = initialValue - slope * x;
+    return Math.max(y, 0); // Ensure y doesn't go below 0
+  };
+
+  const distributeTopToBottomLinear = (
+    numPoints: number = 40
+  ): { x: number; y: number }[] => {
+    return Array.from({ length: numPoints }, (_, i) => ({
+      x: i,
+      y: Math.round(linearDecline(i)),
+    }));
+  };
+
+  // Dummy data for the allocation methods
+  const allocationMethods = [
+    {
+      data: [
+        { x: 0, y: 340 },
+        { x: 10, y: 340 },
+        { x: 10, y: 255 },
+        { x: 20, y: 255 },
+        { x: 20, y: 170 },
+        { x: 30, y: 170 },
+        { x: 30, y: 85 },
+        { x: 40, y: 85 },
+        { x: 40, y: 0 },
+        { x: 50, y: 0 },
+      ],
+      // data: distributeImpactGroups(),
+      formatChartTick: (tick: number) => `${tick}k`,
+      name: "Impact groups",
+      description:
+        "Reward allocation is proportionate and even among projects with the same impact score.",
+      method: DistributionMethod.IMPACT_GROUPS,
+    },
+    {
+      data: distributeTopToBottomLinear(),
+      formatChartTick: (tick: number) => `${tick}k`,
+      name: "Top to bottom",
+      description:
+        "Reward allocation is directly proportionate to stack rankings.",
+      method: DistributionMethod.TOP_TO_BOTTOM,
+    },
+    {
+      data: distributeTopWeighted(),
+      formatChartTick: (tick: number) => `${tick}k`,
+      name: "Top weighted",
+      description:
+        "Reward allocation is weighted toward projects at the top of your ballot.",
+      method: DistributionMethod.TOP_WEIGHTED,
+    },
+    {
+      data: [],
+      formatChartTick: (tick: number) => `--k`,
+      name: "Custom",
+      description:
+        "Reward allocation is weighed heavily towards projects with higher percentages.",
+      method: "CUSTOM",
+    },
+  ];
+  const allocationAmount = "3,333,333";
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <div className="mb-4">
+      <div className='flex items-center justify-between'>
+        <div className='mb-4'>
           <Heading variant={"h3"}>Your ballot</Heading>
-          <div className="text-sm">
+          {/* <div className="text-sm">
             You&apos;ve added {count} of {metrics.length} metrics
-          </div>
+          </div> */}
         </div>
         <BallotFilter />
       </div>
 
-      <div className="divide-y border-y">
-        {isLoading &&
-          Array(3)
-            .fill(0)
-            .map((_, i) => (
-              <div className="py-4" key={i}>
-                <Skeleton key={i} className="h-10" />
-              </div>
-            ))}
-        {sorted
-          .filter((id) => state[id])
-          .map((id) => {
-            const { allocation, locked } = state[id];
-            const { name } = metricById[id] ?? {};
-
-            console.log(id, allocation);
-            return (
-              <div key={id} className="py-4 flex justify-between items-center">
-                <h3 className="font-medium text-sm hover:underline underline-offset-4">
-                  <Link href={`/metrics/${id}`}>{name}</Link>
-                </h3>
-                <div className="flex gap-2">
-                  <Button
-                    size={"icon"}
-                    variant={locked ? "secondary" : "ghost"}
-                    icon={locked ? LockFillLocked : LockFillUnlocked}
-                    className={cn({ ["opacity-50"]: !locked })}
-                    tabIndex={-1}
-                    onClick={() => {
-                      set(id, allocation, locked);
-                      mixpanel.track("Lock Metric", { id, allocation });
-                    }}
-                  />
-                  <div className="flex border rounded-lg">
-                    <Button
-                      size={"icon"}
-                      variant="ghost"
-                      icon={Minus}
-                      tabIndex={-1}
-                      disabled={allocation <= 0}
-                      onClick={() => {
-                        dec(id);
-                        mixpanel.track("Decrease Metric", { id, allocation });
-                      }}
-                    />
-                    <NumericFormat
-                      min={0}
-                      max={100}
-                      suffix={"%"}
-                      allowNegative={false}
-                      allowLeadingZeros={false}
-                      isAllowed={(values) => (values?.floatValue ?? 0) <= 100}
-                      customInput={(p) => (
-                        <input
-                          className="w-16 text-center"
-                          {...p}
-                          max={100}
-                          min={0}
-                        />
-                      )}
-                      placeholder="--%"
-                      value={
-                        allocation !== undefined
-                          ? allocation.toFixed(2)
-                          : undefined
-                      }
-                      onBlur={(e) => {
-                        e.preventDefault();
-                        const updated = parseFloat(e.target.value);
-                        allocation !== updated && set(id, updated);
-                        mixpanel.track("Update Metric", {
-                          id,
-                          allocation: updated,
-                        });
-                      }}
-                    />
-                    <Button
-                      size={"icon"}
-                      variant="ghost"
-                      icon={Plus}
-                      tabIndex={-1}
-                      disabled={allocation >= 100}
-                      onClick={() => {
-                        inc(id);
-                        mixpanel.track("Increase Metric", { id, allocation });
-                      }}
-                    />
-                  </div>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    icon={Trash2}
-                    tabIndex={-1}
-                    onClick={() => {
-                      remove(id);
-                      mixpanel.track("Remove Metric", { id });
-                    }}
-                  />
-                </div>
-              </div>
-            );
-          })}
+      {/* This sections is a work in progress */}
+      <div className=' flex flex-col gap-4 py-4 text-sm'>
+        <p>First, review your project rankings in the list below.</p>
+        <p>
+          Then, choose a method to easily allocate rewards across prjects. You
+          can also customize percentages at any time.
+        </p>
+        <p>
+          OP calculations in this ballot are based on your budget of {budget} OP
+        </p>
+        {/* TO DO: CHANGE ALLOCATION AMOUNT TO ACTUAL BUDGET!!! */}
       </div>
+
+      <div className='flex flex-row justify-between items-end'>
+        <p className='font-semibold mb-2'>Allocation method</p>
+        {!distributionMethod && (
+          <div className='flex flex-row items-center mb-2 gap-1'>
+            <BlueCircleCheckIcon />
+            <p className='font-semibold text-sm'>None selected</p>
+          </div>
+        )}
+      </div>
+      <div className='grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-4'>
+        {allocationMethods.map((method, index) => (
+          <Card
+            key={index}
+            className={cn("cursor-pointer", {
+              "border-2 border-[#BCBFCD]": distributionMethod === method.method,
+            })}
+            onClick={() => {
+              // setSelectedMethod(method.method);
+              saveDistributionMethodToLocalStorage(method.method);
+              if (
+                method.method === DistributionMethod.IMPACT_GROUPS ||
+                method.method === DistributionMethod.TOP_TO_BOTTOM ||
+                method.method === DistributionMethod.TOP_WEIGHTED
+              ) {
+                saveDistributionMethod(method.method);
+              }
+              refetch();
+            }}
+          >
+            <DistributionChart
+              data={method.data}
+              formatChartTick={method.formatChartTick}
+            />
+            <div className='mb-2 mx-4 flex flex-row justify-between items-center'>
+              <div className='flex flex-row items-center gap-1'>
+                {method.method === distributionMethod && (
+                  <BlueCircleCheckIcon />
+                )}
+                <p className='font-bold text-sm'>{method.name}</p>
+              </div>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <svg
+                    width='16'
+                    height='16'
+                    viewBox='0 0 14 14'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                  >
+                    <path
+                      d='M7.00016 13.6673C3.31826 13.6673 0.333496 10.6825 0.333496 7.00065C0.333496 3.31875 3.31826 0.333984 7.00016 0.333984C10.682 0.333984 13.6668 3.31875 13.6668 7.00065C13.6668 10.6825 10.682 13.6673 7.00016 13.6673ZM6.3335 9.00065V10.334H7.66683V9.00065H6.3335ZM7.66683 7.90405C8.63063 7.61718 9.3335 6.72432 9.3335 5.66732C9.3335 4.37865 8.28883 3.33398 7.00016 3.33398C5.86816 3.33398 4.92441 4.14011 4.7117 5.20962L6.01936 5.47116C6.11056 5.0128 6.51503 4.66732 7.00016 4.66732C7.55243 4.66732 8.00016 5.11503 8.00016 5.66732C8.00016 6.21958 7.55243 6.66732 7.00016 6.66732C6.63196 6.66732 6.3335 6.96578 6.3335 7.33398V8.33398H7.66683V7.90405Z'
+                      fill='#BCBFCD'
+                    />
+                  </svg>
+                </HoverCardTrigger>
+                <HoverCardContent className='border-rounded-md text-xs text-center py-1 px-2 drop-shadow-md'>
+                  {method.description}
+                </HoverCardContent>
+              </HoverCard>
+            </div>
+          </Card>
+        ))}
+      </div>
+      {/* ^^This sections is a work in progress^^ */}
     </div>
   );
 }
-
-const LockFillLocked = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M12.6667 6.66732H13.3333C13.7015 6.66732 14 6.96578 14 7.33398V14.0007C14 14.3689 13.7015 14.6673 13.3333 14.6673H2.66667C2.29848 14.6673 2 14.3689 2 14.0007V7.33398C2 6.96578 2.29848 6.66732 2.66667 6.66732H3.33333V6.00065C3.33333 3.42332 5.42267 1.33398 8 1.33398C10.5773 1.33398 12.6667 3.42332 12.6667 6.00065V6.66732ZM11.3333 6.66732V6.00065C11.3333 4.1597 9.84093 2.66732 8 2.66732C6.15905 2.66732 4.66667 4.1597 4.66667 6.00065V6.66732H11.3333ZM7.33333 9.33398V12.0007H8.66667V9.33398H7.33333Z"
-      fill="currentColor"
-    />
-  </svg>
-);
-
-const LockFillUnlocked = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M4.66667 6.66732H13.3333C13.7015 6.66732 14 6.96578 14 7.33398V14.0007C14 14.3689 13.7015 14.6673 13.3333 14.6673H2.66667C2.29848 14.6673 2 14.3689 2 14.0007V7.33398C2 6.96578 2.29848 6.66732 2.66667 6.66732H3.33333V6.00065C3.33333 3.42332 5.42267 1.33398 8 1.33398C9.827 1.33398 11.4087 2.38385 12.1749 3.9132L10.9821 4.50961C10.4348 3.41722 9.305 2.66732 8 2.66732C6.15905 2.66732 4.66667 4.1597 4.66667 6.00065V6.66732ZM6.66667 10.0007V11.334H9.33333V10.0007H6.66667Z"
-      fill="currentColor"
-    />
-  </svg>
-);

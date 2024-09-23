@@ -5,7 +5,7 @@ import { Heading } from "../ui/headings";
 import { Button } from "../ui/button";
 import { Text } from "../ui/text";
 import { votingEndDate } from "@/config";
-import { Ballot, useSubmitBallot } from "@/hooks/useBallot";
+import { Round4Ballot, useSubmitBallot } from "@/hooks/useBallot";
 import { formatDate } from "@/lib/utils";
 import { exportBallot } from "./import-ballot";
 import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
@@ -17,7 +17,7 @@ export function SubmitDialog({
   open,
   ballot,
   onOpenChange,
-}: ComponentProps<typeof Dialog> & { ballot?: Ballot }) {
+}: ComponentProps<typeof Dialog> & { ballot?: Round4Ballot }) {
   const [feedbackProgress, setFeedbackProgress] = useState<
     "init" | "in_progress" | "submit" | "done"
   >(ballot?.status === "SUBMITTED" ? "submit" : "init");
@@ -102,7 +102,7 @@ export function SubmitDialog({
                     Your vote has been received!
                   </Heading>
                   <Text className="text-muted-foreground text-center">
-                    Thank you for your participation in Retro Funding Round 4
+                    Thank you for your participation in Retro Funding Round 5
                     Voting! Your work as a badgeholder is crucial to the
                     improvement of the Superchain.
                   </Text>
