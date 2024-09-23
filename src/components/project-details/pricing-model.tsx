@@ -23,7 +23,7 @@ export function PricingModel({ pricingModel }: {
       </Heading>
       {type === "free" ? (
         <Card className='shadow-none'>
-          <CardContent className='px-2.5 py-3'>
+          <CardContent className='py-2.5 px-3'>
             <div className='capitalize text-sm font-medium leading-5'>
               {formatType(type ?? "")}
             </div>
