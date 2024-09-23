@@ -23,6 +23,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
 	const router = useRouter();
 	const { data: session } = useSession();
 	const { data: project, isPending: isProjectLoading } = useProjectById(id);
+	console.log('project', project)
 	const { data: projects, isPending: isProjectsLoading } = useProjectsByCategory(project?.applicationCategory as CategoryId);
 	const { ballot } = useBallotRound5Context();
 
