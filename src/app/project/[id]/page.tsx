@@ -16,8 +16,8 @@ import { CategoryId } from "@/types/shared";
 import { ProjectsScored } from "@/utils/localStorage";
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useAccount } from "wagmi";
 import { Address } from "viem";
+import { useAccount } from "wagmi";
 
 export default function ProjectDetailsPage({ params }: { params: { id: string } }) {
     const { id } = params;
@@ -36,14 +36,7 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
     const [projectsScored, setProjectsScored] = useState<ProjectsScored | undefined>(undefined);
     const [isUnlocked, setIsUnlocked] = useState(false);
 
-    useEffect(() => {
-        if (address) {
-            const unlocked = localStorage.getItem(`ballot_unlocked_${address}`);
-            setIsUnlocked(unlocked === 'true');
-        }
-    }, [address]);
-
-    const { handleScoreSelect, isLoading: isProjectScoringLoading, isSaving } = useProjectScoring(
+    const { allProjectsScored, handleScoreSelect, isLoading: isProjectScoringLoading, isSaving } = useProjectScoring(
         currentProject?.applicationCategory ?? '',
         currentProject?.applicationId ?? '',
         walletAddress,
@@ -60,25 +53,31 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
         currentProject?.applicationId ?? id
     );
 
-    const handleNavigation = useCallback(() => {
-		if (sortedProjects.length > 0 && projectsScored) {
-			const nextProject = sortedProjects.find((p) => {
-				const nextId = p.applicationId ?? '';
-				return (
-					nextId !== currentProject?.applicationId &&
-					!projectsScored?.votedIds?.includes(nextId) &&
-					!projectsScored?.skippedIds?.includes(nextId) &&
-					!ballot?.project_allocations?.some((allocation) => allocation.project_id === nextId)
-				);
-			});
+    useEffect(() => {
+        if (address && allProjectsScored) {
+            setIsUnlocked(true);
+        }
+    }, [allProjectsScored, address]);
 
-			if (nextProject) {
-				router.push(`/project/${nextProject.applicationId}`);
-			} else {
-				console.log('No more projects to vote on');
-			}
-		}
-	}, [sortedProjects, projectsScored, ballot, router, currentProject]);
+    const handleNavigation = useCallback(() => {
+        if (sortedProjects.length > 0 && projectsScored) {
+            const nextProject = sortedProjects.find((p) => {
+                const nextId = p.applicationId ?? '';
+                return (
+                    nextId !== currentProject?.applicationId &&
+                    !projectsScored?.votedIds?.includes(nextId) &&
+                    !projectsScored?.skippedIds?.includes(nextId) &&
+                    !ballot?.project_allocations?.some((allocation) => allocation.project_id === nextId)
+                );
+            });
+
+            if (nextProject) {
+                router.push(`/project/${nextProject.applicationId}`);
+            } else {
+                console.log('No more projects to vote on');
+            }
+        }
+    }, [sortedProjects, projectsScored, ballot, router, currentProject]);
 
     const handleScore = useCallback(async (score: ImpactScore) => {
         const { allProjectsScored } = await handleScoreSelect(score);
@@ -111,13 +110,13 @@ export default function ProjectDetailsPage({ params }: { params: { id: string } 
         <div className="flex gap-12 mx-auto">
             <section className="flex-1 max-w-[720px]">
                 <ProjectBreadcrumb id={id} />
-                <UnlockBallotDialog 
-                    isOpen={!isUnlocked} 
+                <UnlockBallotDialog
+                    isOpen={isUnlocked}
                     setOpen={(open) => {
                         if (!open) {
                             setIsUnlocked(true);
                         }
-                    }} 
+                    }}
                 />
                 <ConflictOfInterestDialog
                     isOpen={isConflictOfInterestDialogOpen}

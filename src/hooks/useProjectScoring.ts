@@ -36,7 +36,7 @@ export const useProjectScoring = (
 	projectsScored: ProjectsScored | undefined,
 	setProjectsScored: React.Dispatch<React.SetStateAction<ProjectsScored | undefined>>
 ) => {
-	const [isUnlocked, setIsUnlocked] = useState(false);
+	const [allProjectsScored, setAllProjectsScored] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isSaving, setIsSaving] = useState(false);
 	const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
@@ -51,15 +51,16 @@ export const useProjectScoring = (
 		const storedProjectsScored = getProjectsScored(category, walletAddress);
 		const totalAllocations = allocations.length;
 		console.log({ totalAllocations });
+		console.log({ totalProjects });
+		console.log({ storedProjectsScored });
 		if (
 			(storedProjectsScored.votedCount === 0 && totalAllocations !== totalProjects) ||
 			storedProjectsScored.votedCount > totalAllocations
 		) {
 			return storedProjectsScored;
 		} else {
-			const allProjectsScored = storedProjectsScored.votedCount === totalProjects;
-			if (allProjectsScored) {
-				setIsUnlocked(true);
+			if (storedProjectsScored.votedCount === totalProjects) {
+				setAllProjectsScored(true);
 			}
 			return updateVotedProjectsFromAllocations(category, walletAddress, allocations);
 		}
@@ -85,7 +86,7 @@ export const useProjectScoring = (
 				updatedProjectsScored = addSkippedProject(category, id, walletAddress);
 			} else {
 				setIsSaving(true);
-				toast({ variant: 'default', title: 'Saving your impact score...' });
+				toast({ variant: 'default', loading: true, title: 'Saving your impact score...' });
 				try {
 					const result = await saveProjectImpact({ projectId: id, impact: score });
 					if (result.status === HttpStatusCode.OK) {
@@ -102,10 +103,11 @@ export const useProjectScoring = (
 				}
 			}
 
-			const allProjectsScored = updatedProjectsScored.votedCount === totalProjects;
+			if (updatedProjectsScored.votedCount === totalProjects) {
+				setAllProjectsScored(true);
+			}
 
 			if (allProjectsScored) {
-				setIsUnlocked(true);
 				clearProjectsScored(category, walletAddress);
 				updatedProjectsScored = { votedCount: 0, votedIds: [], skippedCount: 0, skippedIds: [] };
 			}
@@ -114,8 +116,17 @@ export const useProjectScoring = (
 
 			return { updatedProjectsScored, allProjectsScored };
 		},
-		[category, id, projectsScored, walletAddress, totalProjects, saveProjectImpact, setProjectsScored]
+		[
+			category,
+			id,
+			projectsScored,
+			allProjectsScored,
+			walletAddress,
+			totalProjects,
+			saveProjectImpact,
+			setProjectsScored,
+		]
 	);
 
-	return { isUnlocked, setIsUnlocked, handleScoreSelect, isLoading, isSaving };
+	return { allProjectsScored, handleScoreSelect, isLoading, isSaving };
 };
