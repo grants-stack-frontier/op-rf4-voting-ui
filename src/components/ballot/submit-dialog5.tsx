@@ -1,17 +1,16 @@
-import { ComponentProps, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Feedback, Form } from "./feedback-form";
-import { Heading } from "../ui/headings";
-import { Button } from "../ui/button";
-import { Text } from "../ui/text";
 import { votingEndDate } from "@/config";
 import { Round5Ballot, useSubmitBallot } from "@/hooks/useBallotRound5";
 import { formatDate } from "@/lib/utils";
-import { exportBallot } from "./import-ballot";
-import VotingSuccess_OPStack from "../../../public/RetroFunding_R5_IVoted_16x9.png";
-import Image from "next/image";
 import { ArrowDownToLineIcon } from "lucide-react";
 import mixpanel from "mixpanel-browser";
+import Image from "next/image";
+import { ComponentProps, useState } from "react";
+import VotingSuccess_OPStack from "../../../public/RetroFunding_R5_IVoted_16x9.png";
+import { Button } from "../ui/button";
+import { Heading } from "../ui/headings";
+import { Text } from "../ui/text";
+import { Feedback, Form } from "./feedback-form";
 import { exportRound5Ballot } from "./import-ballot5";
 
 export function SubmitRound5Dialog({
@@ -38,7 +37,7 @@ export function SubmitRound5Dialog({
                     Before submitting your ballot, please answer the following
                     questions.
                   </Heading>
-                  <Text className="text-muted-foreground">
+                  <Text className="text-secondary-foreground text-center">
                     Your responses will directly inform the design of future
                     rounds, so thank you for taking the time to respond!
                   </Text>
