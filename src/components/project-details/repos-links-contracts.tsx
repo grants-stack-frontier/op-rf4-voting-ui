@@ -3,6 +3,7 @@ import { formatProjectAge } from "@/utils/projectUtils";
 import { RiGitForkFill, RiGithubFill, RiLink, RiStarFill, RiTimeFill, RiUserFill, RiUserStarFill } from "@remixicon/react";
 import Image from "next/image";
 import Link from "next/link";
+import { base, fraxtal, mode, optimism, zora } from 'viem/chains';
 import Logo from "../../../public/logo.png";
 import { CustomAccordion } from "../custom-accordion";
 import { Card, CardContent } from "../ui/card";
@@ -151,14 +152,22 @@ export function ReposLinksContracts({ github, links, contracts }: ReposLinksCont
           </CustomAccordion>
         );
       })}
-      {contracts?.map((contract, index) => {
+      {contracts?.map(({ address, chainId }, index) => {
+        const chain = [optimism, base, mode, zora, fraxtal].find(c => c.id === Number(chainId));
+        const { name, blockExplorers } = chain ?? {};
+        const { url } = blockExplorers?.default ?? {};
+        const icon = `https://icons.llamao.fi/icons/chains/rsz_${name === 'Mode Mainnet' ? 'mode' : name?.toLowerCase()}.jpg`;
         return (
           <Card className="shadow-none" key={index}>
             <CardContent className="px-2.5 py-3">
               <div className="flex items-center gap-2">
-                <Image src={Logo.src} alt="Logo" width={20} height={20} />
-                <Link className="text-sm font-medium leading-5 hover:underline" href={contract.address ? `https://optimistic.etherscan.io/address/${contract.address}` : '#'} target="_blank">
-                  {contract.address ?? 'No address'}
+                <Image className="rounded-full flex-shrink-0 flex relative" alt={chain?.name + "Logo"} src={icon || Logo.src} width={20} height={20} />
+                <Link
+                  className="text-sm font-medium leading-5 hover:underline"
+                  href={address && url ? `${url}/address/${address}` : '#'}
+                  target="_blank"
+                >
+                  {address ?? 'No address'}
                 </Link>
               </div>
             </CardContent>

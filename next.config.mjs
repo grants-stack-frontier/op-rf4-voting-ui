@@ -12,7 +12,9 @@ const hostnames = [
 	'imagedelivery.net',
 	'i.seadn.io',
 	'lh3.googleusercontent.com',
-	'pbs.twimg.com'
+	'pbs.twimg.com',
+	'ipfs.decentralized-content.com',
+	'icons.llamao.fi',
 ];
 
 /** @type {import('next').NextConfig} */
