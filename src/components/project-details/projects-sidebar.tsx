@@ -46,7 +46,7 @@ export function ProjectsSidebar({
         </>
       )}
 
-      <div className="p-3 space-y-2">
+      <div className="space-y-2">
         <ScrollArea className="h-[508px] relative">
           {isPending &&
             Array(8)
@@ -89,7 +89,7 @@ function ProjectItem({
       <div className="flex text-xs items-center justify-between py-2 flex-1 border-b text-muted-foreground">
         <div className="flex gap-2 items-center max-w-[204px] ">
           <div
-            className="size-6 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0"
+            className="size-4 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0"
             style={{
               backgroundImage: `url(${profileAvatarUrl})`,
             }}
