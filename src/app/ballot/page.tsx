@@ -278,7 +278,7 @@ function YourBallot() {
                 className={`flex justify-between flex-1 border-b gap-1 py-6 ${
                   i === 0 ? "pt-0" : ""
                 }`}
-                draggable='true'
+                draggable={distributionMethod !== DistributionMethod.IMPACT_GROUPS}
                 onDragStart={(e) => {
                   e.dataTransfer.setData(
                     "text/plain",
@@ -344,7 +344,7 @@ function YourBallot() {
                       {i + 1}
                     </div>
                     <div
-                      className='flex justify-center items-center rounded-md w-[42px] h-[40px] cursor-move bg-[#F2F3F8] text-[#636779]'
+                      className={`flex justify-center items-center rounded-md w-[42px] h-[40px] cursor-${distributionMethod === DistributionMethod.IMPACT_GROUPS ? 'not-allowed' : 'move'} bg-[#F2F3F8] text-[#636779]`}
                     >
                       <Menu />
                     </div>
