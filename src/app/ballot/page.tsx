@@ -87,48 +87,38 @@ function CheckBallotState() {
   const { address, isConnecting } = useAccount();
   const { isPending } = useRound5Ballot(address);
   const { state, ballot } = useBallotRound5Context();
+
+  const display = useMemo(() => {
+    if (isPending) {
+      return <Skeleton className='p-6 h-96' />;
+    }
+    if (!address && !isConnecting) {
+      return <NonBadgeholder />;
+    }
+    const isEmptyBallot = !Object.keys(state).length;
+    const needImpactScoring =
+      ballot && ballot.projects_to_be_evaluated.length > 0;
+    if (isEmptyBallot || needImpactScoring) {
+      return <EmptyBallot />;
+    }
+    return <YourBallot />;
+  }, [isPending, address, isConnecting, state, ballot]);
+  return display;
   // Comment out for local dev if needed
-  if (isPending) {
-    return <Skeleton className='p-6 h-96' />;
-  }
-  if (!address && !isConnecting) {
-    return <NonBadgeholder />;
-  }
-  const isEmptyBallot = !Object.keys(state).length;
-  const needImpactScoring =
-    ballot && ballot.projects_to_be_evaluated.length > 0;
-  if (isEmptyBallot || needImpactScoring) {
-    return <EmptyBallot />;
-  }
-  return <YourBallot />;
+  // if (isPending) {
+  //   return <Skeleton className='p-6 h-96' />;
+  // }
+  // if (!address && !isConnecting) {
+  //   return <NonBadgeholder />;
+  // }
+  // const isEmptyBallot = !Object.keys(state).length;
+  // const needImpactScoring =
+  //   ballot && ballot.projects_to_be_evaluated.length > 0;
+  // if (isEmptyBallot || needImpactScoring) {
+  //   return <EmptyBallot />;
+  // }
+  // return <YourBallot />;
 }
-
-type Filter = "conflict" | "no-conflict";
-
-function sortAndPrepProjects(
-  newProjects: Round5ProjectAllocation[],
-  filter?: Filter
-): ProjectAllocationState[] {
-  const projects = newProjects
-    .sort((a, b) => a.position - b.position)
-    .map((p) => ({
-      ...p,
-      allocationInput: p.allocation?.toString() || "",
-    }));
-  if (filter === "conflict") {
-    return projects.filter((p) => p.impact === 0);
-  }
-  if (filter === "no-conflict") {
-    return projects.filter((p) => p.impact !== 0);
-  }
-  return projects;
-}
-
-const categoryIds: CategoryId[] = [
-  "ETHEREUM_CORE_CONTRIBUTIONS",
-  "OP_STACK_RESEARCH_AND_DEVELOPMENT",
-  "OP_STACK_TOOLING",
-];
 
 interface ProjectAllocationState extends Round5ProjectAllocation {
   allocationInput: string;
