@@ -91,8 +91,7 @@ export function MetricsEditor() {
     },
     {
       name: 'Custom',
-      description:
-        'Reward allocation is weighed heavily towards projects with higher percentages.',
+      description: 'Reward allocation is customized by you.',
       method: 'CUSTOM',
       image: Custom,
     },
