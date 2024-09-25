@@ -1,4 +1,4 @@
-import { useSession } from "./useAuth";
+import { useSession } from './useAuth';
 
 export function useIsBadgeholder() {
   const { data: session } = useSession();

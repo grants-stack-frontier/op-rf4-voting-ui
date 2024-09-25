@@ -1,12 +1,9 @@
-"use client";
-import { PropsWithChildren, createContext, useContext, useEffect } from "react";
-import {
-  Round5Ballot,
-  useRound5Ballot,
-} from "@/hooks/useBallotRound5";
-import { useAccount } from "wagmi";
-import { useBallotRound5Editor } from "@/hooks/useBallotRound5Editor";
-import { useSaveRound5Allocation } from "@/hooks/useBallotRound5";
+'use client';
+import { PropsWithChildren, createContext, useContext, useEffect } from 'react';
+import { Round5Ballot, useRound5Ballot } from '@/hooks/useBallotRound5';
+import { useAccount } from 'wagmi';
+import { useBallotRound5Editor } from '@/hooks/useBallotRound5Editor';
+import { useSaveRound5Allocation } from '@/hooks/useBallotRound5';
 
 type BallotRound5Context = ReturnType<typeof useBallotRound5Editor>;
 const BallotRound5Context = createContext(
@@ -32,7 +29,9 @@ export function BallotRound5Provider({ children }: PropsWithChildren) {
   const value = { ballot, isPending, ...editor };
 
   return (
-    <BallotRound5Context.Provider value={value}>{children}</BallotRound5Context.Provider>
+    <BallotRound5Context.Provider value={value}>
+      {children}
+    </BallotRound5Context.Provider>
   );
 }
 

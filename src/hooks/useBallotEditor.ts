@@ -1,11 +1,11 @@
-"use client";
-import { useCallback, useMemo, useRef, useState } from "react";
+'use client';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { Round4Allocation } from "./useBallot";
-import { createSortFn, useMetricsByRound } from "./useMetrics";
-import { useBallotFilter } from "./useFilter";
-import { useBallotContext } from "@/components/ballot/provider";
-import debounce from "lodash.debounce";
+import { Round4Allocation } from './useBallot';
+import { createSortFn, useMetricsByRound } from './useMetrics';
+import { useBallotFilter } from './useFilter';
+import { useBallotContext } from '@/components/ballot/provider';
+import debounce from 'lodash.debounce';
 
 export type BallotState = Record<
   string,
@@ -98,8 +98,8 @@ function calculateBalancedAmounts(state: BallotState): BallotState {
         allocation: locked
           ? allocation
           : amountToBalance
-          ? amountToBalance / nonLocked.length
-          : 0,
+            ? amountToBalance / nonLocked.length
+            : 0,
         locked,
       },
     ])
@@ -119,7 +119,7 @@ export function useSortBallot(initialState: BallotState) {
       metrics
         ?.map((m) => ({ ...m, ...state[m.metric_id!] }))
         .sort(createSortFn({ order: filter.order, sort: filter.sort }))
-        .map((m) => m?.metric_id ?? "")
+        .map((m) => m?.metric_id ?? '')
         .filter(Boolean) ?? [],
     [filter, metrics] // Don't put state here because we don't want to sort when allocation changes
   );

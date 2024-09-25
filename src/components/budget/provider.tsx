@@ -1,9 +1,9 @@
-"use client";
-import React, { createContext, useContext } from "react";
-import { Category } from "@/data/categories";
-import { CategoryId } from "@/types/shared";
-import { useBudgetForm } from "@/hooks/useBudgetForm";
-import { Project } from "@/__generated__/api/agora.schemas";
+'use client';
+import React, { createContext, useContext } from 'react';
+import { Category } from '@/data/categories';
+import { CategoryId } from '@/types/shared';
+import { useBudgetForm } from '@/hooks/useBudgetForm';
+import { Project } from '@/__generated__/api/agora.schemas';
 
 interface BudgetContextType {
   categories: Category[] | undefined;
@@ -37,7 +37,7 @@ export function BudgetProvider({ children }: React.PropsWithChildren) {
 export const useBudgetContext = () => {
   const context = useContext(BudgetContext);
   if (context === undefined) {
-    throw new Error("useBudgetContext must be used within a BudgetProvider");
+    throw new Error('useBudgetContext must be used within a BudgetProvider');
   }
   return context;
 };

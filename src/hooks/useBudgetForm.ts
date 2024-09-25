@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useAllProjectsByCategory, useProjects } from "@/hooks/useProjects";
-import { CategoryId } from "@/types/shared";
-import debounce from "lodash.debounce";
-import { calculateBalancedAmounts, isCloseEnough } from "@/lib/budget-helpers";
-import { useBudget } from "./useBudget";
-import { categories } from "@/data/categories";
-import { useAccount } from "wagmi";
-import { updateRetroFundingRoundBudgetAllocation } from "@/__generated__/api/agora";
-import { useSession } from "./useAuth";
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useAllProjectsByCategory, useProjects } from '@/hooks/useProjects';
+import { CategoryId } from '@/types/shared';
+import debounce from 'lodash.debounce';
+import { calculateBalancedAmounts, isCloseEnough } from '@/lib/budget-helpers';
+import { useBudget } from './useBudget';
+import { categories } from '@/data/categories';
+import { useAccount } from 'wagmi';
+import { updateRetroFundingRoundBudgetAllocation } from '@/__generated__/api/agora';
+import { useSession } from './useAuth';
 
 export function useBudgetForm() {
   const roundId = 5;
@@ -17,7 +17,7 @@ export function useBudgetForm() {
   const [totalBudget, setTotalBudget] = useState<number>(2000000);
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [lockedFields, setLockedFields] = useState<Record<string, boolean>>({});
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const session = useSession();
 
   const allocationsRef = useRef(allocations);
@@ -56,15 +56,18 @@ export function useBudgetForm() {
       }
       return false;
     }
-    setError("");
+    setError('');
     return true;
   }, []);
 
   const getDefaultAllocations = useCallback((categories: any[]) => {
-    return categories.reduce((acc, category) => {
-      acc[category.id] = 33.33;
-      return acc;
-    }, {} as Record<string, number>);
+    return categories.reduce(
+      (acc, category) => {
+        acc[category.id] = 33.33;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }, []);
 
   useEffect(() => {
@@ -134,10 +137,13 @@ export function useBudgetForm() {
         const defaultAllocations = getDefaultAllocations(categories);
         setAllocations(defaultAllocations);
 
-        const defaultLockedFields = categories.reduce((acc, category) => {
-          acc[category.id] = false;
-          return acc;
-        }, {} as Record<string, boolean>);
+        const defaultLockedFields = categories.reduce(
+          (acc, category) => {
+            acc[category.id] = false;
+            return acc;
+          },
+          {} as Record<string, boolean>
+        );
 
         setLockedFields(defaultLockedFields);
       }
@@ -170,7 +176,7 @@ export function useBudgetForm() {
         },
         {
           onError: () => {
-            setError("An error occurred while saving. Please try again.");
+            setError('An error occurred while saving. Please try again.');
           },
         }
       );
@@ -196,7 +202,7 @@ export function useBudgetForm() {
 
       if (isModificationNotAllowed) {
         setError(
-          "Unable to modify allocation. Please ensure at least one other category is unlocked before making changes."
+          'Unable to modify allocation. Please ensure at least one other category is unlocked before making changes.'
         );
         return;
       }
@@ -212,7 +218,7 @@ export function useBudgetForm() {
 
       if (!checkTotalAllocation(rebalancedAllocations)) return;
 
-      setError("");
+      setError('');
 
       setAllocations(rebalancedAllocations);
       setLockedFields((prev) => ({
@@ -256,9 +262,9 @@ export function useBudgetForm() {
       try {
         await updateRetroFundingRoundBudgetAllocation(roundId, address, budget);
       } catch (error) {
-        console.error("Failed to save budget allocation:", error);
+        console.error('Failed to save budget allocation:', error);
         setError(
-          "An error occurred while saving the total budget. Please try again."
+          'An error occurred while saving the total budget. Please try again.'
         );
       }
     },

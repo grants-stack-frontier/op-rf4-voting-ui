@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { ComponentProps, useCallback, useRef } from "react";
-import { Button } from "../ui/button";
+import { ComponentProps, useCallback, useRef } from 'react';
+import { Button } from '../ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
-import { format, parse } from "@/lib/csv";
-import { Round4Allocation, useSaveAllocation } from "@/hooks/useBallot";
-import { useBallotContext } from "./provider";
-import { useMetricIds } from "@/hooks/useMetrics";
-import mixpanel from "@/lib/mixpanel";
+} from '../ui/dialog';
+import { format, parse } from '@/lib/csv';
+import { Round4Allocation, useSaveAllocation } from '@/hooks/useBallot';
+import { useBallotContext } from './provider';
+import { useMetricIds } from '@/hooks/useMetrics';
+import mixpanel from '@/lib/mixpanel';
 
 export function ImportBallotDialog({
   isOpen,
@@ -47,7 +47,7 @@ function ImportBallotButton() {
 
   const importCSV = useCallback(
     (csvString: string) => {
-      console.log("import csv");
+      console.log('import csv');
       // Parse CSV and build the ballot data (remove name column)
       const { data } = parse<Round4Allocation>(csvString);
       const allocations = data
@@ -55,19 +55,19 @@ function ImportBallotButton() {
           metric_id,
           allocation: Number(allocation),
           // Only the string "true" and "1" will be matched as locked
-          locked: ["true", "1"].includes(String(locked)) ? true : false,
+          locked: ['true', '1'].includes(String(locked)) ? true : false,
         }))
         .filter((m) => metricIds?.includes(m.metric_id));
 
       if (allocations.length !== data.length) {
         alert(
-          "One or more of the metric IDs were not correct and have been removed."
+          'One or more of the metric IDs were not correct and have been removed.'
         );
       }
       console.log(allocations);
       editor.reset(allocations);
 
-      mixpanel.track("Import CSV", { ballotSize: allocations.length });
+      mixpanel.track('Import CSV', { ballotSize: allocations.length });
 
       allocations.forEach((allocation) => save.mutate(allocation));
     },
@@ -100,7 +100,7 @@ function ImportBallotButton() {
 
 function ExportBallotButton() {
   const emptyBallot = [
-    { metric_id: "trusted_daily_active_users", allocation: 0, locked: false },
+    { metric_id: 'trusted_daily_active_users', allocation: 0, locked: false },
   ];
 
   return (
@@ -120,6 +120,6 @@ export function exportBallot(ballot: Round4Allocation[]) {
     {}
   );
   console.log(csv);
-  mixpanel.track("Export CSV", { ballotSize: ballot.length });
+  mixpanel.track('Export CSV', { ballotSize: ballot.length });
   window.open(`data:text/csv;charset=utf-8,${csv}`);
 }

@@ -1,14 +1,14 @@
-"use client";
+'use client';
 import {
   Toast,
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from "@/components/ui/toast";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { useBallotContext } from "../ballot/provider";
-import { useMetricIds } from "@/hooks/useMetrics";
+} from '@/components/ui/toast';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { useBallotContext } from '../ballot/provider';
+import { useMetricIds } from '@/hooks/useMetrics';
 
 export function ReviewBallotToast() {
   const { state } = useBallotContext();
@@ -19,7 +19,7 @@ export function ReviewBallotToast() {
       <Toast className="flex gap-1" open={isEmpty}>
         <ToastTitle>Your ballot is empty</ToastTitle>
         <Link href={`/metrics/${data?.[0]}`}>
-          <Button variant={"outline"}>Review metrics</Button>
+          <Button variant={'outline'}>Review metrics</Button>
         </Link>
       </Toast>
       <ToastViewport />

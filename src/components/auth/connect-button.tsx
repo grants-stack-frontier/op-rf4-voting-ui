@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { ChevronDown } from "lucide-react";
-import { ConnectButton as RConnectButton } from "@rainbow-me/rainbowkit";
-import { Button } from "../ui/button";
+import Image from 'next/image';
+import { ChevronDown } from 'lucide-react';
+import { ConnectButton as RConnectButton } from '@rainbow-me/rainbowkit';
+import { Button } from '../ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { forwardRef } from "react";
-import mixpanel from "@/lib/mixpanel";
-import { useDisconnect } from "@/hooks/useAuth";
+} from '../ui/dropdown-menu';
+import { forwardRef } from 'react';
+import mixpanel from '@/lib/mixpanel';
+import { useDisconnect } from '@/hooks/useAuth';
 
 export function ConnectButton({}) {
   const { disconnect } = useDisconnect();
@@ -27,21 +27,21 @@ export function ConnectButton({}) {
         authenticationStatus,
         mounted,
       }) => {
-        const ready = mounted && authenticationStatus !== "loading";
+        const ready = mounted && authenticationStatus !== 'loading';
         const connected =
           ready &&
           account &&
           chain &&
-          (!authenticationStatus || authenticationStatus === "authenticated");
+          (!authenticationStatus || authenticationStatus === 'authenticated');
 
         return (
           <div
             {...(!ready && {
-              "aria-hidden": true,
+              'aria-hidden': true,
               style: {
                 opacity: 0,
-                pointerEvents: "none",
-                userSelect: "none",
+                pointerEvents: 'none',
+                userSelect: 'none',
               },
             })}
           >
@@ -49,10 +49,10 @@ export function ConnectButton({}) {
               if (!connected) {
                 return (
                   <Button
-                    variant='destructive'
+                    variant="destructive"
                     onClick={() => {
                       openConnectModal();
-                      mixpanel.track("Connect Wallet", { status: "init" });
+                      mixpanel.track('Connect Wallet', { status: 'init' });
                     }}
                   >
                     Connect Wallet
@@ -62,7 +62,7 @@ export function ConnectButton({}) {
 
               if (chain.unsupported) {
                 return (
-                  <Button variant='outline' onClick={openChainModal}>
+                  <Button variant="outline" onClick={openChainModal}>
                     Wrong network
                   </Button>
                 );
@@ -94,23 +94,23 @@ const UserButton = forwardRef(function UserButton(
 ) {
   return (
     <Button
-      variant='outline'
+      variant="outline"
       icon={() =>
         ensAvatar ? (
           <Image
             alt={displayName}
             width={24}
             height={24}
-            className='size-6 rounded-full mr-2'
+            className="size-6 rounded-full mr-2"
             src={ensAvatar}
           />
         ) : (
-          <div className='bg-gray-200 size-6 mr-2 rounded-full' />
+          <div className="bg-gray-200 size-6 mr-2 rounded-full" />
         )
       }
     >
       {displayName}
-      <ChevronDown className='size-4 ml-2' />
+      <ChevronDown className="size-4 ml-2" />
     </Button>
   );
 });

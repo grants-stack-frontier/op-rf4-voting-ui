@@ -1,18 +1,18 @@
-"use client";
+'use client';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   type CarouselApi,
-} from "@/components/ui/carousel";
-import { cn } from "@/lib/utils";
-import { markIntroAsSeen } from "@/utils/localStorage";
-import Image from "next/image";
-import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
-import { Button } from "../ui/button";
-import { Heading } from "../ui/headings";
+} from '@/components/ui/carousel';
+import { cn } from '@/lib/utils';
+import { markIntroAsSeen } from '@/utils/localStorage';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
+import { Button } from '../ui/button';
+import { Heading } from '../ui/headings';
 
 export function WelcomeCarousel({
   slides,
@@ -37,7 +37,7 @@ export function WelcomeCarousel({
     setCount(api.scrollSnapList().length);
     setCurrent(api.selectedScrollSnap() + 1);
 
-    api.on("select", () => {
+    api.on('select', () => {
       setCurrent(api.selectedScrollSnap() + 1);
     });
   }, [api]);
@@ -45,21 +45,21 @@ export function WelcomeCarousel({
   const { title, description } = slides[current - 1] ?? {};
 
   return (
-    <div className='flex flex-col items-center'>
-      <Carousel setApi={setApi} className='w-full max-w-[550px] h-[280px]'>
+    <div className="flex flex-col items-center">
+      <Carousel setApi={setApi} className="w-full max-w-[550px] h-[280px]">
         <CarouselContent>
           {slides.map(({ image }, index) => (
-            <CarouselItem key={index} className='flex flex-col items-center'>
-              <div className='w-[300px] mb-6'>
-                <div className='flex h-36 items-center justify-center'>
-                  <Image alt='' {...image} />
+            <CarouselItem key={index} className="flex flex-col items-center">
+              <div className="w-[300px] mb-6">
+                <div className="flex h-36 items-center justify-center">
+                  <Image alt="" {...image} />
                 </div>
               </div>
-              <div className='mx-auto'>
-                <Heading variant='h3' className='text-center mb-4'>
+              <div className="mx-auto">
+                <Heading variant="h3" className="text-center mb-4">
                   {title}
                 </Heading>
-                <p className='text-center leading-relaxed'>{description}</p>
+                <p className="text-center leading-relaxed">{description}</p>
               </div>
             </CarouselItem>
           ))}
@@ -73,13 +73,13 @@ export function WelcomeCarousel({
       />
 
       {current === count ? (
-        <Link href={"/budget"}>
-          <Button variant={"destructive"} onClick={handleComplete}>
+        <Link href={'/budget'}>
+          <Button variant={'destructive'} onClick={handleComplete}>
             Let&apos;s go!
           </Button>
         </Link>
       ) : (
-        <Button variant={"secondary"} onClick={() => api?.scrollNext()}>
+        <Button variant={'secondary'} onClick={() => api?.scrollNext()}>
           Next
         </Button>
       )}
@@ -97,7 +97,7 @@ function Dots({
   onChange: (index: number) => void;
 }) {
   return (
-    <div className='flex py-6'>
+    <div className="flex py-6">
       {Array.from({ length: total }).map((_, i) => (
         <div
           onClick={() => onChange(i)}
@@ -107,7 +107,7 @@ function Dots({
           <div
             className={cn(
               `w-2.5 h-2.5 rounded-full cursor-pointer ${
-                current === i ? "bg-gray-600" : "bg-gray-300"
+                current === i ? 'bg-gray-600' : 'bg-gray-300'
               }`
             )}
           />

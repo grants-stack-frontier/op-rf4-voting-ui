@@ -1,8 +1,8 @@
-"use client";
-import { votingEndDate } from "@/config";
-import { useIsBadgeholder } from "@/hooks/useIsBadgeholder";
-import { useAccount } from "wagmi";
-import { useVotingTimeLeft } from "../voting-ends-in";
+'use client';
+import { votingEndDate } from '@/config';
+import { useIsBadgeholder } from '@/hooks/useIsBadgeholder';
+import { useAccount } from 'wagmi';
+import { useVotingTimeLeft } from '../voting-ends-in';
 
 export function Callouts() {
   const { address, status } = useAccount();
@@ -19,7 +19,7 @@ export function Callouts() {
   }
 
   if (!address) return null;
-  if (["connecting", "reconnecting"].includes(status)) return null;
+  if (['connecting', 'reconnecting'].includes(status)) return null;
   if (isBadgeholder) return null;
 
   return (

@@ -1,8 +1,9 @@
-import { useTheme } from "next-themes";
+import { useTheme } from 'next-themes';
 
 export function Logo() {
   const { theme, systemTheme } = useTheme();
-  const isDarkMode = theme === 'dark' || (theme === 'system' && systemTheme === 'dark');
+  const isDarkMode =
+    theme === 'dark' || (theme === 'system' && systemTheme === 'dark');
 
   return (
     <svg

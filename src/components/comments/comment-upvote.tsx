@@ -1,11 +1,11 @@
-"use client";
-import { CircleArrowDown, CircleArrowUp } from "lucide-react";
-import { useVoteComment, useCommentVotes } from "@/hooks/useComments";
-import { Button } from "../ui/button";
-import { useIsBadgeholder } from "@/hooks/useIsBadgeholder";
-import { cn } from "@/lib/utils";
+'use client';
+import { CircleArrowDown, CircleArrowUp } from 'lucide-react';
+import { useVoteComment, useCommentVotes } from '@/hooks/useComments';
+import { Button } from '../ui/button';
+import { useIsBadgeholder } from '@/hooks/useIsBadgeholder';
+import { cn } from '@/lib/utils';
 
-export function CommentUpvote({ count = 0, commentId = "", metricId = "" }) {
+export function CommentUpvote({ count = 0, commentId = '', metricId = '' }) {
   const voteComment = useVoteComment();
   const isBadgeholder = useIsBadgeholder();
   const votes = useCommentVotes({ commentId, metricId });
@@ -21,10 +21,10 @@ export function CommentUpvote({ count = 0, commentId = "", metricId = "" }) {
     <div className="px-2 py-1 border flex rounded-md gap-2 items-center text-sm">
       <Button
         variant="ghost"
-        className={cn("rounded-full", {
-          ["text-success-foreground"]: currentVote?.vote === 1,
+        className={cn('rounded-full', {
+          ['text-success-foreground']: currentVote?.vote === 1,
         })}
-        size={"icon"}
+        size={'icon'}
         onClick={() => handleVote(currentVote?.vote === 0 ? 1 : 0)}
         icon={CircleArrowUp}
         // disabled={isPending || !isBadgeholder}
@@ -33,10 +33,10 @@ export function CommentUpvote({ count = 0, commentId = "", metricId = "" }) {
       <span>{count}</span>
       <Button
         variant="ghost"
-        className={cn("rounded-full", {
-          ["text-red-500"]: currentVote?.vote === -1,
+        className={cn('rounded-full', {
+          ['text-red-500']: currentVote?.vote === -1,
         })}
-        size={"icon"}
+        size={'icon'}
         onClick={() => handleVote(currentVote?.vote === 0 ? -1 : 0)}
         icon={CircleArrowDown}
         // disabled={isPending || !isBadgeholder}
