@@ -1,4 +1,4 @@
-import Papa, { type UnparseConfig } from "papaparse";
+import Papa, { type UnparseConfig } from 'papaparse';
 
 export function parse<T>(file: string) {
   return Papa.parse<T>(file, { header: true });

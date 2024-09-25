@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import mixpanel from "mixpanel-browser";
-import { useEffect } from "react";
+import mixpanel from 'mixpanel-browser';
+import { useEffect } from 'react';
 
-export function PageView({ title = "" }) {
+export function PageView({ title = '' }) {
   useEffect(() => {
     mixpanel.track_pageview({ title });
   }, [title]);

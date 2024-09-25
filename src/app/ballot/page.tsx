@@ -1,21 +1,21 @@
-"use client";
-import { EmptyBallot, NonBadgeholder } from "@/components/ballot/ballot-states";
-import { Card } from "@/components/ui/card";
-import { useAccount } from "wagmi";
+'use client';
+import { EmptyBallot, NonBadgeholder } from '@/components/ballot/ballot-states';
+import { Card } from '@/components/ui/card';
+import { useAccount } from 'wagmi';
 
-import { useBallotRound5Context } from "@/components/ballot/provider5";
-import { downloadImage } from "@/components/ballot/submit-dialog";
-import { SubmitRound5Dialog } from "@/components/ballot/submit-dialog5";
-import { PageView } from "@/components/common/page-view";
-import { SearchInput } from "@/components/common/search-input";
-import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useVotingTimeLeft } from "@/components/voting-ends-in";
-import { votingEndDate } from "@/config";
-import { categoryNames } from "@/data/categories";
+import { useBallotRound5Context } from '@/components/ballot/provider5';
+import { downloadImage } from '@/components/ballot/submit-dialog';
+import { SubmitRound5Dialog } from '@/components/ballot/submit-dialog5';
+import { PageView } from '@/components/common/page-view';
+import { SearchInput } from '@/components/common/search-input';
+import { Alert } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useVotingTimeLeft } from '@/components/voting-ends-in';
+import { votingEndDate } from '@/config';
+import { categoryNames } from '@/data/categories';
 // import {
 //   MAX_MULTIPLIER_VALUE,
 //   useOsMultiplier,
@@ -29,28 +29,28 @@ import {
   useSaveRound5Position,
   useDistributionMethodFromLocalStorage,
   DistributionMethod,
-} from "@/hooks/useBallotRound5";
-import { useIsBadgeholder } from "@/hooks/useIsBadgeholder";
-import { formatDate } from "@/lib/utils";
-import { ArrowDownToLineIcon, LoaderIcon, Menu } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { ComponentProps, useEffect, useMemo, useState } from "react";
-import VotingSuccess from "../../../public/RetroFunding_Round4_IVoted@2x.png";
-import { MetricsEditor } from "../../components/metrics-editor";
-import { CategoryId } from "@/types/shared";
-import { useProjects, useProjectsByCategory } from "@/hooks/useProjects";
-import { useVotingCategory } from "@/hooks/useVotingCategory";
+} from '@/hooks/useBallotRound5';
+import { useIsBadgeholder } from '@/hooks/useIsBadgeholder';
+import { formatDate } from '@/lib/utils';
+import { ArrowDownToLineIcon, LoaderIcon, Menu } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ComponentProps, useEffect, useMemo, useState } from 'react';
+import VotingSuccess from '../../../public/RetroFunding_Round4_IVoted@2x.png';
+import { MetricsEditor } from '../../components/metrics-editor';
+import { CategoryId } from '@/types/shared';
+import { useProjects, useProjectsByCategory } from '@/hooks/useProjects';
+import { useVotingCategory } from '@/hooks/useVotingCategory';
 
 function formatAllocationOPAmount(amount?: number) {
   if (amount === undefined) return 0;
 
   const value = amount.toString();
-  const pointIndex = value.indexOf(".");
+  const pointIndex = value.indexOf('.');
   const exists = pointIndex !== -1;
   const numWithCommas = value
     .slice(0, exists ? pointIndex : value.length)
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   if (exists) {
     const cutoffPoint = 3;
     const decimals = value.slice(pointIndex);
@@ -64,12 +64,12 @@ function formatAllocationOPAmount(amount?: number) {
 }
 
 const impactScores: { [key: number]: string } = {
-  0: "Conflict of interest",
-  1: "Very low impact",
-  2: "Low impact",
-  3: "Medium impact",
-  4: "High impact",
-  5: "Very high impact",
+  0: 'Conflict of interest',
+  1: 'Very low impact',
+  2: 'Low impact',
+  3: 'Medium impact',
+  4: 'High impact',
+  5: 'Very high impact',
 };
 
 const totalAllocationAmount = 3_333_333;
@@ -77,7 +77,7 @@ const totalAllocationAmount = 3_333_333;
 export default function BallotPage() {
   return (
     <>
-      <PageView title='Ballot' />
+      <PageView title="Ballot" />
       <CheckBallotState />
     </>
   );
@@ -90,7 +90,7 @@ function CheckBallotState() {
 
   const display = useMemo(() => {
     if (isPending) {
-      return <Skeleton className='p-6 h-96' />;
+      return <Skeleton className="p-6 h-96" />;
     }
     if (!address && !isConnecting) {
       return <NonBadgeholder />;
@@ -141,7 +141,7 @@ function YourBallot() {
   console.log({ ballot });
   console.log({ projects });
   console.log(
-    "Diff:",
+    'Diff:',
     projects?.filter(
       (p) =>
         !ballot?.project_allocations.find(
@@ -152,45 +152,48 @@ function YourBallot() {
   );
 
   const [projectList, setProjectList] = useState<ProjectAllocationState[]>(
-    sortAndPrepProjects(ballot?.project_allocations || [], "no-conflict")
+    sortAndPrepProjects(ballot?.project_allocations || [], 'no-conflict')
   );
   const [conflicts, setConflicts] = useState<ProjectAllocationState[]>(
-    sortAndPrepProjects(ballot?.project_allocations || [], "conflict")
+    sortAndPrepProjects(ballot?.project_allocations || [], 'conflict')
   );
 
   useEffect(() => {
-    console.log("Ballot updated:", ballot?.project_allocations);
+    console.log('Ballot updated:', ballot?.project_allocations);
     setProjectList(
-      sortAndPrepProjects(ballot?.project_allocations || [], "no-conflict")
+      sortAndPrepProjects(ballot?.project_allocations || [], 'no-conflict')
     );
     setConflicts(
-      sortAndPrepProjects(ballot?.project_allocations || [], "conflict")
+      sortAndPrepProjects(ballot?.project_allocations || [], 'conflict')
     );
   }, [ballot]);
 
-  type Filter = "conflict" | "no-conflict";
+  type Filter = 'conflict' | 'no-conflict';
   function sortAndPrepProjects(
     newProjects: Round5ProjectAllocation[],
     filter?: Filter
   ): ProjectAllocationState[] {
     const projects = newProjects
-      .sort((a, b) => distributionMethod === DistributionMethod.CUSTOM ? Number(b.allocation) - Number(a.allocation) : a.position - b.position)
+      .sort((a, b) =>
+        distributionMethod === DistributionMethod.CUSTOM
+          ? Number(b.allocation) - Number(a.allocation)
+          : a.position - b.position
+      )
       .map((p) => ({
         ...p,
         allocation: p.allocation ?? 0,
         allocationInput: p.allocation?.toString() ?? '',
-      })
-    )
+      }));
     if (filter === 'conflict') {
-      return projects.filter(p => p.impact === 0);
+      return projects.filter((p) => p.impact === 0);
     }
-    if (filter === "no-conflict") {
+    if (filter === 'no-conflict') {
       return projects.filter((p) => p.impact !== 0);
     }
     return projects;
   }
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [filteredProjects, setFilteredProjects] = useState<
     ProjectAllocationState[]
   >([]);
@@ -213,30 +216,30 @@ function YourBallot() {
   const displayProjects = searchTerm ? filteredProjects : projectList;
 
   return (
-    <div className='space-y-4'>
-      {ballot?.status === "SUBMITTED" && (
-        <Alert variant={"accent"}>
-          <div className='flex gap-2 text-sm items-center'>
+    <div className="space-y-4">
+      {ballot?.status === 'SUBMITTED' && (
+        <Alert variant={'accent'}>
+          <div className="flex gap-2 text-sm items-center">
             <p>
               Your ballot was submitted on {formatDate(ballot?.published_at)}.
-              You can make changes and resubmit until{" "}
+              You can make changes and resubmit until{' '}
               {formatDate(votingEndDate)}. To do so, simply edit the ballot
               below and submit again.
             </p>
             <div
-              className='flex gap-4 items-center cursor-pointer hover:opacity-80 transition-opacity'
-              onClick={() => downloadImage(document.querySelector("#download"))}
+              className="flex gap-4 items-center cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => downloadImage(document.querySelector('#download'))}
             >
               <Image
-                id='download'
+                id="download"
                 {...VotingSuccess}
-                alt='Success!'
-                className='rounded-xl max-w-[142px]'
+                alt="Success!"
+                className="rounded-xl max-w-[142px]"
               />
               <Button
                 icon={ArrowDownToLineIcon}
-                size='icon'
-                variant={"ghost"}
+                size="icon"
+                variant={'ghost'}
               />
             </div>
           </div>
@@ -244,19 +247,19 @@ function YourBallot() {
       )}
       {/* TO DO: Change to category based on badgeholder */}
       <p>
-        Your voting category is{" "}
-        <a href={`/category/${votingCategory}`} className='underline'>
+        Your voting category is{' '}
+        <a href={`/category/${votingCategory}`} className="underline">
           {votingCategory
             ? categoryNames[votingCategory as CategoryId]
-            : "Unknown"}
-        </a>{" "}
+            : 'Unknown'}
+        </a>{' '}
         ({ballot?.total_projects} projects)
       </p>
-      <Card className='p-6 space-y-8'>
+      <Card className="p-6 space-y-8">
         <MetricsEditor />
         <SearchInput
-          className='my-2'
-          placeholder='Search projects...'
+          className="my-2"
+          placeholder="Search projects..."
           onChange={handleSearch}
         />
 
@@ -266,12 +269,12 @@ function YourBallot() {
               <div
                 key={proj.project_id}
                 className={`flex justify-between flex-1 border-b gap-1 py-6 ${
-                  i === 0 ? "pt-0" : ""
+                  i === 0 ? 'pt-0' : ''
                 }`}
-                draggable='true'
+                draggable="true"
                 onDragStart={(e) => {
                   e.dataTransfer.setData(
-                    "text/plain",
+                    'text/plain',
                     JSON.stringify({ index: i, id: proj.project_id })
                   );
                 }}
@@ -280,17 +283,14 @@ function YourBallot() {
                 }}
                 onDrop={(e) => {
                   e.preventDefault();
-                  const data = e.dataTransfer.getData("text/plain");
+                  const data = e.dataTransfer.getData('text/plain');
                   if (data) {
                     const { index: draggedIndex, id: draggedId } =
                       JSON.parse(data);
                     const newIndex = i;
                     if (draggedIndex !== newIndex) {
                       const newProjects = [...projectList];
-                      const [removed] = newProjects.splice(
-                        draggedIndex,
-                        1
-                      );
+                      const [removed] = newProjects.splice(draggedIndex, 1);
                       newProjects.splice(newIndex, 0, removed);
                       setProjectList(newProjects);
                       savePosition({
@@ -301,54 +301,52 @@ function YourBallot() {
                   }
                 }}
               >
-                <div className='flex items-start justify-between flex-grow'>
-                  <div className='flex items-start gap-1'>
+                <div className="flex items-start justify-between flex-grow">
+                  <div className="flex items-start gap-1">
                     <div
-                      className='size-12 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0'
+                      className="size-12 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0"
                       style={{
                         backgroundImage: `url(${proj.image})`,
                       }}
                     />
-                    <div className='flex flex-col gap-1 ml-4'>
+                    <div className="flex flex-col gap-1 ml-4">
                       <div>
                         <Link href={`/project/${proj.project_id}`}>
-                          <p className='font-semibold truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
+                          <p className="font-semibold truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]">
                             {proj.name}
                           </p>
                         </Link>
-                        <p className='text-sm text-gray-600 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
+                        <p className="text-sm text-gray-600 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]">
                           {projects?.find(
                             (p) =>
                               p.applicationId?.toLowerCase() ===
                               proj.project_id?.toLowerCase()
-                          )?.description ?? "No description"}
+                          )?.description ?? 'No description'}
                         </p>
                       </div>
-                      <div className='text-muted-foreground text-xs'>
+                      <div className="text-muted-foreground text-xs">
                         You scored: {impactScores[proj.impact]}
                       </div>
                     </div>
                   </div>
-                  <div className='flex gap-2'>
-                    <div className='flex justify-center items-center rounded-md w-[42px] h-[40px] bg-[#F2F3F8] text-[#636779]'>
+                  <div className="flex gap-2">
+                    <div className="flex justify-center items-center rounded-md w-[42px] h-[40px] bg-[#F2F3F8] text-[#636779]">
                       {i + 1}
                     </div>
-                    <div
-                      className='flex justify-center items-center rounded-md w-[42px] h-[40px] cursor-move bg-[#F2F3F8] text-[#636779]'
-                    >
+                    <div className="flex justify-center items-center rounded-md w-[42px] h-[40px] cursor-move bg-[#F2F3F8] text-[#636779]">
                       <Menu />
                     </div>
                   </div>
                 </div>
-                <div className='px-1'>
-                  <Separator orientation='vertical' className='h-10' />
+                <div className="px-1">
+                  <Separator orientation="vertical" className="h-10" />
                 </div>
-                <div className='flex flex-col justify-start items-center gap-1 max-w-[112px]'>
-                  <div className='relative'>
+                <div className="flex flex-col justify-start items-center gap-1 max-w-[112px]">
+                  <div className="relative">
                     <Input
-                      type='number'
-                      placeholder='--'
-                      className='text-center'
+                      type="number"
+                      placeholder="--"
+                      className="text-center"
                       value={proj.allocationInput}
                       onChange={(e) => {
                         const newAllocation = parseFloat(e.target.value);
@@ -367,14 +365,14 @@ function YourBallot() {
                         });
                       }}
                     />
-                    <span className='absolute right-6 top-1/2 transform -translate-y-1/2 pointer-events-none'>
+                    <span className="absolute right-6 top-1/2 transform -translate-y-1/2 pointer-events-none">
                       %
                     </span>
                   </div>
-                  <div className='text-muted-foreground text-xs'>
+                  <div className="text-muted-foreground text-xs">
                     {formatAllocationOPAmount(
                       (totalAllocationAmount * proj.allocation) / 100
-                    )}{" "}
+                    )}{' '}
                     OP
                   </div>
                 </div>
@@ -386,9 +384,9 @@ function YourBallot() {
         {/* <OpenSourceMultiplier initialValue={ballot?.os_multiplier} /> */}
         {/* <Button onClick={() => handleImpactChange(ballot?.projects_to_be_evaluated[0] ?? "", 5)}>Score Impact</Button> */}
 
-        <div className='flex flex-col gap-6 mt-6'>
+        <div className="flex flex-col gap-6 mt-6">
           <WeightsError />
-          <div className='flex items-center gap-4'>
+          <div className="flex items-center gap-4">
             <BallotSubmitButton onClick={() => setSubmitting(true)} />
             <IsSavingBallot />
           </div>
@@ -409,44 +407,44 @@ function YourBallot() {
       </Card>
       {conflicts.length > 0 && (
         <>
-          <h1 className='text-lg font-bold pt-6'>Conflicts of interest</h1>
+          <h1 className="text-lg font-bold pt-6">Conflicts of interest</h1>
           {conflicts.map((proj, i) => {
             return (
               <div
                 key={proj.project_id}
                 className={`flex justify-between flex-1 border-b gap-1 py-6`}
-                draggable='true'
+                draggable="true"
                 onDragStart={(e) => {
                   e.dataTransfer.setData(
-                    "text/plain",
+                    'text/plain',
                     JSON.stringify({ index: i, id: proj.project_id })
                   );
                 }}
               >
-                <div className='flex items-start justify-between flex-grow'>
-                  <div className='flex items-start gap-1'>
+                <div className="flex items-start justify-between flex-grow">
+                  <div className="flex items-start gap-1">
                     <div
-                      className='size-12 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0'
+                      className="size-12 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0"
                       style={{
                         backgroundImage: `url(${proj.image})`,
                       }}
                     />
-                    <div className='flex flex-col gap-1 ml-4'>
+                    <div className="flex flex-col gap-1 ml-4">
                       <div>
                         <Link href={`/project/${proj.project_id}`}>
-                          <p className='font-semibold truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
+                          <p className="font-semibold truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]">
                             {proj.name}
                           </p>
                         </Link>
-                        <p className='text-sm text-gray-600 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]'>
+                        <p className="text-sm text-gray-600 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]">
                           {projects?.find(
                             (p) =>
                               p.applicationId?.toLowerCase() ===
                               proj.project_id?.toLowerCase()
-                          )?.description ?? "No description"}
+                          )?.description ?? 'No description'}
                         </p>
                       </div>
-                      <div className='text-muted-foreground text-xs'>
+                      <div className="text-muted-foreground text-xs">
                         You marked: {impactScores[proj.impact]}
                       </div>
                     </div>
@@ -472,8 +470,8 @@ function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
   return (
     <Button
       disabled={allocationSum !== 100}
-      variant={"destructive"}
-      type='submit'
+      variant={'destructive'}
+      type="submit"
       onClick={onClick}
     >
       Submit budget and ballot
@@ -491,7 +489,7 @@ function WeightsError() {
 
   if (!distributionMethod)
     return (
-      <span className='text-sm text-destructive'>
+      <span className="text-sm text-destructive">
         Choose an allocation method at the top of this ballot.
       </span>
     );
@@ -499,7 +497,7 @@ function WeightsError() {
   if (allocationSum === 100) return null;
 
   return (
-    <span className='text-sm text-destructive'>
+    <span className="text-sm text-destructive">
       Percentages must equal 100% (
       {remainingAllocation > 0
         ? `add ${remainingAllocation}% to your ballot`
@@ -513,9 +511,9 @@ function IsSavingBallot() {
   const isSavingBallot = useIsSavingRound5Ballot();
 
   return isSavingBallot ? (
-    <span className='flex gap-2'>
-      <LoaderIcon className={"animate-spin size-4"} />
-      <span className='text-xs'>Saving ballot...</span>
+    <span className="flex gap-2">
+      <LoaderIcon className={'animate-spin size-4'} />
+      <span className="text-xs">Saving ballot...</span>
     </span>
   ) : null;
 }

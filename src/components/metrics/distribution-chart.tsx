@@ -1,7 +1,7 @@
-"use client";
-import { suffixNumber } from "@/lib/utils";
-import dynamic from "next/dynamic";
-import { LineChart, Line, CartesianGrid, YAxis } from "recharts";
+'use client';
+import { suffixNumber } from '@/lib/utils';
+import dynamic from 'next/dynamic';
+import { LineChart, Line, CartesianGrid, YAxis } from 'recharts';
 
 export function DistributionChart({
   data,

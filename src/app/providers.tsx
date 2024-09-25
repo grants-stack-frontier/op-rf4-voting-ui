@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
-import { PropsWithChildren } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { PropsWithChildren } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   getDefaultConfig,
   getDefaultWallets,
   RainbowKitProvider,
-} from "@rainbow-me/rainbowkit";
-import { WagmiProvider } from "wagmi";
+} from '@rainbow-me/rainbowkit';
+import { WagmiProvider } from 'wagmi';
 import {
   argentWallet,
   trustWallet,
   ledgerWallet,
-} from "@rainbow-me/rainbowkit/wallets";
+} from '@rainbow-me/rainbowkit/wallets';
 
-import { mainnet, optimism } from "wagmi/chains";
-import "@/lib/mixpanel";
+import { mainnet, optimism } from 'wagmi/chains';
+import '@/lib/mixpanel';
 
 function makeQueryClient() {
   return new QueryClient({
@@ -32,7 +32,7 @@ function makeQueryClient() {
 let browserQueryClient: QueryClient | undefined = undefined;
 
 function getQueryClient() {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     // Server: always make a new query client
     return makeQueryClient();
   } else {
@@ -44,13 +44,13 @@ function getQueryClient() {
 const { wallets } = getDefaultWallets();
 
 const config = getDefaultConfig({
-  appName: "OP Round 5",
+  appName: 'OP Round 5',
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_ID!,
   chains: [mainnet, optimism],
   wallets: [
     ...wallets,
     {
-      groupName: "Other",
+      groupName: 'Other',
       wallets: [argentWallet, trustWallet, ledgerWallet],
     },
   ],

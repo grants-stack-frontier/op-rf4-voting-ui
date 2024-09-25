@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
 import {
   useIsMutating,
   useMutation,
   useQuery,
   useQueryClient,
-} from "@tanstack/react-query";
-import { agoraRoundsAPI } from "@/config";
+} from '@tanstack/react-query';
+import { agoraRoundsAPI } from '@/config';
 
-import { useAccount, useSignMessage } from "wagmi";
-import { useToast } from "@/components/ui/use-toast";
-import { request } from "@/lib/request";
-import { ProjectAllocation } from "./useMetrics";
-import debounce from "lodash.debounce";
-import { useRef } from "react";
-import { useBallotContext } from "@/components/ballot/provider";
-import { CategoryId } from "@/types/shared";
+import { useAccount, useSignMessage } from 'wagmi';
+import { useToast } from '@/components/ui/use-toast';
+import { request } from '@/lib/request';
+import { ProjectAllocation } from './useMetrics';
+import debounce from 'lodash.debounce';
+import { useRef } from 'react';
+import { useBallotContext } from '@/components/ballot/provider';
+import { CategoryId } from '@/types/shared';
 
 export type Round4Ballot = {
   address: string;
@@ -25,7 +25,7 @@ export type Round4Ballot = {
   published_at: string;
   os_multiplier: number;
   os_only: boolean;
-  status: "SUBMITTED";
+  status: 'SUBMITTED';
 };
 export type Round4Allocation = {
   metric_id: string;
@@ -48,7 +48,11 @@ export type Round5ProjectAllocation = {
   impact: number;
 };
 
-export type Round5BallotStatus = "NOT STARTED" | "RANKED" | "PENDING SUBMISSION" | "SUBMITTED";
+export type Round5BallotStatus =
+  | 'NOT STARTED'
+  | 'RANKED'
+  | 'PENDING SUBMISSION'
+  | 'SUBMITTED';
 
 export type Round5Ballot = {
   address: string;
@@ -62,14 +66,14 @@ export type Round5Ballot = {
   projects_to_be_evaluated: string[];
   total_projects: number;
   distribution_method: string;
-}
+};
 
 export type Ballot<T extends 4 | 5> = T extends 4 ? Round4Ballot : Round5Ballot;
 
 export function useRound5Ballot(address?: string) {
   return useQuery({
     enabled: Boolean(address),
-    queryKey: ["ballot", address],
+    queryKey: ['ballot', address],
     queryFn: async () =>
       request
         .get(`${agoraRoundsAPI}/ballots/${address}`)
@@ -82,7 +86,7 @@ export function useBallot(address?: string) {
   const { toast } = useToast();
   return useQuery({
     enabled: Boolean(address),
-    queryKey: ["ballot", address],
+    queryKey: ['ballot', address],
     queryFn: async () =>
       request
         .get(`${agoraRoundsAPI}/ballots/${address}`)
@@ -103,28 +107,28 @@ export function useSaveAllocation() {
 
   const debounceToast = useRef(
     debounce(
-      () => toast({ title: "Your ballot is saved automatically" }),
+      () => toast({ title: 'Your ballot is saved automatically' }),
       2000,
       { leading: true, trailing: false }
     )
   ).current;
 
   return useMutation({
-    mutationKey: ["save-ballot"],
+    mutationKey: ['save-ballot'],
     mutationFn: async (allocation: Round4Allocation) => {
       return request
         .post(`${agoraRoundsAPI}/ballots/${address}/impactMetrics`, {
-          json: { ...allocation, metric_id: allocation["metric_id"] },
+          json: { ...allocation, metric_id: allocation['metric_id'] },
         })
         .json<Round4Ballot[]>()
         .then((r) => {
-          queryClient.setQueryData(["ballot", address], r?.[0]);
+          queryClient.setQueryData(['ballot', address], r?.[0]);
           return r;
         });
     },
     // onSuccess: debounceToast,
     onError: () =>
-      toast({ variant: "destructive", title: "Error saving ballot" }),
+      toast({ variant: 'destructive', title: 'Error saving ballot' }),
   });
 }
 
@@ -136,24 +140,24 @@ export function useRemoveAllocation() {
 
   const debounceToast = useRef(
     debounce(
-      () => toast({ title: "Your ballot is saved automatically" }),
+      () => toast({ title: 'Your ballot is saved automatically' }),
       2000,
       { leading: true, trailing: false }
     )
   ).current;
   return useMutation({
-    mutationKey: ["save-ballot", "remove"],
+    mutationKey: ['save-ballot', 'remove'],
     mutationFn: async (id: string) => {
       return request
         .delete(`${agoraRoundsAPI}/ballots/${address}/impactMetrics/${id}`)
         .json()
         .then(() =>
-          queryClient.invalidateQueries({ queryKey: ["ballot", address] })
+          queryClient.invalidateQueries({ queryKey: ['ballot', address] })
         );
     },
     onSuccess: debounceToast,
     onError: () =>
-      toast({ variant: "destructive", title: "Error saving ballot" }),
+      toast({ variant: 'destructive', title: 'Error saving ballot' }),
   });
 }
 
@@ -172,7 +176,7 @@ export function useOsMultiplier() {
           )
           .json<Round4Ballot[]>()
           .then(([ballot]) =>
-            queryClient.setQueryData(["ballot", address], ballot)
+            queryClient.setQueryData(['ballot', address], ballot)
           ),
 
       2000,
@@ -182,7 +186,7 @@ export function useOsMultiplier() {
   return useMutation({
     mutationFn: async (amount: number) => debouncedCall(amount),
     onError: () =>
-      toast({ variant: "destructive", title: "Error updating multiplier" }),
+      toast({ variant: 'destructive', title: 'Error updating multiplier' }),
   });
 }
 
@@ -218,12 +222,12 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
     },
     onSuccess,
     onError: () =>
-      toast({ variant: "destructive", title: "Error publishing ballot" }),
+      toast({ variant: 'destructive', title: 'Error publishing ballot' }),
   });
 }
 
 export function useIsSavingBallot() {
-  return Boolean(useIsMutating({ mutationKey: ["save-ballot"] }));
+  return Boolean(useIsMutating({ mutationKey: ['save-ballot'] }));
 }
 
 export function useBallotWeightSum() {

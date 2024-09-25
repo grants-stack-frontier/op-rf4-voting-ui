@@ -1,7 +1,7 @@
-import { CategoryType, categoryNames } from "@/data/categories";
-import { getBadgeClassName } from "@/utils/projectUtils";
-import { AvatarCarousel } from "../common/avatar-carousel";
-import { Badge } from "../ui/badge";
+import { CategoryType, categoryNames } from '@/data/categories';
+import { getBadgeClassName } from '@/utils/projectUtils';
+import { AvatarCarousel } from '../common/avatar-carousel';
+import { Badge } from '../ui/badge';
 
 // Define a type for team members
 export type TeamMember = {
@@ -27,19 +27,29 @@ export type TeamMember = {
   };
 };
 
-export function CategoryAndTeam({ category, team }: { category?: CategoryType, team?: TeamMember[] }) {
+export function CategoryAndTeam({
+  category,
+  team,
+}: {
+  category?: CategoryType;
+  team?: TeamMember[];
+}) {
   // Safely map over the team array, with additional checks
-  const teamImages = team?.filter(member =>
-    member &&
-    typeof member === 'object' &&
-    'pfp_url' in member &&
-    'display_name' in member &&
-    member.pfp_url &&
-    member.display_name
-  ).map((member) => ({
-    url: member.pfp_url as string,
-    name: member.display_name
-  })) ?? [];
+  const teamImages =
+    team
+      ?.filter(
+        (member) =>
+          member &&
+          typeof member === 'object' &&
+          'pfp_url' in member &&
+          'display_name' in member &&
+          member.pfp_url &&
+          member.display_name
+      )
+      .map((member) => ({
+        url: member.pfp_url as string,
+        name: member.display_name,
+      })) ?? [];
 
   return (
     <div className="flex items-center gap-4 mb-12">
@@ -50,9 +60,7 @@ export function CategoryAndTeam({ category, team }: { category?: CategoryType, t
         {category ? categoryNames[category] : 'N/A'}
       </Badge>
       {teamImages && teamImages.length > 0 ? (
-        <AvatarCarousel
-          images={teamImages}
-        />
+        <AvatarCarousel images={teamImages} />
       ) : (
         <span className="text-sm text-gray-500">No team members</span>
       )}

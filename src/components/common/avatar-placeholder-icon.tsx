@@ -1,6 +1,6 @@
-import { ComponentProps } from "react";
+import { ComponentProps } from 'react';
 
-export function AvatarPlaceholderIcon(props: ComponentProps<"svg">) {
+export function AvatarPlaceholderIcon(props: ComponentProps<'svg'>) {
   return (
     <svg
       {...props}

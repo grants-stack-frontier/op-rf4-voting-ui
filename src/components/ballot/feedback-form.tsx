@@ -1,7 +1,7 @@
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Heading } from "../ui/headings";
-import { Badge } from "../ui/badge";
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Heading } from '../ui/headings';
+import { Badge } from '../ui/badge';
 
 import {
   FormProvider,
@@ -9,22 +9,22 @@ import {
   useController,
   useForm,
   useFormContext,
-} from "react-hook-form";
+} from 'react-hook-form';
 
-import { Card } from "../ui/card";
-import { Checkbox } from "../ui/checkbox";
-import { Textarea } from "../ui/textarea";
-import { ChevronLeft } from "lucide-react";
-import { PropsWithChildren, useMemo } from "react";
+import { Card } from '../ui/card';
+import { Checkbox } from '../ui/checkbox';
+import { Textarea } from '../ui/textarea';
+import { ChevronLeft } from 'lucide-react';
+import { PropsWithChildren, useMemo } from 'react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
-import { FeedbackForm, useSendFeedback } from "@/hooks/useFeedback";
-import { FormMessage } from "../ui/form";
+} from '../ui/select';
+import { FeedbackForm, useSendFeedback } from '@/hooks/useFeedback';
+import { FormMessage } from '../ui/form';
 
 export function Form({
   children,
@@ -38,7 +38,7 @@ export function Form({
 export function Feedback({ onSubmit = () => {} }) {
   const form = useFormContext<FeedbackForm & { index: number }>();
   const { handleSubmit, register, setValue, watch } = form;
-  const index = watch("index") ?? 0;
+  const index = watch('index') ?? 0;
 
   const { mutate, isPending } = useSendFeedback();
 
@@ -47,11 +47,11 @@ export function Feedback({ onSubmit = () => {} }) {
   return (
     <form
       onSubmit={handleSubmit((values) => {
-        console.log("next", values);
+        console.log('next', values);
         if (index < questions.length - 1) {
-          setValue("index", index + 1);
+          setValue('index', index + 1);
         } else {
-          console.log("submit", values);
+          console.log('submit', values);
           mutate(values, {
             onSuccess: onSubmit,
             onError: onSubmit, // Skips feedback if error (for testing)
@@ -59,15 +59,15 @@ export function Feedback({ onSubmit = () => {} }) {
         }
       })}
     >
-      <input type="hidden" {...register("index")} />
+      <input type="hidden" {...register('index')} />
       <div className="space-y-8">
         <div className="flex justify-center">
-          <Badge variant={"secondary"} className="text-muted-foreground">
+          <Badge variant={'secondary'} className="text-muted-foreground">
             {index + 1} of {questions.length}
           </Badge>
         </div>
         <div className="space-y-2">
-          <Heading variant={"h3"} className="text-center">
+          <Heading variant={'h3'} className="text-center">
             {title}
           </Heading>
           {description && (
@@ -79,16 +79,16 @@ export function Feedback({ onSubmit = () => {} }) {
           <Button
             icon={ChevronLeft}
             variant="ghost"
-            size={"icon"}
+            size={'icon'}
             type="button"
             className="absolute -top-[28px] left-2 rounded-full"
             disabled={index === 0}
-            onClick={() => setValue("index", index - 1)}
+            onClick={() => setValue('index', index - 1)}
           />
         )}
         <Button
           className="w-full"
-          variant={"destructive"}
+          variant={'destructive'}
           type="submit"
           isLoading={isPending}
           disabled={isPending}
@@ -107,9 +107,9 @@ function Behaviors() {
     formState: { errors },
   } = useFormContext();
   const { field } = useController({
-    name: "behaviors",
+    name: 'behaviors',
     control,
-    rules: { required: "At least one must be selected" },
+    rules: { required: 'At least one must be selected' },
   });
 
   const error = String(errors[field.name]?.message);
@@ -118,25 +118,25 @@ function Behaviors() {
       <div className="space-y-2 mb-4">
         {[
           {
-            id: "collusion",
+            id: 'collusion',
             label:
-              "Collusion (e.g., secret cooperation among badgeholders for a dishonest purpose)",
+              'Collusion (e.g., secret cooperation among badgeholders for a dishonest purpose)',
           },
           {
-            id: "bribery",
+            id: 'bribery',
             label:
-              "Bribery (e.g., promising something in return for voting in a particular way)",
+              'Bribery (e.g., promising something in return for voting in a particular way)',
           },
           {
-            id: "self-dealing",
+            id: 'self-dealing',
             label:
-              "Self-dealing (e.g., voting in someone’s self-interest rather than in the ecosystem’s interest)",
+              'Self-dealing (e.g., voting in someone’s self-interest rather than in the ecosystem’s interest)',
           },
           {
-            id: "other",
-            label: "Other behaviors that are detrimental to the Collective",
+            id: 'other',
+            label: 'Other behaviors that are detrimental to the Collective',
           },
-          { id: "none", label: "None of the above" },
+          { id: 'none', label: 'None of the above' },
         ].map((item, i) => (
           <label key={i} htmlFor={item.id} className="block cursor-pointer">
             <Card className="px-4 py-3 flex gap-2 items-center w-full">
@@ -144,7 +144,7 @@ function Behaviors() {
                 id={item.id}
                 checked={field.value?.includes(item.id)}
                 onCheckedChange={(checked) => {
-                  console.log("checked ", checked);
+                  console.log('checked ', checked);
                   checked
                     ? field.onChange([...(field.value ?? []), item.id])
                     : field.onChange(
@@ -158,7 +158,7 @@ function Behaviors() {
         ))}
       </div>
       <Textarea
-        {...register("behaviorsComment")}
+        {...register('behaviorsComment')}
         placeholder="Please feel free to elaborate here. Reminder that these responses are anonymous..."
       />
       <div className="text-destructive text-sm pt-4">{error}</div>
@@ -171,17 +171,17 @@ function createQuestions(
 ) {
   return [
     {
-      title: "How much time did you spend on voting in this round (in hours)?",
+      title: 'How much time did you spend on voting in this round (in hours)?',
       children: (
         <Input
-          {...register("votingTime", { required: true })}
+          {...register('votingTime', { required: true })}
           type="number"
           placeholder="Ex: 10 hours"
         />
       ),
     },
     {
-      title: "Please rate the voting experience",
+      title: 'Please rate the voting experience',
       children: (
         <SelectForm
           key="voting"
@@ -191,7 +191,7 @@ function createQuestions(
             .fill(0)
             .map((_, index) => ({
               label: `${index + 1} ${
-                index === 0 ? "(terrible)" : index === 9 ? "(amazing ✨)" : ""
+                index === 0 ? '(terrible)' : index === 9 ? '(amazing ✨)' : ''
               }`,
               value: String(index + 1),
             }))}
@@ -204,9 +204,9 @@ function createQuestions(
     // },
     {
       title:
-        "How worried are you about detrimental behavior among badgeholders influencing the allocation of Retro Funding in this round?",
+        'How worried are you about detrimental behavior among badgeholders influencing the allocation of Retro Funding in this round?',
       description:
-        "Examples are collusion, bribery, self-dealing, or other behaviors at odds with the goals of the Collective.",
+        'Examples are collusion, bribery, self-dealing, or other behaviors at odds with the goals of the Collective.',
       children: (
         <SelectForm
           key="concern"
@@ -216,12 +216,12 @@ function createQuestions(
             .map((_, index) => ({
               label: `${index + 1} ${
                 index === 0
-                  ? "(not worried)"
+                  ? '(not worried)'
                   : index === 3
-                  ? "(somewhat worried)"
-                  : index === 6
-                  ? "(very worried)"
-                  : ""
+                    ? '(somewhat worried)'
+                    : index === 6
+                      ? '(very worried)'
+                      : ''
               }`,
               value: String(index + 1),
             }))}
@@ -230,7 +230,7 @@ function createQuestions(
     },
     {
       title:
-        "Given the design of this round, how confident do you feel that OP rewards will be allocated efficiently to the most deserving projects?",
+        'Given the design of this round, how confident do you feel that OP rewards will be allocated efficiently to the most deserving projects?',
       children: (
         <SelectForm
           key="confidence"
@@ -240,12 +240,12 @@ function createQuestions(
             .map((_, index) => ({
               label: `${index + 1} ${
                 index === 0
-                  ? "(very low confidence)"
+                  ? '(very low confidence)'
                   : index === 3
-                  ? "(some confidence)"
-                  : index === 6
-                  ? "(very high confidence)"
-                  : ""
+                    ? '(some confidence)'
+                    : index === 6
+                      ? '(very high confidence)'
+                      : ''
               }`,
               value: String(index + 1),
             }))}
@@ -253,7 +253,8 @@ function createQuestions(
       ),
     },
     {
-      title: 'To what extent did the “Grants and investment” information influence your token allocation among projects?',
+      title:
+        'To what extent did the “Grants and investment” information influence your token allocation among projects?',
       children: (
         <SelectForm
           key="influence"
@@ -262,7 +263,11 @@ function createQuestions(
             .fill(0)
             .map((_, index) => ({
               label: `${index + 1} ${
-                index === 0 ? "(did not influence my token allocation)" : index === 6 ? "(had a large influence on my token allocation)" : ""
+                index === 0
+                  ? '(did not influence my token allocation)'
+                  : index === 6
+                    ? '(had a large influence on my token allocation)'
+                    : ''
               }`,
               value: String(index + 1),
             }))}
@@ -395,7 +400,7 @@ function createQuestions(
 }
 
 function SelectForm({
-  name = "",
+  name = '',
   options = [],
   hideComment,
 }: {
