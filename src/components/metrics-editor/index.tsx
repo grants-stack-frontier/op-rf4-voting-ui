@@ -55,7 +55,7 @@ export function MetricsEditor() {
 
   const budget = useMemo(() => {
     if (ballot && votingCategory) {
-      const portion = ballot.category_allocations.find(
+      const portion = ballot.category_allocations?.find(
         (c) => c.category_slug === votingCategory
       )?.allocation;
       return formatNumberWithCommas(

@@ -10,16 +10,11 @@ import { PageView } from '@/components/common/page-view';
 import { SearchInput } from '@/components/common/search-input';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useVotingTimeLeft } from '@/components/voting-ends-in';
 import { votingEndDate } from '@/config';
 import { categoryNames } from '@/data/categories';
-// import {
-//   MAX_MULTIPLIER_VALUE,
-//   useOsMultiplier,
-// } from "@/hooks/useBallot";
 import {
   Round5ProjectAllocation,
   useRound5Ballot,
@@ -30,6 +25,7 @@ import {
   useDistributionMethodFromLocalStorage,
   DistributionMethod,
   useDistributionMethod,
+  saveDistributionMethodToLocalStorage,
 } from '@/hooks/useBallotRound5';
 import { useIsBadgeholder } from '@/hooks/useIsBadgeholder';
 import { formatDate } from '@/lib/utils';
@@ -45,8 +41,9 @@ import { ComponentProps, useEffect, useMemo, useState } from 'react';
 import VotingSuccess from '../../../public/RetroFunding_Round4_IVoted@2x.png';
 import { MetricsEditor } from '../../components/metrics-editor';
 import { CategoryId } from '@/types/shared';
-import { useProjects, useProjectsByCategory } from '@/hooks/useProjects';
+import { useProjectsByCategory } from '@/hooks/useProjects';
 import { useVotingCategory } from '@/hooks/useVotingCategory';
+import { NumberInput } from '@/components/ui/number-input';
 
 function formatAllocationOPAmount(amount?: number) {
   if (amount === undefined) return 0;
@@ -102,7 +99,7 @@ function CheckBallotState() {
   }
   const isEmptyBallot = !Object.keys(state).length;
   const needImpactScoring =
-    ballot && ballot.projects_to_be_evaluated.length > 0;
+    ballot && ballot.projects_to_be_evaluated?.length > 0;
   if (isEmptyBallot || needImpactScoring) {
     return <EmptyBallot />;
   }
@@ -161,7 +158,7 @@ function YourBallot() {
     'Diff:',
     projects?.filter(
       (p) =>
-        !ballot?.project_allocations.find(
+        !ballot?.project_allocations?.find(
           (p2) =>
             p2.project_id?.toLowerCase() === p.applicationId?.toLowerCase()
         )
@@ -176,7 +173,6 @@ function YourBallot() {
   );
 
   useEffect(() => {
-    console.log('Ballot updated:', ballot?.project_allocations);
     setProjectList(
       sortAndPrepProjects(ballot?.project_allocations || [], 'no-conflict')
     );
@@ -233,8 +229,9 @@ function YourBallot() {
   const displayProjects = searchTerm ? filteredProjects : projectList;
 
   const isMovable =
-    distributionMethod !== DistributionMethod.IMPACT_GROUPS &&
-    distributionMethod !== DistributionMethod.CUSTOM;
+    distributionMethod === DistributionMethod.TOP_TO_BOTTOM ||
+    distributionMethod === DistributionMethod.TOP_WEIGHTED ||
+    distributionMethod === DistributionMethod.CUSTOM;
 
   return (
     <div className="space-y-4">
@@ -364,11 +361,82 @@ function YourBallot() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <div className="flex justify-center items-center rounded-md w-[42px] h-[40px] bg-[#F2F3F8] text-[#636779]">
-                      {i + 1}
+                    <div
+                      className={`flex justify-center items-center rounded-md w-[42px] h-[40px] bg-[#F2F3F8] text-[#636779] ${
+                        !isMovable ? 'bg-gray-200 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <NumberInput
+                        min="1"
+                        max={projectList.length}
+                        className="text-center"
+                        value={i + 1}
+                        disabled={!isMovable}
+                        hideSpinButtons={true}
+                        onChange={(e) => {
+                          const newIndex = parseInt(e.target.value, 10) - 1;
+                          if (
+                            isMovable &&
+                            newIndex >= 0 &&
+                            newIndex < projectList.length
+                          ) {
+                            const newProjects = [...projectList];
+                            const [movedProject] = newProjects.splice(i, 1);
+                            newProjects.splice(newIndex, 0, movedProject);
+
+                            let newAllocation;
+
+                            if (
+                              newIndex > 0 &&
+                              newIndex < newProjects.length - 1
+                            ) {
+                              const allocationBefore = Number(
+                                newProjects[newIndex - 1].allocation
+                              );
+                              const allocationAfter = Number(
+                                newProjects[newIndex + 1].allocation
+                              );
+                              newAllocation =
+                                (allocationBefore + allocationAfter) / 2;
+                            } else if (newIndex === 0) {
+                              const allocationAfter = Number(
+                                newProjects[newIndex + 1].allocation
+                              );
+                              newAllocation = allocationAfter;
+                            } else if (newIndex === newProjects.length - 1) {
+                              const allocationBefore = Number(
+                                newProjects[newIndex - 1].allocation
+                              );
+                              newAllocation = allocationBefore;
+                            } else {
+                              newAllocation = Number(movedProject.allocation);
+                            }
+
+                            movedProject.allocation = newAllocation;
+                            movedProject.allocationInput =
+                              newAllocation.toString();
+
+                            setProjectList(newProjects);
+
+                            savePosition({
+                              id: movedProject.project_id,
+                              position: newIndex,
+                            });
+
+                            saveAllocation({
+                              project_id: movedProject.project_id,
+                              allocation: newAllocation,
+                            });
+                          }
+                        }}
+                      />
                     </div>
                     <div
-                      className={`flex justify-center items-center rounded-md w-[42px] h-[40px] cursor-${isMovable ? 'move' : 'not-allowed'} bg-[#F2F3F8] text-[#636779]`}
+                      className={`flex justify-center items-center rounded-md w-[42px] h-[40px] ${
+                        isMovable
+                          ? 'cursor-move bg-[#F2F3F8]'
+                          : 'cursor-not-allowed bg-gray-200'
+                      } text-[#636779]`}
                     >
                       <Menu />
                     </div>
@@ -379,11 +447,11 @@ function YourBallot() {
                 </div>
                 <div className="flex flex-col justify-start items-center gap-4 max-w-[112px]">
                   <div className="relative">
-                    <Input
-                      type="number"
+                    <NumberInput
                       placeholder="--"
                       className="text-center"
                       value={proj.allocationInput}
+                      decimalPlaces={2}
                       onChange={(e) => {
                         const newAllocation = parseFloat(e.target.value);
                         const newProjectList = [...projectList];
@@ -392,7 +460,10 @@ function YourBallot() {
                           : newAllocation;
                         newProjectList[i].allocationInput = e.target.value;
                         setProjectList(newProjectList);
-                        saveDistributionMethod(DistributionMethod.CUSTOM);
+
+                        saveDistributionMethodToLocalStorage(
+                          DistributionMethod.CUSTOM
+                        );
                       }}
                       onBlur={() => {
                         saveAllocation({
@@ -401,7 +472,7 @@ function YourBallot() {
                         });
                       }}
                     />
-                    <span className="absolute right-6 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <span className="absolute right-8 top-1/2 transform -translate-y-1/2 pointer-events-none">
                       %
                     </span>
                   </div>
@@ -429,11 +500,6 @@ function YourBallot() {
         </div>
 
         {ballot?.address && (
-          // <SubmitDialog
-          //   ballot={ballot!}
-          //   open={isSubmitting}
-          //   onOpenChange={() => setSubmitting(false)}
-          // />
           <SubmitRound5Dialog
             ballot={ballot!}
             open={isSubmitting}
