@@ -1,7 +1,7 @@
-import { useToast } from "@/components/ui/use-toast";
-import { agoraRoundsAPI } from "@/config";
-import { request } from "@/lib/request";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useToast } from '@/components/ui/use-toast';
+import { agoraRoundsAPI } from '@/config';
+import { request } from '@/lib/request';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export type Comment = {
   address: string;
@@ -25,7 +25,7 @@ type Meta = {
   total_returned: number;
 };
 
-export type CommentSort = "newest" | "votes";
+export type CommentSort = 'newest' | 'votes';
 export type CommentFilter = {
   sort: CommentSort;
   limit: number;
@@ -34,16 +34,16 @@ export type CommentFilter = {
 export const defaultCommentFilter: CommentFilter = {
   limit: 100,
   offset: 0,
-  sort: "votes",
+  sort: 'votes',
 };
 export const commentSortLabels = {
-  votes: "Top comments",
-  newest: "Newest",
+  votes: 'Top comments',
+  newest: 'Newest',
 };
-export function useComments(metricId = "_", filter: CommentFilter) {
+export function useComments(metricId = '_', filter: CommentFilter) {
   return useQuery({
     enabled: Boolean(metricId),
-    queryKey: ["comments", metricId, filter],
+    queryKey: ['comments', metricId, filter],
     queryFn: async () =>
       request
         .get(`${agoraRoundsAPI}/impactMetrics/${metricId}/comments`, {
@@ -69,7 +69,7 @@ export function useAddComment() {
         })
         .then(async (r) => {
           await queryClient.invalidateQueries({
-            queryKey: ["comments", metricId],
+            queryKey: ['comments', metricId],
           });
           return r;
         }),
@@ -95,7 +95,7 @@ export function useEditComment() {
         )
         .then(async (r) => {
           await queryClient.invalidateQueries({
-            queryKey: ["comments", metricId],
+            queryKey: ['comments', metricId],
           });
           return r;
         }),
@@ -119,12 +119,12 @@ export function useDeleteComment() {
         )
         .then(async (r) => {
           await queryClient.invalidateQueries({
-            queryKey: ["comments", metricId],
+            queryKey: ['comments', metricId],
           });
           return r;
         }),
     onError: () =>
-      toast({ variant: "destructive", title: "Error deleting comment" }),
+      toast({ variant: 'destructive', title: 'Error deleting comment' }),
   });
 }
 
@@ -138,7 +138,7 @@ export function useCommentVotes({
   const { toast } = useToast();
   return useQuery({
     enabled: Boolean(commentId),
-    queryKey: ["comments", metricId, commentId],
+    queryKey: ['comments', metricId, commentId],
     queryFn: async () =>
       request
         .get(
@@ -147,8 +147,8 @@ export function useCommentVotes({
         .json<CommentVote[]>()
         .catch(() => {
           toast({
-            variant: "destructive",
-            title: "Error loading comment votes",
+            variant: 'destructive',
+            title: 'Error loading comment votes',
           });
 
           return [];
@@ -177,11 +177,11 @@ export function useVoteComment() {
         .json()
         .then(async (r) => {
           await queryClient.invalidateQueries({
-            queryKey: ["comments", metricId],
+            queryKey: ['comments', metricId],
           });
           return r;
         }),
     onError: () =>
-      toast({ variant: "destructive", title: "Error voting on comment" }),
+      toast({ variant: 'destructive', title: 'Error voting on comment' }),
   });
 }

@@ -1,19 +1,19 @@
-"use client";
-import { ChevronDown } from "lucide-react";
+'use client';
+import { ChevronDown } from 'lucide-react';
 
 import {
   CommentFilter,
   commentSortLabels,
   type CommentSort,
-} from "@/hooks/useComments";
+} from '@/hooks/useComments';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "../ui/button";
+} from '@/components/ui/dropdown-menu';
+import { Button } from '../ui/button';
 
 export function CommentSort({
   filter,

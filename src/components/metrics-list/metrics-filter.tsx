@@ -1,6 +1,6 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { SearchInput } from "@/components/common/search-input";
+'use client';
+import { Button } from '@/components/ui/button';
+import { SearchInput } from '@/components/common/search-input';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,16 +8,16 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { ChevronDown } from "lucide-react";
+} from '@/components/ui/dropdown-menu';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { ChevronDown } from 'lucide-react';
 import {
   decode,
   encode,
   sortLabels,
   useMetricsFilter,
-} from "@/hooks/useFilter";
+} from '@/hooks/useFilter';
 
 export function MetricsFilter() {
   const [filter, setFilter] = useMetricsFilter();
@@ -50,7 +50,7 @@ export function MetricsFilter() {
               value={encode(filter)}
               onValueChange={(value) => setFilter(decode(value))}
             >
-              {(["name_asc", "name_desc"] as const).map((value) => (
+              {(['name_asc', 'name_desc'] as const).map((value) => (
                 <DropdownMenuRadioItem key={value} value={value}>
                   {sortLabels[value]}
                 </DropdownMenuRadioItem>

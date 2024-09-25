@@ -1,11 +1,16 @@
-"use client";
-import { ArrowDownNarrowWide, ArrowUpWideNarrow } from "lucide-react";
-import { Button } from "../ui/button";
+'use client';
+import { ArrowDownNarrowWide, ArrowUpWideNarrow } from 'lucide-react';
+import { Button } from '../ui/button';
 
-export function MetricSort({ sort, setSort}: { sort: boolean, setSort: (bool: boolean) => void}) {
-
+export function MetricSort({
+  sort,
+  setSort,
+}: {
+  sort: boolean;
+  setSort: (bool: boolean) => void;
+}) {
   const icon = sort ? ArrowUpWideNarrow : ArrowDownNarrowWide;
-  const title = sort ? "Ascending" : "Descending";
+  const title = sort ? 'Ascending' : 'Descending';
   return (
     <Button
       onClick={() => setSort(!sort)}

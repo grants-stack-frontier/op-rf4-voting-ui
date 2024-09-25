@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import {
   Pagination,
   PaginationContent,
@@ -6,11 +6,11 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination";
-import { useMetricIds } from "@/hooks/useMetrics";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/pagination';
+import { useMetricIds } from '@/hooks/useMetrics';
+import { cn } from '@/lib/utils';
 
-export function MetricPagination({ id = "" }) {
+export function MetricPagination({ id = '' }) {
   const { data, isPending } = useMetricIds();
   if (isPending) return null;
   const current = data?.findIndex((_id) => _id === id) ?? 0;
@@ -22,7 +22,7 @@ export function MetricPagination({ id = "" }) {
         <PaginationContent>
           <PaginationItem
             className={cn({
-              ["pointer-events-none opacity-50"]: current === 0,
+              ['pointer-events-none opacity-50']: current === 0,
             })}
           >
             <PaginationPrevious href={`/metrics/${pages[current - 1]}`} />
@@ -41,7 +41,7 @@ export function MetricPagination({ id = "" }) {
 
           <PaginationItem
             className={cn({
-              ["pointer-events-none opacity-50"]: current === pages.length - 1,
+              ['pointer-events-none opacity-50']: current === pages.length - 1,
             })}
           >
             <PaginationNext href={`/metrics/${pages[current + 1]}`} />

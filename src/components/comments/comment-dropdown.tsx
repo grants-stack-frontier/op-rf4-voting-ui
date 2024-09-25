@@ -1,11 +1,11 @@
-"use client";
+'use client';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "../ui/button";
+} from '@/components/ui/dropdown-menu';
+import { Button } from '../ui/button';
 
 export function CommentDropdown({
   onEdit,

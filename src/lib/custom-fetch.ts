@@ -1,14 +1,14 @@
-import { getToken } from "./token";
+import { getToken } from './token';
 
 // NOTE: Supports cases where `content-type` is other than `json`
 const getBody = <T>(c: Response | Request): Promise<T> => {
-  const contentType = c.headers.get("content-type");
+  const contentType = c.headers.get('content-type');
 
-  if (contentType && contentType.includes("application/json")) {
+  if (contentType && contentType.includes('application/json')) {
     return c.json();
   }
 
-  if (contentType && contentType.includes("application/pdf")) {
+  if (contentType && contentType.includes('application/pdf')) {
     return c.blob() as Promise<T>;
   }
 
@@ -20,7 +20,7 @@ const getHeaders = (headers?: HeadersInit): HeadersInit => {
   const token = getToken();
   return {
     ...headers,
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`,
   };
 };
@@ -29,7 +29,7 @@ export const customFetch = async <T>(
   url: string,
   options: RequestInit
 ): Promise<T> => {
-  console.log("Calling custom fetch for URL: ", url);
+  console.log('Calling custom fetch for URL: ', url);
   const requestHeaders = getHeaders(options.headers);
 
   const requestInit: RequestInit = {

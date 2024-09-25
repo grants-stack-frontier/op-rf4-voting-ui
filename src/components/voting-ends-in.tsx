@@ -1,8 +1,8 @@
-"use client";
-import { ComponentProps, PropsWithChildren } from "react";
-import { createGlobalState, useHarmonicIntervalFn } from "react-use";
+'use client';
+import { ComponentProps, PropsWithChildren } from 'react';
+import { createGlobalState, useHarmonicIntervalFn } from 'react-use';
 
-const useEndDate = createGlobalState<string[]>(["00", "00", "00"]);
+const useEndDate = createGlobalState<string[]>(['00', '00', '00']);
 export function useVotingTimeLeft(date: Date) {
   const [state, setState] = useEndDate();
 
@@ -13,7 +13,7 @@ export function useVotingTimeLeft(date: Date) {
 export const VotingEndsIn = ({
   date,
   ...props
-}: ComponentProps<"span"> & { date: Date }) => {
+}: ComponentProps<'span'> & { date: Date }) => {
   const [days, hours, minutes, seconds] = useVotingTimeLeft(date);
   if (Number(seconds) < 0) {
     return (

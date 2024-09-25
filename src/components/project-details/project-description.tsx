@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { Button } from "../ui/button";
+import { useEffect, useRef, useState } from 'react';
+import { Button } from '../ui/button';
 
 export function ProjectDescription({ description }: { description?: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [truncatedText, setTruncatedText] = useState("");
+  const [truncatedText, setTruncatedText] = useState('');
   const [isClampable, setIsClampable] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -14,11 +14,11 @@ export function ProjectDescription({ description }: { description?: string }) {
       if (!containerRef.current) return;
 
       const container = containerRef.current;
-      const tempElement = document.createElement("div");
+      const tempElement = document.createElement('div');
       tempElement.style.width = `${container.clientWidth}px`;
-      tempElement.style.position = "absolute";
-      tempElement.style.visibility = "hidden";
-      tempElement.style.whiteSpace = "normal";
+      tempElement.style.position = 'absolute';
+      tempElement.style.visibility = 'hidden';
+      tempElement.style.whiteSpace = 'normal';
       document.body.appendChild(tempElement);
 
       const lineHeight = parseInt(
@@ -35,12 +35,12 @@ export function ProjectDescription({ description }: { description?: string }) {
         let low = 0;
         let high = description.length;
         let mid;
-        let result = "";
+        let result = '';
 
         while (low <= high) {
           mid = Math.floor((low + high) / 2);
           tempElement.textContent =
-            description.slice(0, mid) + " ... view more";
+            description.slice(0, mid) + ' ... view more';
 
           if (tempElement.offsetHeight <= maxHeight) {
             result = description.slice(0, mid);
@@ -57,8 +57,8 @@ export function ProjectDescription({ description }: { description?: string }) {
     };
 
     processText();
-    window.addEventListener("resize", processText);
-    return () => window.removeEventListener("resize", processText);
+    window.addEventListener('resize', processText);
+    return () => window.removeEventListener('resize', processText);
   }, [description]);
 
   const toggleExpand = () => {
@@ -66,16 +66,16 @@ export function ProjectDescription({ description }: { description?: string }) {
   };
 
   return (
-    <div className='my-6' ref={containerRef}>
-      <div className='leading-6 dark:text-white'>
+    <div className="my-6" ref={containerRef}>
+      <div className="leading-6 dark:text-white">
         {isExpanded ? description : truncatedText}
         {isClampable && (
           <Button
-            variant='link'
-            className='p-0 align-baseline ml-1 text-[16px] h-[24px]'
+            variant="link"
+            className="p-0 align-baseline ml-1 text-[16px] h-[24px]"
             onClick={toggleExpand}
           >
-            {isExpanded ? "... view less" : "... view more"}
+            {isExpanded ? '... view less' : '... view more'}
           </Button>
         )}
       </div>
