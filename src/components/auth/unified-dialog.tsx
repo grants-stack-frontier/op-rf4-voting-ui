@@ -33,10 +33,10 @@ export const UnifiedDialog: React.FC<UnifiedDialogProps> = ({
               {emoji}
             </div>
           )}
-          <DialogTitle className='text-[#0F111A] text-center text-xl font-semibold leading-7 mb-4'>
+          <DialogTitle className='text-[#0F111A] dark:text-white text-center text-xl font-semibold leading-7 mb-4'>
             {title}
           </DialogTitle>
-          <DialogDescription className='text-[#404454] text-center text-base font-normal leading-6'>
+          <DialogDescription className='text-[#404454] dark:text-[#B0B3B8] text-center text-base font-normal leading-6'>
             {description}
           </DialogDescription>
         </DialogHeader>
