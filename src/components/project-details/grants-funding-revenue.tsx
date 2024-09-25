@@ -1,4 +1,3 @@
-import React from 'react';
 import { ProjectGrantsAndFunding } from "@/__generated__/api/agora.schemas";
 import { RiLink, RiMoneyDollarCircleFill, RiTimeFill } from "@remixicon/react";
 import Image from "next/image";
@@ -26,13 +25,13 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
       </div>
     );
   }
-  
+
   const formatGrantName = (name: string) => {
     if (name === 'retroFunding') return 'Retro Funding';
     return name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
-  const renderItem = (item: any, type: string) => {
+  const renderItem = (item: any, type: string, index: number) => {
     console.log('item', item)
     const { amount, date, details, link, grant, year } = item;
     const formattedAmount = amount && Number(amount) > 0 ? new Intl.NumberFormat('en-US').format(Number(amount)) : amount;
@@ -74,14 +73,14 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
 
     if (details) {
       return (
-        <CustomAccordion key={`${type}-${grant || amount}`} value={grant || amount || ''} trigger={header}>
+        <CustomAccordion key={`${type}-${grant || amount}-${index}`} value={grant || amount || ''} trigger={header}>
           <div className="px-3">{details}</div>
         </CustomAccordion>
       );
     }
 
     return (
-      <Card className="shadow-none" key={`${type}-${grant || amount}`}>
+      <Card className="shadow-none" key={`${type}-${grant || amount}-${index}`}>
         <CardContent className="flex items-center gap-2 px-2.5 py-3">
           {header}
         </CardContent>
@@ -92,10 +91,10 @@ export function GrantsFundingRevenue({ grantsAndFunding }: { grantsAndFunding?: 
   return (
     <div className="flex flex-col gap-2">
       <Heading className="text-sm font-medium leading-5" variant="h1">Grants and investment</Heading>
-      {grantsAndFunding.grants?.map(item => renderItem(item, 'Grant'))}
-      {grantsAndFunding.ventureFunding?.map(item => renderItem(item, 'Venture Funding'))}
-      {grantsAndFunding.revenue?.map(item => renderItem(item, 'Revenue'))}
-      {grantsAndFunding.investment?.map(item => renderItem(item, 'Investment'))}
+      {grantsAndFunding.grants?.map((item, index) => renderItem(item, 'Grant', index))}
+      {grantsAndFunding.ventureFunding?.map((item, index) => renderItem(item, 'Venture Funding', index))}
+      {grantsAndFunding.revenue?.map((item, index) => renderItem(item, 'Revenue', index))}
+      {grantsAndFunding.investment?.map((item, index) => renderItem(item, 'Investment', index))}
     </div>
   );
 }
