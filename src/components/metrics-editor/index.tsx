@@ -212,7 +212,7 @@ export function MetricsEditor() {
                 )}
                 <p className='font-bold text-sm'>{method.name}</p>
               </div>
-              <HoverCard>
+              <HoverCard openDelay={0}>
                 <HoverCardTrigger>
                   <svg
                     width='16'
