@@ -20,6 +20,7 @@ import {
 import { useVotingCategory } from "@/hooks/useVotingCategory";
 import { useBallotRound5Context } from "../ballot/provider5";
 import { useBudgetContext } from "../budget/provider";
+import { ResetButton } from "./reset-button";
 
 export function BlueCircleCheckIcon() {
   return (
@@ -145,40 +146,37 @@ export function MetricsEditor() {
       method: "CUSTOM",
     },
   ];
-  const allocationAmount = "3,333,333";
 
   return (
     <div>
-      <div className='flex items-center justify-between'>
-        <div className='mb-4'>
-          <Heading variant={"h3"}>Your ballot</Heading>
-          {/* <div className="text-sm">
-            You&apos;ve added {count} of {metrics.length} metrics
-          </div> */}
-        </div>
+      <div className='flex items-center justify-between mb-6'>
+        <h4 className='text-[20px] text-[#0F111A] font-semibold line-height-[28px]'>
+          Your ballot
+        </h4>
         <BallotFilter />
       </div>
 
-      {/* This sections is a work in progress */}
-      <div className=' flex flex-col gap-4 py-4 text-sm'>
+      <div className='flex flex-col gap-4 text-[16px] line-height-[24px] mb-10 text-[#404454]'>
         <p>First, review your project rankings in the list below.</p>
         <p>
-          Then, choose a method to easily allocate rewards across prjects. You
+          Then, choose a method to easily allocate rewards across projects. You
           can also customize percentages at any time.
         </p>
         <p>
-          OP calculations in this ballot are based on your budget of {budget} OP
+          OP calculations in this ballot are based on <a href="/budget" className='underline'>your category budget of {budget} OP</a>.
         </p>
-        {/* TO DO: CHANGE ALLOCATION AMOUNT TO ACTUAL BUDGET!!! */}
       </div>
 
-      <div className='flex flex-row justify-between items-end'>
-        <p className='font-semibold mb-2'>Allocation method</p>
+      <div className='flex flex-row justify-between items-end mb-2'>
+        <p className='font-semibold'>Allocation method</p>
         {!distributionMethod && (
-          <div className='flex flex-row items-center mb-2 gap-1'>
+          <div className='flex flex-row items-center gap-1'>
             <BlueCircleCheckIcon />
             <p className='font-semibold text-sm'>None selected</p>
           </div>
+        )}
+        {distributionMethod && (
+          <ResetButton />
         )}
       </div>
       <div className='grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-4'>

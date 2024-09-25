@@ -9,6 +9,7 @@ import {Button} from "@/components/ui/button";
 import {useState} from "react";
 import { useBallotRound5Context } from "./provider5";
 import { exportRound5Ballot, ImportBallotDialog } from "./import-ballot5";
+import { Ellipsis } from "lucide-react";
 
 export function BallotFilter() {
   const [isOpen, setOpen] = useState(false);
@@ -18,7 +19,9 @@ export function BallotFilter() {
     <div className="flex gap-2">
       <DropdownMenu>
         <DropdownMenuTrigger>
-          <Button variant={"secondary"}>...</Button>
+          <Button variant={"ghost"} size={"icon"} className="hover:bg-transparent h-10 w-10">
+            <Ellipsis className="w-4 h-4" />
+          </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem onClick={() => setOpen(true)}>
