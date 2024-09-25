@@ -20,6 +20,7 @@ import {
 import { useVotingCategory } from "@/hooks/useVotingCategory";
 import { useBallotRound5Context } from "../ballot/provider5";
 import { useBudgetContext } from "../budget/provider";
+import { ResetButton } from "./reset-button";
 
 export function BlueCircleCheckIcon() {
   return (
@@ -166,13 +167,16 @@ export function MetricsEditor() {
         </p>
       </div>
 
-      <div className='flex flex-row justify-between items-end'>
-        <p className='font-semibold mb-2'>Allocation method</p>
+      <div className='flex flex-row justify-between items-end mb-2'>
+        <p className='font-semibold'>Allocation method</p>
         {!distributionMethod && (
-          <div className='flex flex-row items-center mb-2 gap-1'>
+          <div className='flex flex-row items-center gap-1'>
             <BlueCircleCheckIcon />
             <p className='font-semibold text-sm'>None selected</p>
           </div>
+        )}
+        {distributionMethod && (
+          <ResetButton />
         )}
       </div>
       <div className='grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-4'>
