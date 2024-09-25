@@ -1,9 +1,9 @@
-import { truncate } from "@/lib/truncate";
-import { type ComponentProps } from "react";
-import { type Address } from "viem";
-import { normalize } from "viem/ens";
-import { useEnsAvatar, useEnsName } from "wagmi";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { truncate } from '@/lib/truncate';
+import { type ComponentProps } from 'react';
+import { type Address } from 'viem';
+import { normalize } from 'viem/ens';
+import { useEnsAvatar, useEnsName } from 'wagmi';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 export function AvatarENS({
   address,
@@ -35,7 +35,7 @@ export function NameENS({
 }: {
   address?: string;
   truncateLength?: number;
-} & ComponentProps<"div">) {
+} & ComponentProps<'div'>) {
   const { data: name } = useEnsName({
     address: address as Address,
     chainId: 1,

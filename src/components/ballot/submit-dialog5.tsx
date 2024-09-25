@@ -1,18 +1,17 @@
-import { ComponentProps, useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Feedback, Form } from "./feedback-form";
-import { Heading } from "../ui/headings";
-import { Button } from "../ui/button";
-import { Text } from "../ui/text";
-import { votingEndDate } from "@/config";
-import { Round5Ballot, useSubmitBallot } from "@/hooks/useBallotRound5";
-import { formatDate } from "@/lib/utils";
-import { exportBallot } from "./import-ballot";
-import VotingSuccess_OPStack from "../../../public/RetroFunding_R5_IVoted_16x9.png";
-import Image from "next/image";
-import { ArrowDownToLineIcon } from "lucide-react";
-import mixpanel from "mixpanel-browser";
-import { exportRound5Ballot } from "./import-ballot5";
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { votingEndDate } from '@/config';
+import { Round5Ballot, useSubmitBallot } from '@/hooks/useBallotRound5';
+import { formatDate } from '@/lib/utils';
+import { ArrowDownToLineIcon } from 'lucide-react';
+import mixpanel from 'mixpanel-browser';
+import Image from 'next/image';
+import { ComponentProps, useState } from 'react';
+import VotingSuccess_OPStack from '../../../public/RetroFunding_R5_IVoted_16x9.png';
+import { Button } from '../ui/button';
+import { Heading } from '../ui/headings';
+import { Text } from '../ui/text';
+import { Feedback, Form } from './feedback-form';
+import { exportRound5Ballot } from './import-ballot5';
 
 export function SubmitRound5Dialog({
   open,
@@ -20,38 +19,38 @@ export function SubmitRound5Dialog({
   onOpenChange,
 }: ComponentProps<typeof Dialog> & { ballot?: Round5Ballot }) {
   const [feedbackProgress, setFeedbackProgress] = useState<
-    "init" | "in_progress" | "submit" | "done"
-  >(ballot?.status === "SUBMITTED" ? "submit" : "init");
+    'init' | 'in_progress' | 'submit' | 'done'
+  >(ballot?.status === 'SUBMITTED' ? 'submit' : 'init');
 
   const submit = useSubmitBallot({
-    onSuccess: () => setFeedbackProgress("done"),
+    onSuccess: () => setFeedbackProgress('done'),
   });
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         {(() => {
           switch (feedbackProgress) {
-            case "init":
+            case 'init':
               return (
                 <div className="flex flex-col gap-2">
                   <Heading variant="h3" className="text-center">
                     Before submitting your ballot, please answer the following
                     questions.
                   </Heading>
-                  <Text className="text-muted-foreground">
+                  <Text className="text-secondary-foreground text-center">
                     Your responses will directly inform the design of future
                     rounds, so thank you for taking the time to respond!
                   </Text>
                   <Button
                     className="w-full"
                     variant="destructive"
-                    onClick={() => setFeedbackProgress("in_progress")}
+                    onClick={() => setFeedbackProgress('in_progress')}
                   >
                     Continue
                   </Button>
                 </div>
               );
-            case "in_progress":
+            case 'in_progress':
               return (
                 <Form
                   defaultValues={{
@@ -60,10 +59,10 @@ export function SubmitRound5Dialog({
                     behaviors: [],
                   }}
                 >
-                  <Feedback onSubmit={() => setFeedbackProgress("submit")} />
+                  <Feedback onSubmit={() => setFeedbackProgress('submit')} />
                 </Form>
               );
-            case "submit":
+            case 'submit':
               return (
                 <div className="flex flex-col gap-2">
                   <Heading variant="h3" className="text-center">
@@ -71,7 +70,7 @@ export function SubmitRound5Dialog({
                   </Heading>
                   <Text className="text-muted-foreground text-center">
                     <div>
-                      You can make changes and resubmit your ballot until{" "}
+                      You can make changes and resubmit your ballot until{' '}
                     </div>
                     {formatDate(votingEndDate)}
                   </Text>
@@ -88,7 +87,7 @@ export function SubmitRound5Dialog({
                   </Button>
                 </div>
               );
-            case "done":
+            case 'done':
               return (
                 <div className="flex flex-col gap-2">
                   <div className="flex justify-center">
@@ -110,7 +109,7 @@ export function SubmitRound5Dialog({
                   <Button
                     variant="destructive"
                     onClick={() => {
-                      const imageURL = document.querySelector("#download");
+                      const imageURL = document.querySelector('#download');
                       downloadImage(imageURL as HTMLImageElement);
                     }}
                   >
@@ -141,14 +140,14 @@ export function SubmitRound5Dialog({
 
 export function downloadImage(element: HTMLImageElement | null) {
   if (!element) return;
-  const anchor = document.createElement("a");
+  const anchor = document.createElement('a');
   anchor.href = element.src;
 
-  anchor.download = "optimism-round4-voted.png";
+  anchor.download = 'optimism-round4-voted.png';
 
   document.body.appendChild(anchor);
   anchor.click();
   document.body.removeChild(anchor);
 
-  mixpanel.track("Download I Voted image");
+  mixpanel.track('Download I Voted image');
 }

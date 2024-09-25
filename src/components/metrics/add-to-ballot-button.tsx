@@ -1,20 +1,20 @@
-"use client";
-import { Check, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useBallotContext } from "../ballot/provider";
-import mixpanel from "@/lib/mixpanel";
+'use client';
+import { Check, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useBallotContext } from '../ballot/provider';
+import mixpanel from '@/lib/mixpanel';
 
 export function AddToBallotButton({
-  id = "",
-  variant = "secondary",
+  id = '',
+  variant = 'secondary',
 }: {
   id?: string;
-  variant?: "default" | "secondary" | "destructive";
+  variant?: 'default' | 'secondary' | 'destructive';
 }) {
   const { add, remove, state, isPending } = useBallotContext();
   if (isPending)
     return (
-      <Button disabled variant={"secondary"} isLoading>
+      <Button disabled variant={'secondary'} isLoading>
         Loading
       </Button>
     );
@@ -26,7 +26,7 @@ export function AddToBallotButton({
         variant="success"
         onClick={() => {
           remove(id);
-          mixpanel.track("Remove from ballot", { id });
+          mixpanel.track('Remove from ballot', { id });
         }}
       >
         Added
@@ -40,7 +40,7 @@ export function AddToBallotButton({
       variant={variant}
       onClick={() => {
         add(id);
-        mixpanel.track("Add to ballot", { id });
+        mixpanel.track('Add to ballot', { id });
       }}
     >
       Add to ballot

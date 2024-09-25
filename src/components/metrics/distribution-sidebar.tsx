@@ -1,9 +1,9 @@
-"use client";
-import { useMemo } from "react";
-import { StatsSidebar } from "../common/stats-sidebar";
-import { useMetricById } from "@/hooks/useMetrics";
+'use client';
+import { useMemo } from 'react';
+import { StatsSidebar } from '../common/stats-sidebar';
+import { useMetricById } from '@/hooks/useMetrics';
 
-export function DistributionSidebar({ id = "" }) {
+export function DistributionSidebar({ id = '' }) {
   const { data, isPending } = useMetricById(id);
 
   const projects = useMemo(
@@ -21,7 +21,7 @@ export function DistributionSidebar({ id = "" }) {
       description="For this particular metric"
       projects={projects}
       formatChartTick={(p) => `${(p * 100).toFixed(0)}%`}
-      formatAllocation={(alloc) => (alloc * 100).toFixed(2) + "%"}
+      formatAllocation={(alloc) => (alloc * 100).toFixed(2) + '%'}
     />
   );
 }

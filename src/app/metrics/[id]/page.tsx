@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,16 +6,16 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Comments } from "@/components/comments/comments";
-import { MetricPagination } from "@/components/metrics/metric-pagination";
-import { MetricDetails } from "@/components/metrics-details";
-import { DistributionSidebar } from "@/components/metrics/distribution-sidebar";
-import Link from "next/link";
-import { useMetricById, useViewMetric } from "@/hooks/useMetrics";
-import { PageView } from "@/components/common/page-view";
+} from '@/components/ui/breadcrumb';
+import { Comments } from '@/components/comments/comments';
+import { MetricPagination } from '@/components/metrics/metric-pagination';
+import { MetricDetails } from '@/components/metrics-details';
+import { DistributionSidebar } from '@/components/metrics/distribution-sidebar';
+import Link from 'next/link';
+import { useMetricById, useViewMetric } from '@/hooks/useMetrics';
+import { PageView } from '@/components/common/page-view';
 
-export default function MetricDetailsPage({ params: { id = "" } }) {
+export default function MetricDetailsPage({ params: { id = '' } }) {
   useViewMetric(id);
   const metric = useMetricById(id);
   return (

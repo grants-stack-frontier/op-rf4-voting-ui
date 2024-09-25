@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import ky from "ky";
-import { decodeJwt } from "jose";
-import { useAccount, useDisconnect as useWagmiDisconnect } from "wagmi";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button } from "../ui/button";
+import ky from 'ky';
+import { decodeJwt } from 'jose';
+import { useAccount, useDisconnect as useWagmiDisconnect } from 'wagmi';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button } from '../ui/button';
 
-import { getToken, setToken } from "@/lib/token";
-import { useRouter } from "next/navigation";
-import mixpanel from "@/lib/mixpanel";
-import { Address } from "viem";
-import { useEffect, useState } from "react";
+import { getToken, setToken } from '@/lib/token';
+import { useRouter } from 'next/navigation';
+import mixpanel from '@/lib/mixpanel';
+import { Address } from 'viem';
+import { useEffect, useState } from 'react';
 
-import { UnifiedDialog } from "./unified-dialog";
+import { UnifiedDialog } from './unified-dialog';
 
-import React from "react";
+import React from 'react';
 import {
   getVoterConfirmationView,
   removeVoterConfirmationView,
-} from "@/hooks/useAuth";
+} from '@/hooks/useAuth';
 
 export function VoterConfirmationDialog() {
   const { data: session } = useSession();
@@ -54,12 +54,12 @@ function VoterIsSelected({ onClose }: { onClose: () => void }) {
       onClose={onClose}
       title="You've been selected to vote in this round of Retro Funding"
       description="You're in a special group of badgeholders and guest voters participating in this round. Thanks in advance for your efforts."
-      emoji='✅'
+      emoji="✅"
     >
       <Button
-        type='button'
-        className='w-full'
-        variant='destructive'
+        type="button"
+        className="w-full"
+        variant="destructive"
         onClick={onClose}
       >
         Continue
@@ -76,18 +76,18 @@ function VoterIsNotSelected({ onClose }: { onClose: () => void }) {
       onClose={onClose}
       title="You weren't selected to vote in this round of Retro Funding"
       description="Thanks for being a badgeholder, and we'll see you in the next round of Retro Funding."
-      emoji='🛑'
+      emoji="🛑"
     >
-      <div className='space-y-2'>
+      <div className="space-y-2">
         <Button
-          type='button'
-          className='w-full'
-          variant='destructive'
+          type="button"
+          className="w-full"
+          variant="destructive"
           onClick={() => disconnect?.()}
         >
           Disconnect wallet
         </Button>
-        <Button className='w-full' variant='outline' onClick={onClose}>
+        <Button className="w-full" variant="outline" onClick={onClose}>
           Explore the app
         </Button>
       </div>
@@ -103,18 +103,18 @@ function VoterIsNotBadgeholder({ onClose }: { onClose: () => void }) {
       onClose={onClose}
       title="You're not a badgeholder"
       description="Feel free to explore the app, but you won't be able to use all features or submit a ballot."
-      emoji='🛑'
+      emoji="🛑"
     >
-      <div className='space-y-2'>
+      <div className="space-y-2">
         <Button
-          type='button'
-          className='w-full'
-          variant='destructive'
+          type="button"
+          className="w-full"
+          variant="destructive"
           onClick={() => disconnect?.()}
         >
           Disconnect wallet
         </Button>
-        <Button className='w-full' variant='outline' onClick={onClose}>
+        <Button className="w-full" variant="outline" onClick={onClose}>
           Explore the app
         </Button>
       </div>
@@ -124,8 +124,8 @@ function VoterIsNotBadgeholder({ onClose }: { onClose: () => void }) {
 
 function useNonce() {
   return useQuery({
-    queryKey: ["nonce"],
-    queryFn: async () => ky.get("/api/agora/auth/nonce").text(),
+    queryKey: ['nonce'],
+    queryFn: async () => ky.get('/api/agora/auth/nonce').text(),
   });
 }
 function useVerify() {
@@ -137,13 +137,13 @@ function useVerify() {
       nonce: string;
     }) => {
       const { access_token, ...rest } = await ky
-        .post("/api/agora/auth/verify", { json })
+        .post('/api/agora/auth/verify', { json })
         .json<{ access_token: string }>();
       console.log(rest);
-      mixpanel.track("Sign In", { status: "success" });
+      mixpanel.track('Sign In', { status: 'success' });
       setToken(access_token);
       // Trigger a refetch of the session
-      await client.invalidateQueries({ queryKey: ["session"] });
+      await client.invalidateQueries({ queryKey: ['session'] });
 
       return { access_token };
     },
@@ -156,17 +156,17 @@ export function useDisconnect() {
 
   async function disconnect() {
     wagmiDisconnect.disconnect();
-    global?.localStorage.removeItem("token");
+    global?.localStorage.removeItem('token');
     mixpanel.reset();
-    await client.invalidateQueries({ queryKey: ["session"] });
-    router.push("/");
+    await client.invalidateQueries({ queryKey: ['session'] });
+    router.push('/');
   }
 
   return { disconnect };
 }
 export function useSession() {
   return useQuery({
-    queryKey: ["session"],
+    queryKey: ['session'],
     queryFn: async () => {
       const accessToken = getToken();
       const user = accessToken

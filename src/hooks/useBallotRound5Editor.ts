@@ -1,11 +1,11 @@
-"use client";
-import { useCallback, useMemo, useRef, useState } from "react";
+'use client';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { createSortFn, useMetricsByRound } from "./useMetrics";
-import { useBallotFilter } from "./useFilter";
-import { useBallotContext } from "@/components/ballot/provider";
-import { Round5Ballot, Round5ProjectAllocation } from "./useBallotRound5";
-import { CategoryId } from "@/types/shared";
+import { createSortFn, useMetricsByRound } from './useMetrics';
+import { useBallotFilter } from './useFilter';
+import { useBallotContext } from '@/components/ballot/provider';
+import { Round5Ballot, Round5ProjectAllocation } from './useBallotRound5';
+import { CategoryId } from '@/types/shared';
 
 export type BallotRound5State = Record<
   string,
@@ -15,7 +15,7 @@ export type BallotRound5State = Record<
 export function useBallotRound5Editor({
   onUpdate,
 }: {
-  onUpdate?: (allocation: Round5ProjectAllocation) => void|Round5Ballot;
+  onUpdate?: (allocation: Round5ProjectAllocation) => void | Round5Ballot;
 }) {
   const [state, setState] = useState<BallotRound5State>({});
 
@@ -90,8 +90,8 @@ function calculateBalancedAmounts(state: BallotRound5State): BallotRound5State {
         allocation: locked
           ? allocation
           : amountToBalance
-          ? amountToBalance / nonLocked.length
-          : 0,
+            ? amountToBalance / nonLocked.length
+            : 0,
         locked,
       },
     ])
@@ -111,7 +111,7 @@ export function useSortBallot(initialState: BallotRound5State) {
       metrics
         ?.map((m) => ({ ...m, ...state[m.metric_id!] }))
         .sort(createSortFn({ order: filter.order, sort: filter.sort }))
-        .map((m) => m?.metric_id ?? "")
+        .map((m) => m?.metric_id ?? '')
         .filter(Boolean) ?? [],
     [filter, metrics] // Don't put state here because we don't want to sort when allocation changes
   );

@@ -1,8 +1,8 @@
-"use client";
-import { useAccount } from "wagmi";
-import { StatsSidebar } from "../common/stats-sidebar";
-import { useBallot, useIsSavingBallot } from "@/hooks/useBallot";
-import { formatNumber, suffixNumber } from "@/lib/utils";
+'use client';
+import { useAccount } from 'wagmi';
+import { StatsSidebar } from '../common/stats-sidebar';
+import { useBallot, useIsSavingBallot } from '@/hooks/useBallot';
+import { formatNumber, suffixNumber } from '@/lib/utils';
 
 export function BallotSidebar() {
   const { address } = useAccount();
@@ -18,7 +18,7 @@ export function BallotSidebar() {
       title="OP Allocation"
       projects={ballot?.project_allocations ?? []}
       formatChartTick={suffixNumber}
-      formatAllocation={(alloc) => formatNumber(alloc) + " OP"}
+      formatAllocation={(alloc) => formatNumber(alloc) + ' OP'}
       footer={
         <div className="text-xs p-2 text-muted-foreground">
           If all badgeholders voted like you, this would be the Round 4

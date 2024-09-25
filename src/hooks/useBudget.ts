@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useAccount } from "wagmi";
-import { useToast } from "@/components/ui/use-toast";
-import { CategoryId, Round5Allocation } from "@/types/shared";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAccount } from 'wagmi';
+import { useToast } from '@/components/ui/use-toast';
+import { CategoryId, Round5Allocation } from '@/types/shared';
 import {
   getRetroFundingRoundBallotById,
   updateRetroFundingRoundCategoryAllocation,
   getRetroFundingRoundBallotByIdResponse,
   updateRetroFundingRoundCategoryAllocationResponse,
-} from "@/__generated__/api/agora";
+} from '@/__generated__/api/agora';
 import {
   RetroFundingBallotCategoriesAllocation,
   Round5Ballot,
-} from "@/__generated__/api/agora.schemas";
+} from '@/__generated__/api/agora.schemas';
 
 export function useBudget(roundId: number) {
   const { toast } = useToast();
@@ -22,9 +22,9 @@ export function useBudget(roundId: number) {
 
   const getBudget = useQuery({
     enabled: Boolean(address),
-    queryKey: ["budget", address, roundId],
+    queryKey: ['budget', address, roundId],
     queryFn: async () => {
-      if (!address) throw new Error("No address provided");
+      if (!address) throw new Error('No address provided');
       return getRetroFundingRoundBallotById(roundId, address).then(
         (response: getRetroFundingRoundBallotByIdResponse) => {
           const ballot = response.data as Round5Ballot;
@@ -39,9 +39,9 @@ export function useBudget(roundId: number) {
   });
 
   const saveAllocation = useMutation({
-    mutationKey: ["save-budget", roundId],
+    mutationKey: ['save-budget', roundId],
     mutationFn: async (allocation: Round5Allocation) => {
-      if (!address) throw new Error("No address provided");
+      if (!address) throw new Error('No address provided');
       return updateRetroFundingRoundCategoryAllocation(
         roundId,
         address,
@@ -50,7 +50,7 @@ export function useBudget(roundId: number) {
         const updatedBallot = response.data as Round5Ballot;
         // Update the query data with the full structure
         queryClient.setQueryData(
-          ["budget", address, roundId],
+          ['budget', address, roundId],
           (oldData: any) => ({
             budget: updatedBallot.budget,
             allocations: updatedBallot.category_allocations,
@@ -61,8 +61,8 @@ export function useBudget(roundId: number) {
     },
     onError: () =>
       toast({
-        variant: "destructive",
-        title: "Error saving budget allocation",
+        variant: 'destructive',
+        title: 'Error saving budget allocation',
       }),
   });
 
