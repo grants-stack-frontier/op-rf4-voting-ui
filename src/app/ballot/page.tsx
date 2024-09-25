@@ -266,15 +266,15 @@ function YourBallot() {
         </a>{" "}
         ({ballot?.total_projects} projects)
       </p>
-      <Card className='p-6 space-y-8'>
+      <Card className='p-10 space-y-10'>
         <MetricsEditor />
-        <SearchInput
-          className='my-2'
-          placeholder='Search projects...'
-          onChange={handleSearch}
-        />
 
         <div>
+          <SearchInput
+            className='mb-6'
+            placeholder='Search projects...'
+            onChange={handleSearch}
+          />
           {displayProjects.map((proj, i) => {
             return (
               <div
