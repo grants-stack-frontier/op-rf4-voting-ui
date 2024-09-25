@@ -1,13 +1,13 @@
-import { CircleHelp } from "lucide-react";
-import { ComponentProps } from "react";
-import { cn } from "@/lib/utils";
+import { CircleHelp } from 'lucide-react';
+import { ComponentProps } from 'react';
+import { cn } from '@/lib/utils';
 
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
 
 export type MetricStatProps = {
   label: string;
@@ -21,15 +21,15 @@ export function MetricStat({
   value,
   hint,
   icon: Icon,
-}: MetricStatProps & ComponentProps<"div">) {
+}: MetricStatProps & ComponentProps<'div'>) {
   return (
     <div
       className={cn(
-        "rounded-xl bg-gray-100 text-gray-700 px-4 py-4 inline-flex gap-1 flex-col transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+        'rounded-xl bg-gray-100 text-gray-700 px-4 py-4 inline-flex gap-1 flex-col transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
         className
       )}
     >
-      <div className={cn("text-sm inline-flex items-center font-medium")}>
+      <div className={cn('text-sm inline-flex items-center font-medium')}>
         {label}
         {hint && (
           <TooltipProvider>
@@ -44,7 +44,7 @@ export function MetricStat({
           </TooltipProvider>
         )}
       </div>
-      <div className={cn("text-sm inline-flex items-center")}>
+      <div className={cn('text-sm inline-flex items-center')}>
         {Icon && <Icon className="mr-1 size-4" />}
         {value}
       </div>

@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import {
   Toast,
@@ -7,16 +7,23 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from "@/components/ui/toast"
-import { useToast } from "@/components/ui/use-toast"
-import { RiLoader4Line } from "@remixicon/react"
+} from '@/components/ui/toast';
+import { useToast } from '@/components/ui/use-toast';
+import { RiLoader4Line } from '@remixicon/react';
 
 export function Toaster() {
-  const { toasts } = useToast()
+  const { toasts } = useToast();
 
   return (
     <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, loading, ...props }) {
+      {toasts.map(function ({
+        id,
+        title,
+        description,
+        action,
+        loading,
+        ...props
+      }) {
         return (
           <Toast key={id} {...props}>
             <div className="flex items-center gap-2">
@@ -31,9 +38,9 @@ export function Toaster() {
             {action}
             <ToastClose />
           </Toast>
-        )
+        );
       })}
       <ToastViewport />
     </ToastProvider>
-  )
+  );
 }

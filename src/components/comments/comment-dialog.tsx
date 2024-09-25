@@ -1,18 +1,18 @@
-"use client";
+'use client';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Textarea } from "../ui/textarea";
-import { Comment } from "@/hooks/useComments";
-import { useForm } from "react-hook-form";
-import { Form } from "../ui/form";
-import { ComponentProps } from "react";
-import { useMetricById } from "@/hooks/useMetrics";
+} from '../ui/dialog';
+import { Button } from '../ui/button';
+import { Textarea } from '../ui/textarea';
+import { Comment } from '@/hooks/useComments';
+import { useForm } from 'react-hook-form';
+import { Form } from '../ui/form';
+import { ComponentProps } from 'react';
+import { useMetricById } from '@/hooks/useMetrics';
 
 export function CommentDialog({
   isOpen,
@@ -26,12 +26,12 @@ export function CommentDialog({
   isLoading: boolean;
   editingComment: Comment | null;
   metricId: string;
-  setOpen: ComponentProps<typeof Dialog>["onOpenChange"];
+  setOpen: ComponentProps<typeof Dialog>['onOpenChange'];
   onSave: (comment: string) => void;
 }) {
   const { data: metric } = useMetricById(metricId);
   const form = useForm({
-    defaultValues: { comment: editingComment?.comment ?? "" },
+    defaultValues: { comment: editingComment?.comment ?? '' },
   });
 
   return (
@@ -50,14 +50,14 @@ export function CommentDialog({
               placeholder="Enter text..."
               rows={8}
               maxLength={1000}
-              {...form.register("comment", { required: true })}
+              {...form.register('comment', { required: true })}
             />
             <div className="flex flex-col">
               <Button
                 isLoading={isLoading}
                 disabled={isLoading}
                 type="submit"
-                variant={"destructive"}
+                variant={'destructive'}
               >
                 Comment
               </Button>

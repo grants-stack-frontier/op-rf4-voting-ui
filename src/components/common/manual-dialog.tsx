@@ -1,8 +1,8 @@
-"use client";
-import { ComponentProps, PropsWithChildren, useEffect } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Markdown } from "@/components/markdown";
-import mixpanel from "mixpanel-browser";
+'use client';
+import { ComponentProps, PropsWithChildren, useEffect } from 'react';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Markdown } from '@/components/markdown';
+import mixpanel from 'mixpanel-browser';
 
 export function ManualDialog({
   children,
@@ -10,12 +10,12 @@ export function ManualDialog({
   onOpenChange,
 }: PropsWithChildren<Partial<ComponentProps<typeof Dialog>>>) {
   useEffect(() => {
-    console.log("mixlanel", open);
+    console.log('mixlanel', open);
     if (open) track();
   }, [open]);
 
   function track() {
-    mixpanel.track("Open Manual");
+    mixpanel.track('Open Manual');
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

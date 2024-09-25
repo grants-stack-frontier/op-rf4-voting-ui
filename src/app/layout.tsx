@@ -1,19 +1,19 @@
-import { BallotRound5Provider } from "@/components/ballot/provider5";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/toaster";
-import { cn } from "@/lib/utils";
-import "@rainbow-me/rainbowkit/styles.css";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { Provider } from "./providers";
-import { BallotProvider } from "@/components/ballot/provider";
-import { BudgetProvider } from "@/components/budget/provider";
-import { ClientLayout } from "./client-layout";
-import { metadata } from "./layout-metadata";
+import { BallotRound5Provider } from '@/components/ballot/provider5';
+import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from '@/components/ui/toaster';
+import { cn } from '@/lib/utils';
+import '@rainbow-me/rainbowkit/styles.css';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import { Provider } from './providers';
+import { BallotProvider } from '@/components/ballot/provider';
+import { BudgetProvider } from '@/components/budget/provider';
+import { ClientLayout } from './client-layout';
+import { metadata } from './layout-metadata';
 
 export { metadata };
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({
   children,
@@ -21,17 +21,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
-      <link rel='icon' href='/favicon-32x32.png' sizes='any' />
+    <html lang="en">
+      <link rel="icon" href="/favicon-32x32.png" sizes="any" />
       <body
         className={cn(
-          "min-h-screen bg-background antialiased",
+          'min-h-screen bg-background antialiased',
           inter.className
         )}
       >
         <ThemeProvider
-          attribute='class'
-          defaultTheme='system'
+          attribute="class"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >

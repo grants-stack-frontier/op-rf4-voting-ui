@@ -1,10 +1,10 @@
-import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
+import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot';
+import { cva, type VariantProps } from 'class-variance-authority';
 
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
-const textVariants = cva("leading-relaxed mb-4", {
+const textVariants = cva('leading-relaxed mb-4', {
   variants: {
     variant: {},
   },
@@ -12,14 +12,14 @@ const textVariants = cva("leading-relaxed mb-4", {
 });
 
 export interface TextProps
-  extends React.ComponentProps<"p">,
+  extends React.ComponentProps<'p'>,
     VariantProps<typeof textVariants> {
   asChild?: boolean;
 }
 
 const Text = React.forwardRef<HTMLParagraphElement, TextProps>(
   ({ className, variant, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "p";
+    const Comp = asChild ? Slot : 'p';
     return (
       <Comp
         className={cn(textVariants({ variant, className }))}
@@ -29,6 +29,6 @@ const Text = React.forwardRef<HTMLParagraphElement, TextProps>(
     );
   }
 );
-Text.displayName = "Text";
+Text.displayName = 'Text';
 
 export { Text, textVariants };

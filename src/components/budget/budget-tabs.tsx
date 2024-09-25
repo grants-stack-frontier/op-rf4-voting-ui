@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const tabs = [
   {
-    children: "Budget",
-    href: "/budget",
+    children: 'Budget',
+    href: '/budget',
   },
   {
-    children: "Ballot",
-    href: "/ballot",
+    children: 'Ballot',
+    href: '/ballot',
   },
 ];
 
@@ -23,8 +23,8 @@ export function BudgetTabs() {
       {tabs.map((tab, i) => (
         <Link
           key={i}
-          className={cn("text-gray-400 font-semibold", {
-            ["text-foreground"]: tab.href === path, // is active
+          className={cn('text-gray-400 font-semibold', {
+            ['text-foreground']: tab.href === path, // is active
           })}
           {...tab}
         />

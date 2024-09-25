@@ -1,6 +1,6 @@
-import { ComponentProps } from "react";
+import { ComponentProps } from 'react';
 
-export function OpenSourceIcon(props: ComponentProps<"svg">) {
+export function OpenSourceIcon(props: ComponentProps<'svg'>) {
   return (
     <svg
       {...props}

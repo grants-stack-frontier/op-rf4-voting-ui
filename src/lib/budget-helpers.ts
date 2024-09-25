@@ -34,8 +34,8 @@ export const autobalanceAllocations = (
           ? (Number(allocation.allocation.toFixed(2)) / totalUnlocked) *
             amountToBalance
           : unlockedEntities
-          ? amountToBalance / unlockedEntities
-          : 0,
+            ? amountToBalance / unlockedEntities
+            : 0,
       };
     }
     return allocation;

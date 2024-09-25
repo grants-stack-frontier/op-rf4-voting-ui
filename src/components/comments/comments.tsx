@@ -1,11 +1,11 @@
-"use client";
-import { format } from "date-fns";
-import { CheckCircle } from "lucide-react";
+'use client';
+import { format } from 'date-fns';
+import { CheckCircle } from 'lucide-react';
 
-import { Heading } from "@/components/ui/headings";
-import { Card } from "@/components/ui/card";
-import { CommentDialog } from "./comment-dialog";
-import { useParams } from "next/navigation";
+import { Heading } from '@/components/ui/headings';
+import { Card } from '@/components/ui/card';
+import { CommentDialog } from './comment-dialog';
+import { useParams } from 'next/navigation';
 import {
   type Comment,
   CommentFilter,
@@ -14,20 +14,20 @@ import {
   useComments,
   useDeleteComment,
   useEditComment,
-} from "@/hooks/useComments";
-import { AvatarENS, NameENS } from "../ens";
-import { useState } from "react";
-import { useBallot } from "@/hooks/useBallot";
-import { useAccount } from "wagmi";
-import { cn } from "@/lib/utils";
-import { CommentSort } from "./comment-sort";
-import { CommentUpvote } from "./comment-upvote";
-import { CommentDropdown } from "./comment-dropdown";
-import { Button } from "../ui/button";
-import { Markdown } from "../markdown";
-import { Skeleton } from "../ui/skeleton";
-import { Alert } from "../ui/alert";
-import { useIsBadgeholder } from "@/hooks/useIsBadgeholder";
+} from '@/hooks/useComments';
+import { AvatarENS, NameENS } from '../ens';
+import { useState } from 'react';
+import { useBallot } from '@/hooks/useBallot';
+import { useAccount } from 'wagmi';
+import { cn } from '@/lib/utils';
+import { CommentSort } from './comment-sort';
+import { CommentUpvote } from './comment-upvote';
+import { CommentDropdown } from './comment-dropdown';
+import { Button } from '../ui/button';
+import { Markdown } from '../markdown';
+import { Skeleton } from '../ui/skeleton';
+import { Alert } from '../ui/alert';
+import { useIsBadgeholder } from '@/hooks/useIsBadgeholder';
 
 export function Comments() {
   const params = useParams();
@@ -50,7 +50,7 @@ export function Comments() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <Heading variant={"h3"}>Comments</Heading>
+        <Heading variant={'h3'}>Comments</Heading>
         <CommentSort filter={filter} onUpdate={setFilter} />
       </div>
       <div className="space-y-8">
@@ -64,12 +64,12 @@ export function Comments() {
           </Alert>
         )}
         {comments?.data?.data?.map((comment) => {
-          const commentId = String(comment["comment_id"]);
+          const commentId = String(comment['comment_id']);
           return (
             <div
               key={commentId}
-              className={cn("space-y-4", {
-                ["animate-pulse opacity-20"]:
+              className={cn('space-y-4', {
+                ['animate-pulse opacity-20']:
                   remove.variables?.commentId === commentId,
               })}
             >
@@ -82,8 +82,8 @@ export function Comments() {
                       address={comment.address}
                     />
                     <div className="text-muted-foreground">
-                      {format(comment["created_at"], "dd MMM")} at{" "}
-                      {format(comment["created_at"], "hh:mm a")}
+                      {format(comment['created_at'], 'dd MMM')} at{' '}
+                      {format(comment['created_at'], 'hh:mm a')}
                     </div>
                   </div>
                 </div>
@@ -132,7 +132,7 @@ export function Comments() {
                   {
                     comment,
                     metricId,
-                    commentId: String(editComment["comment_id"]),
+                    commentId: String(editComment['comment_id']),
                   },
                   { onSuccess: () => setOpen(false) }
                 );
@@ -150,10 +150,10 @@ export function Comments() {
   );
 }
 
-function MetricInBallot({ address = "", metricId = "" }) {
+function MetricInBallot({ address = '', metricId = '' }) {
   const { data } = useBallot(address);
   const inBallot = data?.allocations
-    ?.map((alloc) => alloc["metric_id"])
+    ?.map((alloc) => alloc['metric_id'])
     .includes(metricId);
   return inBallot ? (
     <div className="text-sm flex gap-2 items-center">

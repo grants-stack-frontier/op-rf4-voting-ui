@@ -1,16 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useDisconnect as useWagmiDisconnect } from "wagmi";
-import ky from "ky";
-import { decodeJwt } from "jose";
-import { Address } from "viem";
-import mixpanel from "@/lib/mixpanel";
-import { getToken, setToken } from "@/lib/token";
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { useDisconnect as useWagmiDisconnect } from 'wagmi';
+import ky from 'ky';
+import { decodeJwt } from 'jose';
+import { Address } from 'viem';
+import mixpanel from '@/lib/mixpanel';
+import { getToken, setToken } from '@/lib/token';
 
 export function useNonce() {
   return useQuery({
-    queryKey: ["nonce"],
-    queryFn: async () => ky.get("/api/agora/auth/nonce").text(),
+    queryKey: ['nonce'],
+    queryFn: async () => ky.get('/api/agora/auth/nonce').text(),
   });
 }
 
@@ -23,13 +23,13 @@ export function useVerify() {
       nonce: string;
     }) => {
       const { access_token, ...rest } = await ky
-        .post("/api/agora/auth/verify", { json })
+        .post('/api/agora/auth/verify', { json })
         .json<{ access_token: string }>();
       console.log(rest);
-      mixpanel.track("Sign In", { status: "success" });
+      mixpanel.track('Sign In', { status: 'success' });
       setToken(access_token);
       // Trigger a refetch of the session
-      await client.invalidateQueries({ queryKey: ["session"] });
+      await client.invalidateQueries({ queryKey: ['session'] });
 
       setVoterConfirmationView();
 
@@ -45,10 +45,10 @@ export function useDisconnect() {
 
   async function disconnect() {
     wagmiDisconnect.disconnect();
-    global?.localStorage?.removeItem("token");
+    global?.localStorage?.removeItem('token');
     mixpanel.reset();
-    await client.invalidateQueries({ queryKey: ["session"] });
-    router.push("/");
+    await client.invalidateQueries({ queryKey: ['session'] });
+    router.push('/');
   }
 
   return { disconnect };
@@ -56,7 +56,7 @@ export function useDisconnect() {
 
 export function useSession() {
   return useQuery({
-    queryKey: ["session"],
+    queryKey: ['session'],
     queryFn: async () => {
       const accessToken = getToken();
       /**
@@ -66,9 +66,11 @@ export function useSession() {
        */
 
       const user = accessToken
-        ? decodeJwt<{ siwe: { address: Address }; isBadgeholder?: boolean; category?: string }>(
-            accessToken
-          )
+        ? decodeJwt<{
+            siwe: { address: Address };
+            isBadgeholder?: boolean;
+            category?: string;
+          }>(accessToken)
         : null;
 
       if (user) {
@@ -86,15 +88,15 @@ export function useSession() {
 
 // Helper functions
 function setVoterConfirmationView() {
-  localStorage.setItem("voter-confirmation-view", "true");
+  localStorage.setItem('voter-confirmation-view', 'true');
 }
 
 export function getVoterConfirmationView() {
-  const view = localStorage.getItem("voter-confirmation-view");
+  const view = localStorage.getItem('voter-confirmation-view');
   return !!view;
 }
 
 export function removeVoterConfirmationView() {
-  const view = localStorage.getItem("voter-confirmation-view");
-  if (view) localStorage.removeItem("voter-confirmation-view");
+  const view = localStorage.getItem('voter-confirmation-view');
+  if (view) localStorage.removeItem('voter-confirmation-view');
 }

@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { SiweMessage } from "siwe";
-import { useAccount, useChainId, useSignMessage } from "wagmi";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button } from "../ui/button";
+import { useState, useEffect } from 'react';
+import { SiweMessage } from 'siwe';
+import { useAccount, useChainId, useSignMessage } from 'wagmi';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button } from '../ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
-import mixpanel from "@/lib/mixpanel";
+} from '../ui/dialog';
+import mixpanel from '@/lib/mixpanel';
 import {
   useDisconnect,
   useNonce,
   useSession,
   useVerify,
-} from "@/hooks/useAuth";
+} from '@/hooks/useAuth';
 
 export function SignMessage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -36,20 +36,20 @@ export function SignMessage() {
   }, [isSessionLoading]);
 
   useEffect(() => {
-    if (address) mixpanel.track("Connect Wallet", { status: "success" });
+    if (address) mixpanel.track('Connect Wallet', { status: 'success' });
   }, [address]);
 
   async function handleSign() {
     if (nonce) {
-      mixpanel.track("Sign In", { status: "init" });
+      mixpanel.track('Sign In', { status: 'init' });
       const message = new SiweMessage({
-        version: "1",
+        version: '1',
         domain: window.location.host,
         uri: window.location.origin,
         address,
         chainId,
         nonce,
-        statement: "Sign in to Agora with Ethereum",
+        statement: 'Sign in to Agora with Ethereum',
       }).prepareMessage();
       const signature = await sign.signMessageAsync({ message });
       verify.mutate({ signature, message, nonce });
@@ -69,19 +69,19 @@ export function SignMessage() {
           <DialogTitle>Authenticate</DialogTitle>
           <DialogDescription>Sign message to authenticate.</DialogDescription>
         </DialogHeader>
-        <div className='space-y-2'>
+        <div className="space-y-2">
           <Button
-            type='button'
-            className='w-full'
-            variant={"destructive"}
+            type="button"
+            className="w-full"
+            variant={'destructive'}
             isLoading={sign.isPending}
             onClick={handleSign}
           >
             Sign message
           </Button>
           <Button
-            className='w-full'
-            variant='ghost'
+            className="w-full"
+            variant="ghost"
             onClick={() => {
               disconnect?.();
             }}
