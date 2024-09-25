@@ -49,7 +49,7 @@ export function ResetButton() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Are you sure you want to reset your ballot?</DialogTitle>
-          <DialogDescription>You'll lose any changes you've made.</DialogDescription>
+          <DialogDescription>You&apos;ll lose any changes you&apos;ve made.</DialogDescription>
         </DialogHeader>
         <div className='space-y-2'>
           <Button
