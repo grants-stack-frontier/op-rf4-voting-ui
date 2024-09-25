@@ -344,7 +344,7 @@ function YourBallot() {
                             <ChevronRightIcon className="size-4" />
                           </div>
                         </Link>
-                        <p className="text-[16px] text-[#404454] line-height-[24px] font-regular truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]">
+                        <p className="text-[16px] text-[#404454] line-height-[24px] font-regular truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px] dark:text-[#B0B3B8]">
                           {projects?.find(
                             (p) =>
                               p.applicationId?.toLowerCase() ===
