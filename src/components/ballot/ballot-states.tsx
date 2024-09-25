@@ -132,7 +132,7 @@ function PairwiseCard() {
         <div className="w-full flex items-center justify-between gap-4">
           <Image src={PairwiseLogo} alt="Pairwise Logo" width={112} height={28} />
           <Separator orientation="vertical" className="h-10" />
-          <p className="text-sm text-left">
+          <p className="text-sm text-left dark:text-white">
             Alternatively, you can compare projects with <a href="https://www.pairwise.vote/retrofunding5" target="_blank" className="underline">Pairwise</a>. Return here to complete and submit your ballot.
           </p>
           <Link href="https://www.pairwise.vote/retrofunding5" target="_blank">
