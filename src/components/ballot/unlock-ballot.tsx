@@ -1,9 +1,5 @@
-'use client';
 import { RiLockUnlockFill } from '@remixicon/react';
-import { useRouter } from 'next/navigation';
-import { ComponentProps, useState, useCallback } from 'react';
-import { useAccount } from 'wagmi';
-import { useQueryClient } from '@tanstack/react-query';
+import { ComponentProps, useCallback, useState } from 'react';
 import { LoadingDialog } from '../common/loading-dialog';
 import {
   AlertDialog,
@@ -17,31 +13,17 @@ import { Button } from '../ui/button';
 export function UnlockBallotDialog({
   isOpen,
   setOpen,
+  onUnlock,
 }: {
   isOpen: boolean;
   setOpen: ComponentProps<typeof AlertDialog>['onOpenChange'];
+  onUnlock: () => void;
 }) {
   const [isUnlockedLoading, setIsUnlockedLoading] = useState(false);
-  const router = useRouter();
-  const { address } = useAccount();
-  const queryClient = useQueryClient();
-  const roundId = 5;
-
   const handleUnlock = useCallback(() => {
     setIsUnlockedLoading(true);
-    setTimeout(() => {
-      setIsUnlockedLoading(false);
-      setOpen?.(false);
-      if (address) {
-        localStorage.setItem(`ballot_unlocked_${address}`, 'true');
-      }
-
-      queryClient.invalidateQueries({ queryKey: ['budget', address, roundId] });
-      queryClient.invalidateQueries({ queryKey: ['ballot', address, roundId] });
-
-      router.push('/ballot');
-    }, 1000);
-  }, [router, setOpen, address, queryClient, roundId]);
+    onUnlock();
+  }, [onUnlock]);
 
   return (
     <>
