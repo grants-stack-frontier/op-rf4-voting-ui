@@ -41,10 +41,6 @@ export function BlueCircleCheckIcon() {
   );
 }
 
-function formatNumberWithCommas(number: number): string {
-  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
-
 export function MetricsEditor() {
   const { ballot } = useBallotRound5Context();
   const { mutate: saveDistributionMethod } = useDistributionMethod();
@@ -58,15 +54,12 @@ export function MetricsEditor() {
       const portion = ballot.category_allocations?.find(
         (c) => c.category_slug === votingCategory
       )?.allocation;
-      return formatNumberWithCommas(
-        Math.round((totalBudget * (portion || 0)) / 100)
-      );
+      return Math.round((totalBudget * (portion || 0)) / 100);
       // return formatNumberWithCommas(totalBudget);
     }
-    return '0';
+    return totalBudget / 3;
   }, [ballot, votingCategory, totalBudget]);
 
-  // Dummy data for the allocation methods
   const allocationMethods = [
     {
       name: 'Impact groups',
@@ -115,7 +108,8 @@ export function MetricsEditor() {
         <p>
           OP calculations in this ballot are based on{' '}
           <a href="/budget" className="underline">
-            your category budget of {budget} OP
+            your category budget of {Math.ceil(Number(budget)).toLocaleString()}{' '}
+            OP
           </a>
           .
         </p>
