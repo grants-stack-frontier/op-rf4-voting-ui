@@ -6,7 +6,7 @@ import { LoadingDialog } from '@/components/common/loading-dialog';
 import { PageView } from '@/components/common/page-view';
 import { ProjectDetails } from '@/components/project-details';
 import { ProjectBreadcrumb } from '@/components/project-details/project-breadcrumb';
-import { ProjectReview } from '@/components/project-details/project-review';
+import { ReviewSidebar } from '@/components/project-details/review-sidebar';
 import { useSession } from '@/hooks/useAuth';
 import { useConflictOfInterest } from '@/hooks/useConflictOfInterest';
 import { ImpactScore, useProjectScoring } from '@/hooks/useProjectScoring';
@@ -93,7 +93,8 @@ export default function ProjectDetailsPage({
 
   const handleNavigation = useCallback(() => {
     if (sortedProjects.length > 0 && projectsScored) {
-      const nextProject = sortedProjects.find((p) => {
+      // First, try to find a project that hasn't been voted or skipped
+      let nextProject = sortedProjects.find((p) => {
         const nextId = p.applicationId ?? '';
         return (
           nextId !== currentProject?.applicationId &&
@@ -105,6 +106,17 @@ export default function ProjectDetailsPage({
         );
       });
 
+      if (!nextProject) {
+        // If no unvoted and unskipped projects, try to find a skipped project
+        nextProject = sortedProjects.find((p) => {
+          const nextId = p.applicationId ?? '';
+          return (
+            nextId !== currentProject?.applicationId &&
+            projectsScored?.skippedIds?.includes(nextId)
+          );
+        });
+      }
+
       if (nextProject) {
         router.push(`/project/${nextProject.applicationId}`);
       } else {
@@ -115,13 +127,8 @@ export default function ProjectDetailsPage({
 
   const handleScore = useCallback(
     async (score: ImpactScore) => {
-      const { allProjectsScored } = await handleScoreSelect(score);
-      if (score === 'Skip') {
-        handleNavigation();
-      }
-      if (!allProjectsScored && score !== 'Skip') {
-        handleNavigation();
-      }
+      await handleScoreSelect(score);
+      handleNavigation();
     },
     [handleScoreSelect, handleNavigation]
   );
@@ -145,12 +152,14 @@ export default function ProjectDetailsPage({
       isProjectsLoading ||
       isProjectLoading ||
       !currentProject ||
-      isProjectScoringLoading,
+      isProjectScoringLoading ||
+      !projects,
     [
       isProjectsLoading,
       isProjectLoading,
       currentProject,
       isProjectScoringLoading,
+      projects,
     ]
   );
 
@@ -182,7 +191,7 @@ export default function ProjectDetailsPage({
       </section>
       {isUserCategory && walletAddress && !showUnlockDialog && (
         <aside className="max-w-[304px]">
-          <ProjectReview
+          <ReviewSidebar
             onScoreSelect={handleScore}
             onConflictOfInterest={setIsConflictOfInterestDialogOpen}
             votedCount={projectsScored?.votedCount}
@@ -190,8 +199,6 @@ export default function ProjectDetailsPage({
             isLoading={isProjectScoringLoading}
             isSaving={isSaving}
             isVoted={isVoted}
-            currentProject={currentProject}
-            walletAddress={walletAddress}
             currentProjectScore={currentProjectScore}
           />
         </aside>
