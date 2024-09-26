@@ -127,7 +127,7 @@ function YourBallot() {
 
   const { ballot } = useBallotRound5Context();
   const { mutate: saveAllocation } = useSaveRound5Allocation();
-  const { mutate: savePosition } = useSaveRound5Position();
+  const { mutateAsync: savePosition } = useSaveRound5Position();
   // const { data: projects } = useProjects();
   const votingCategory = useVotingCategory();
   const { data: projects } = useProjectsByCategory(
@@ -299,6 +299,10 @@ function YourBallot() {
                       savePosition({
                         id: draggedId,
                         position: newIndex,
+                      }).then(() => {
+                        redistribute(
+                          distributionMethod as DistributionMethod
+                        );
                       });
                     }
                   }
