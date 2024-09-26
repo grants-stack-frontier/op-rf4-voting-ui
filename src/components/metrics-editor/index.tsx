@@ -1,6 +1,6 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { BallotFilter } from '../ballot/ballot-filter';
 import { Card } from '../ui/card';
 import {
@@ -22,7 +22,6 @@ import Impact from '../../../public/chart-impact.svg';
 import TopBottom from '../../../public/chart-top-bottom.svg';
 import TopWeighted from '../../../public/chart-top-weighted.svg';
 import Custom from '../../../public/chart-custom.svg';
-import Image from 'next/image';
 
 export function BlueCircleCheckIcon() {
   return (
@@ -46,8 +45,13 @@ export function MetricsEditor() {
   const { mutate: saveDistributionMethod } = useDistributionMethod();
   const { data: distributionMethod, refetch } =
     useDistributionMethodFromLocalStorage();
+  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const votingCategory = useVotingCategory();
   const { totalBudget } = useBudgetContext();
+
+  useEffect(() => {
+    setSelectedMethod(distributionMethod || null);
+  }, [distributionMethod]);
 
   const budget = useMemo(() => {
     if (ballot && votingCategory) {
@@ -55,7 +59,6 @@ export function MetricsEditor() {
         (c) => c.category_slug === votingCategory
       )?.allocation;
       return Math.round((totalBudget * (portion || 0)) / 100);
-      // return formatNumberWithCommas(totalBudget);
     }
     return totalBudget / 3;
   }, [ballot, votingCategory, totalBudget]);
@@ -130,10 +133,10 @@ export function MetricsEditor() {
           <Card
             key={index}
             className={cn('cursor-pointer p-3', {
-              'border-2 border-[#BCBFCD]': distributionMethod === method.method,
+              'border-2 border-[#BCBFCD]': selectedMethod === method.method,
             })}
             onClick={() => {
-              // setSelectedMethod(method.method);
+              setSelectedMethod(method.method);
               saveDistributionMethodToLocalStorage(method.method);
               if (
                 method.method === DistributionMethod.IMPACT_GROUPS ||
@@ -153,9 +156,6 @@ export function MetricsEditor() {
                 backgroundPosition: 'center', // Keep the image centered
               }}
             />
-
-            {/* <Image src={method.image} alt="Impact" width={220} height={130} />
-            </div> */}
 
             <div className="flex flex-row justify-between items-center">
               <div className="flex flex-row items-center gap-1">
