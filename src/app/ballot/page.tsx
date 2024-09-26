@@ -39,6 +39,7 @@ import { CategoryId } from '@/types/shared';
 import { useProjectsByCategory } from '@/hooks/useProjects';
 import { useVotingCategory } from '@/hooks/useVotingCategory';
 import { NumberInput } from '@/components/ui/number-input';
+import { Input } from '@/components/ui/input';
 
 function formatAllocationOPAmount(amount?: number) {
   if (amount === undefined) return 0;
@@ -120,6 +121,7 @@ function CheckBallotState() {
 
 interface ProjectAllocationState extends Round5ProjectAllocation {
   allocationInput: string;
+  positionInput: string;
 }
 
 function YourBallot() {
@@ -178,8 +180,9 @@ function YourBallot() {
           ? Number(b.allocation) - Number(a.allocation)
           : a.position - b.position
       )
-      .map((p) => ({
+      .map((p, i) => ({
         ...p,
+        positionInput: (i + 1).toString(),
         allocation: p.allocation ?? 0,
         allocationInput: p.allocation?.toString() ?? '',
       }));
@@ -295,7 +298,7 @@ function YourBallot() {
                       const newProjects = [...projectList];
                       const [removed] = newProjects.splice(draggedIndex, 1);
                       newProjects.splice(newIndex, 0, removed);
-                      setProjectList(newProjects);
+                      setProjectList(newProjects.map((p, index) => ({...p, positionInput: (index + 1).toString()})));
                       savePosition({
                         id: draggedId,
                         position: newIndex,
@@ -340,25 +343,49 @@ function YourBallot() {
                         !isMovable ? 'bg-gray-200 cursor-not-allowed' : ''
                       }`}
                     >
-                      <NumberInput
-                        min={1}
-                        max={projectList?.length ?? 0}
+                      <Input
+                        
+                        // max={projectList?.length ?? 0}
                         className="text-center"
-                        value={i + 1}
+                        value={proj.positionInput}
                         disabled={!isMovable}
-                        hideSpinButtons
                         onChange={async (e) => {
+                          const newIndex = parseInt(e.currentTarget.value, 10) - 1;
+                          console.log({newIndex})
+                          if (
+                            isMovable &&
+                            // newIndex >= 0 &&
+                            (!e.currentTarget.value || (newIndex < projectList.length && newIndex >= 0))
+                          ) {
+                            let newProjects = [...projectList];
+                            newProjects[i].positionInput = e.currentTarget.value;
+                            if (e.currentTarget.value) {
+                              const [movedProject] = newProjects.splice(i, 1);
+                              newProjects.splice(newIndex, 0, movedProject);
+                              newProjects = newProjects.map((p, index) => ({...p, positionInput: (index + 1).toString()}))
+                            }
+                            setProjectList(newProjects);
+                          }
+                        }}
+                        onBlur={async (e) => {
+                          if (e.target.value === '') {
+                            const newProjects = [...projectList];
+                            newProjects[i].positionInput = (i + 1).toString();
+                            setProjectList(newProjects);
+                            return;
+                          }
                           const newIndex = parseInt(e.target.value, 10) - 1;
                           if (
                             isMovable &&
-                            newIndex >= 0 &&
-                            newIndex < projectList.length
+                            Number(proj.position) !== Number(proj.positionInput) - 1
                           ) {
+                            console.log({
+                              position: proj.position,
+                              positionInput: proj.positionInput,
+                            });
                             const newProjects = [...projectList];
                             const [movedProject] = newProjects.splice(i, 1);
                             newProjects.splice(newIndex, 0, movedProject);
-
-                            setProjectList(newProjects);
 
                             await savePosition({
                               id: movedProject.project_id,
@@ -366,9 +393,9 @@ function YourBallot() {
                             });
 
                             // yolo results
-                            // redistribute(
-                            //   distributionMethod as DistributionMethod
-                            // );
+                            redistribute(
+                              distributionMethod as DistributionMethod
+                            );
                           }
                         }}
                       />
