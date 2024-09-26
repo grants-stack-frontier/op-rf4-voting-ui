@@ -133,8 +133,10 @@ function YourBallot() {
   const { data: projects } = useProjectsByCategory(
     votingCategory as CategoryId
   );
-  const { data: distributionMethod, update: saveDistributionMethod } =
+  const { data: distributionMethod, refetch } =
     useDistributionMethodFromLocalStorage();
+
+  const { mutate: redistribute } = useDistributionMethod();
 
   console.log({ ballot });
   console.log({ projects });
@@ -214,8 +216,7 @@ function YourBallot() {
 
   const isMovable =
     distributionMethod === DistributionMethod.TOP_TO_BOTTOM ||
-    distributionMethod === DistributionMethod.TOP_WEIGHTED ||
-    distributionMethod === DistributionMethod.CUSTOM;
+    distributionMethod === DistributionMethod.TOP_WEIGHTED;
 
   return (
     <div className="space-y-4">
@@ -338,13 +339,13 @@ function YourBallot() {
                       }`}
                     >
                       <NumberInput
-                        min="1"
-                        max={projectList.length}
+                        min={1}
+                        max={projectList?.length ?? 0}
                         className="text-center"
                         value={i + 1}
                         disabled={!isMovable}
-                        hideSpinButtons={true}
-                        onChange={(e) => {
+                        hideSpinButtons
+                        onChange={async (e) => {
                           const newIndex = parseInt(e.target.value, 10) - 1;
                           if (
                             isMovable &&
@@ -355,49 +356,17 @@ function YourBallot() {
                             const [movedProject] = newProjects.splice(i, 1);
                             newProjects.splice(newIndex, 0, movedProject);
 
-                            let newAllocation;
-
-                            if (
-                              newIndex > 0 &&
-                              newIndex < newProjects.length - 1
-                            ) {
-                              const allocationBefore = Number(
-                                newProjects[newIndex - 1].allocation
-                              );
-                              const allocationAfter = Number(
-                                newProjects[newIndex + 1].allocation
-                              );
-                              newAllocation =
-                                (allocationBefore + allocationAfter) / 2;
-                            } else if (newIndex === 0) {
-                              const allocationAfter = Number(
-                                newProjects[newIndex + 1].allocation
-                              );
-                              newAllocation = allocationAfter;
-                            } else if (newIndex === newProjects.length - 1) {
-                              const allocationBefore = Number(
-                                newProjects[newIndex - 1].allocation
-                              );
-                              newAllocation = allocationBefore;
-                            } else {
-                              newAllocation = Number(movedProject.allocation);
-                            }
-
-                            movedProject.allocation = newAllocation;
-                            movedProject.allocationInput =
-                              newAllocation.toString();
-
                             setProjectList(newProjects);
 
-                            savePosition({
+                            await savePosition({
                               id: movedProject.project_id,
                               position: newIndex,
                             });
 
-                            saveAllocation({
-                              project_id: movedProject.project_id,
-                              allocation: newAllocation,
-                            });
+                            // yolo results
+                            // redistribute(
+                            //   distributionMethod as DistributionMethod
+                            // );
                           }
                         }}
                       />
@@ -419,22 +388,27 @@ function YourBallot() {
                 <div className="flex flex-col justify-start items-center gap-1 max-w-[112px]">
                   <div className="relative">
                     <NumberInput
+                      min={0}
+                      max={100}
+                      step={1}
                       placeholder="--"
-                      className="text-center"
-                      value={proj.allocationInput}
-                      decimalPlaces={2}
+                      className="text-center w-[112px]"
+                      value={proj.allocationInput || ''}
                       onChange={(e) => {
-                        const newAllocation = parseFloat(e.target.value);
+                        const inputValue = e.target.value;
+                        const newAllocation = parseFloat(inputValue);
+
                         const newProjectList = [...projectList];
                         newProjectList[i].allocation = isNaN(newAllocation)
                           ? 0
                           : newAllocation;
-                        newProjectList[i].allocationInput = e.target.value;
+                        newProjectList[i].allocationInput = inputValue;
                         setProjectList(newProjectList);
 
                         saveDistributionMethodToLocalStorage(
                           DistributionMethod.CUSTOM
                         );
+                        refetch();
                       }}
                       onBlur={() => {
                         saveAllocation({
