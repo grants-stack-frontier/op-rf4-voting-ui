@@ -297,7 +297,12 @@ function YourBallot() {
                       const newProjects = [...projectList];
                       const [removed] = newProjects.splice(draggedIndex, 1);
                       newProjects.splice(newIndex, 0, removed);
-                      setProjectList(newProjects.map((p, index) => ({...p, positionInput: (index + 1).toString()})));
+                      setProjectList(
+                        newProjects.map((p, index) => ({
+                          ...p,
+                          positionInput: (index + 1).toString(),
+                        }))
+                      );
                       savePosition({
                         id: draggedId,
                         position: newIndex,
@@ -343,25 +348,30 @@ function YourBallot() {
                       }`}
                     >
                       <Input
-                        
                         // max={projectList?.length ?? 0}
                         className="text-center"
                         value={proj.positionInput}
                         disabled={!isMovable}
                         onChange={async (e) => {
-                          const newIndex = parseInt(e.currentTarget.value, 10) - 1;
-                          console.log({newIndex})
+                          const newIndex =
+                            parseInt(e.currentTarget.value, 10) - 1;
+                          console.log({ newIndex });
                           if (
                             isMovable &&
                             // newIndex >= 0 &&
-                            (!e.currentTarget.value || (newIndex < projectList.length && newIndex >= 0))
+                            (!e.currentTarget.value ||
+                              (newIndex < projectList.length && newIndex >= 0))
                           ) {
                             let newProjects = [...projectList];
-                            newProjects[i].positionInput = e.currentTarget.value;
+                            newProjects[i].positionInput =
+                              e.currentTarget.value;
                             if (e.currentTarget.value) {
                               const [movedProject] = newProjects.splice(i, 1);
                               newProjects.splice(newIndex, 0, movedProject);
-                              newProjects = newProjects.map((p, index) => ({...p, positionInput: (index + 1).toString()}))
+                              newProjects = newProjects.map((p, index) => ({
+                                ...p,
+                                positionInput: (index + 1).toString(),
+                              }));
                             }
                             setProjectList(newProjects);
                           }
@@ -376,7 +386,8 @@ function YourBallot() {
                           const newIndex = parseInt(e.target.value, 10) - 1;
                           if (
                             isMovable &&
-                            Number(proj.position) !== Number(proj.positionInput) - 1
+                            Number(proj.position) !==
+                              Number(proj.positionInput) - 1
                           ) {
                             console.log({
                               position: proj.position,
