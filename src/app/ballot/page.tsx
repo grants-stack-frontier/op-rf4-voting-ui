@@ -223,7 +223,7 @@ function YourBallot() {
 
   return (
     <div className="space-y-4">
-      {ballot?.status === 'SUBMITTED' && (
+      {/* {ballot?.status === 'SUBMITTED' && (
         <Alert variant={'accent'}>
           <div className="flex gap-2 text-sm items-center">
             <p>
@@ -250,8 +250,7 @@ function YourBallot() {
             </div>
           </div>
         </Alert>
-      )}
-      {/* TO DO: Change to category based on badgeholder */}
+      )} */}
       <p>
         Your voting category is{' '}
         <a href={`/category/${votingCategory}`} className="underline">
