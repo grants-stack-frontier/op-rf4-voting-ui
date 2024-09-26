@@ -300,9 +300,7 @@ function YourBallot() {
                         id: draggedId,
                         position: newIndex,
                       }).then(() => {
-                        redistribute(
-                          distributionMethod as DistributionMethod
-                        );
+                        redistribute(distributionMethod as DistributionMethod);
                       });
                     }
                   }
