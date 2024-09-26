@@ -29,12 +29,7 @@ import {
 } from '@/hooks/useBallotRound5';
 import { useIsBadgeholder } from '@/hooks/useIsBadgeholder';
 import { formatDate } from '@/lib/utils';
-import {
-  ArrowDownToLineIcon,
-  ChevronRightIcon,
-  LoaderIcon,
-  Menu,
-} from 'lucide-react';
+import { ArrowDownToLineIcon, LoaderIcon, Menu } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ComponentProps, useEffect, useMemo, useState } from 'react';
@@ -90,48 +85,38 @@ function CheckBallotState() {
   const { address, isConnecting } = useAccount();
   const { isPending } = useRound5Ballot(address);
   const { state, ballot } = useBallotRound5Context();
+
+  const display = useMemo(() => {
+    if (isPending) {
+      return <Skeleton className="p-6 h-96" />;
+    }
+    if (!address && !isConnecting) {
+      return <NonBadgeholder />;
+    }
+    const isEmptyBallot = !Object.keys(state).length;
+    const needImpactScoring =
+      ballot && ballot.projects_to_be_evaluated.length > 0;
+    if (isEmptyBallot || needImpactScoring) {
+      return <EmptyBallot />;
+    }
+    return <YourBallot />;
+  }, [isPending, address, isConnecting, state, ballot]);
+  return display;
   // Comment out for local dev if needed
-  if (isPending) {
-    return <Skeleton className="p-6 h-96" />;
-  }
-  if (!address && !isConnecting) {
-    return <NonBadgeholder />;
-  }
-  const isEmptyBallot = !Object.keys(state).length;
-  const needImpactScoring =
-    ballot && ballot.projects_to_be_evaluated?.length > 0;
-  if (isEmptyBallot || needImpactScoring) {
-    return <EmptyBallot />;
-  }
-  return <YourBallot />;
+  // if (isPending) {
+  //   return <Skeleton className='p-6 h-96' />;
+  // }
+  // if (!address && !isConnecting) {
+  //   return <NonBadgeholder />;
+  // }
+  // const isEmptyBallot = !Object.keys(state).length;
+  // const needImpactScoring =
+  //   ballot && ballot.projects_to_be_evaluated.length > 0;
+  // if (isEmptyBallot || needImpactScoring) {
+  //   return <EmptyBallot />;
+  // }
+  // return <YourBallot />;
 }
-
-type Filter = 'conflict' | 'no-conflict';
-
-function sortAndPrepProjects(
-  newProjects: Round5ProjectAllocation[],
-  filter?: Filter
-): ProjectAllocationState[] {
-  const projects = newProjects
-    .sort((a, b) => a.position - b.position)
-    .map((p) => ({
-      ...p,
-      allocationInput: p.allocation?.toString() || '',
-    }));
-  if (filter === 'conflict') {
-    return projects.filter((p) => p.impact === 0);
-  }
-  if (filter === 'no-conflict') {
-    return projects.filter((p) => p.impact !== 0);
-  }
-  return projects;
-}
-
-const categoryIds: CategoryId[] = [
-  'ETHEREUM_CORE_CONTRIBUTIONS',
-  'OP_STACK_RESEARCH_AND_DEVELOPMENT',
-  'OP_STACK_TOOLING',
-];
 
 interface ProjectAllocationState extends Round5ProjectAllocation {
   allocationInput: string;
@@ -142,7 +127,7 @@ function YourBallot() {
 
   const { ballot } = useBallotRound5Context();
   const { mutate: saveAllocation } = useSaveRound5Allocation();
-  const { mutateAsync: savePosition } = useSaveRound5Position();
+  const { mutate: savePosition } = useSaveRound5Position();
   // const { data: projects } = useProjects();
   const votingCategory = useVotingCategory();
   const { data: projects } = useProjectsByCategory(
@@ -150,7 +135,6 @@ function YourBallot() {
   );
   const { data: distributionMethod, update: saveDistributionMethod } =
     useDistributionMethodFromLocalStorage();
-  const { mutate: redistribute } = useDistributionMethod();
 
   console.log({ ballot });
   console.log({ projects });
@@ -273,23 +257,23 @@ function YourBallot() {
         </a>{' '}
         ({ballot?.total_projects} projects)
       </p>
-      <Card className="p-10 space-y-10">
+      <Card className="p-6 space-y-8">
         <MetricsEditor />
+        <SearchInput
+          className="my-2"
+          placeholder="Search projects..."
+          onChange={handleSearch}
+        />
 
         <div>
-          <SearchInput
-            className="mb-6"
-            placeholder="Search projects..."
-            onChange={handleSearch}
-          />
           {displayProjects.map((proj, i) => {
             return (
               <div
                 key={proj.project_id}
-                className={`flex justify-between flex-1 border-b gap-4 py-6 ${
+                className={`flex justify-between flex-1 border-b gap-1 py-6 ${
                   i === 0 ? 'pt-0' : ''
                 }`}
-                draggable={isMovable}
+                draggable="true"
                 onDragStart={(e) => {
                   e.dataTransfer.setData(
                     'text/plain',
@@ -314,32 +298,25 @@ function YourBallot() {
                       savePosition({
                         id: draggedId,
                         position: newIndex,
-                      }).then(() => {
-                        redistribute(distributionMethod as DistributionMethod);
                       });
                     }
                   }
                 }}
               >
                 <div className="flex items-start justify-between flex-grow">
-                  <div className="flex items-start gap-4">
-                    <Link href={`/project/${proj.project_id}`}>
-                      <div
-                        className="size-12 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0"
-                        style={{
-                          backgroundImage: `url(${proj.image})`,
-                        }}
-                      />
-                    </Link>
-                    <div className="flex flex-col gap-2">
+                  <div className="flex items-start gap-1">
+                    <div
+                      className="size-12 rounded-lg bg-gray-100 bg-cover bg-center flex-shrink-0"
+                      style={{
+                        backgroundImage: `url(${proj.image})`,
+                      }}
+                    />
+                    <div className="flex flex-col gap-1 ml-4">
                       <div>
                         <Link href={`/project/${proj.project_id}`}>
-                          <div className="flex items-center gap-2">
-                            <p className="text-[16px] font-semibold line-height-[24px] hover:underline truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]">
-                              {proj.name}
-                            </p>
-                            <ChevronRightIcon className="size-4" />
-                          </div>
+                          <p className="font-semibold truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]">
+                            {proj.name}
+                          </p>
                         </Link>
                         <p className="text-[16px] text-[#404454] line-height-[24px] font-regular truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px] dark:text-[#B0B3B8]">
                           {projects?.find(
@@ -349,14 +326,8 @@ function YourBallot() {
                           )?.description ?? 'No description'}
                         </p>
                       </div>
-                      <div className="font-regular text-[#404454] line-height-[16px] text-xs">
-                        You scored:{' '}
-                        <a
-                          href={`/project/${proj.project_id}`}
-                          className="font-medium hover:underline cursor-pointer"
-                        >
-                          {impactScores[proj.impact]}
-                        </a>
+                      <div className="text-muted-foreground text-xs">
+                        You scored: {impactScores[proj.impact]}
                       </div>
                     </div>
                   </div>
@@ -445,7 +416,7 @@ function YourBallot() {
                 <div className="px-1">
                   <Separator orientation="vertical" className="h-10" />
                 </div>
-                <div className="flex flex-col justify-start items-center gap-4 max-w-[112px]">
+                <div className="flex flex-col justify-start items-center gap-1 max-w-[112px]">
                   <div className="relative">
                     <NumberInput
                       placeholder="--"
@@ -476,7 +447,7 @@ function YourBallot() {
                       %
                     </span>
                   </div>
-                  <div className="text-xs text-[#636779] line-height-[16px]">
+                  <div className="text-muted-foreground text-xs">
                     {formatAllocationOPAmount(
                       (totalAllocationAmount * proj.allocation) / 100
                     )}{' '}
