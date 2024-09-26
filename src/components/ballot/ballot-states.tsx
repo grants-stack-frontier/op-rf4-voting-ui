@@ -153,7 +153,7 @@ function PairwiseCard() {
             height={28}
           />
           <Separator orientation="vertical" className="h-10" />
-          <p className="text-sm text-left dark:text-white">
+          <p className="text-sm text-left dark:text-black">
             Alternatively, you can compare projects with{' '}
             <a
               href="https://www.pairwise.vote/retrofunding5"

@@ -10,16 +10,11 @@ import { PageView } from '@/components/common/page-view';
 import { SearchInput } from '@/components/common/search-input';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useVotingTimeLeft } from '@/components/voting-ends-in';
 import { votingEndDate } from '@/config';
 import { categoryNames } from '@/data/categories';
-// import {
-//   MAX_MULTIPLIER_VALUE,
-//   useOsMultiplier,
-// } from "@/hooks/useBallot";
 import {
   Round5ProjectAllocation,
   useRound5Ballot,
@@ -29,6 +24,8 @@ import {
   useSaveRound5Position,
   useDistributionMethodFromLocalStorage,
   DistributionMethod,
+  useDistributionMethod,
+  saveDistributionMethodToLocalStorage,
 } from '@/hooks/useBallotRound5';
 import { useIsBadgeholder } from '@/hooks/useIsBadgeholder';
 import { formatDate } from '@/lib/utils';
@@ -39,8 +36,9 @@ import { ComponentProps, useEffect, useMemo, useState } from 'react';
 import VotingSuccess from '../../../public/RetroFunding_Round4_IVoted@2x.png';
 import { MetricsEditor } from '../../components/metrics-editor';
 import { CategoryId } from '@/types/shared';
-import { useProjects, useProjectsByCategory } from '@/hooks/useProjects';
+import { useProjectsByCategory } from '@/hooks/useProjects';
 import { useVotingCategory } from '@/hooks/useVotingCategory';
+import { NumberInput } from '@/components/ui/number-input';
 
 function formatAllocationOPAmount(amount?: number) {
   if (amount === undefined) return 0;
@@ -135,8 +133,10 @@ function YourBallot() {
   const { data: projects } = useProjectsByCategory(
     votingCategory as CategoryId
   );
-  const { data: distributionMethod, update: saveDistributionMethod } =
+  const { data: distributionMethod, refetch } =
     useDistributionMethodFromLocalStorage();
+
+  const { mutate: redistribute } = useDistributionMethod();
 
   console.log({ ballot });
   console.log({ projects });
@@ -144,7 +144,7 @@ function YourBallot() {
     'Diff:',
     projects?.filter(
       (p) =>
-        !ballot?.project_allocations.find(
+        !ballot?.project_allocations?.find(
           (p2) =>
             p2.project_id?.toLowerCase() === p.applicationId?.toLowerCase()
         )
@@ -159,7 +159,6 @@ function YourBallot() {
   );
 
   useEffect(() => {
-    console.log('Ballot updated:', ballot?.project_allocations);
     setProjectList(
       sortAndPrepProjects(ballot?.project_allocations || [], 'no-conflict')
     );
@@ -214,6 +213,10 @@ function YourBallot() {
   };
 
   const displayProjects = searchTerm ? filteredProjects : projectList;
+
+  const isMovable =
+    distributionMethod === DistributionMethod.TOP_TO_BOTTOM ||
+    distributionMethod === DistributionMethod.TOP_WEIGHTED;
 
   return (
     <div className="space-y-4">
@@ -316,7 +319,7 @@ function YourBallot() {
                             {proj.name}
                           </p>
                         </Link>
-                        <p className="text-sm text-gray-600 truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px]">
+                        <p className="text-[16px] text-[#404454] line-height-[24px] font-regular truncate max-w-[200px] sm:max-w-[300px] md:max-w-[400px] lg:max-w-[550px] xl:max-w-[625px] dark:text-[#B0B3B8]">
                           {projects?.find(
                             (p) =>
                               p.applicationId?.toLowerCase() ===
@@ -330,10 +333,51 @@ function YourBallot() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <div className="flex justify-center items-center rounded-md w-[42px] h-[40px] bg-[#F2F3F8] text-[#636779]">
-                      {i + 1}
+                    <div
+                      className={`flex justify-center items-center rounded-md w-[42px] h-[40px] bg-[#F2F3F8] text-[#636779] ${
+                        !isMovable ? 'bg-gray-200 cursor-not-allowed' : ''
+                      }`}
+                    >
+                      <NumberInput
+                        min={1}
+                        max={projectList?.length ?? 0}
+                        className="text-center"
+                        value={i + 1}
+                        disabled={!isMovable}
+                        hideSpinButtons
+                        onChange={async (e) => {
+                          const newIndex = parseInt(e.target.value, 10) - 1;
+                          if (
+                            isMovable &&
+                            newIndex >= 0 &&
+                            newIndex < projectList.length
+                          ) {
+                            const newProjects = [...projectList];
+                            const [movedProject] = newProjects.splice(i, 1);
+                            newProjects.splice(newIndex, 0, movedProject);
+
+                            setProjectList(newProjects);
+
+                            await savePosition({
+                              id: movedProject.project_id,
+                              position: newIndex,
+                            });
+
+                            // yolo results
+                            // redistribute(
+                            //   distributionMethod as DistributionMethod
+                            // );
+                          }
+                        }}
+                      />
                     </div>
-                    <div className="flex justify-center items-center rounded-md w-[42px] h-[40px] cursor-move bg-[#F2F3F8] text-[#636779]">
+                    <div
+                      className={`flex justify-center items-center rounded-md w-[42px] h-[40px] ${
+                        isMovable
+                          ? 'cursor-move bg-[#F2F3F8]'
+                          : 'cursor-not-allowed bg-gray-200'
+                      } text-[#636779]`}
+                    >
                       <Menu />
                     </div>
                   </div>
@@ -343,20 +387,28 @@ function YourBallot() {
                 </div>
                 <div className="flex flex-col justify-start items-center gap-1 max-w-[112px]">
                   <div className="relative">
-                    <Input
-                      type="number"
+                    <NumberInput
+                      min={0}
+                      max={100}
+                      step={1}
                       placeholder="--"
-                      className="text-center"
-                      value={proj.allocationInput}
+                      className="text-center w-[112px]"
+                      value={proj.allocationInput || ''}
                       onChange={(e) => {
-                        const newAllocation = parseFloat(e.target.value);
+                        const inputValue = e.target.value;
+                        const newAllocation = parseFloat(inputValue);
+
                         const newProjectList = [...projectList];
                         newProjectList[i].allocation = isNaN(newAllocation)
                           ? 0
                           : newAllocation;
-                        newProjectList[i].allocationInput = e.target.value;
+                        newProjectList[i].allocationInput = inputValue;
                         setProjectList(newProjectList);
-                        saveDistributionMethod(DistributionMethod.CUSTOM);
+
+                        saveDistributionMethodToLocalStorage(
+                          DistributionMethod.CUSTOM
+                        );
+                        refetch();
                       }}
                       onBlur={() => {
                         saveAllocation({
@@ -365,7 +417,7 @@ function YourBallot() {
                         });
                       }}
                     />
-                    <span className="absolute right-6 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <span className="absolute right-8 top-1/2 transform -translate-y-1/2 pointer-events-none">
                       %
                     </span>
                   </div>
@@ -393,11 +445,6 @@ function YourBallot() {
         </div>
 
         {ballot?.address && (
-          // <SubmitDialog
-          //   ballot={ballot!}
-          //   open={isSubmitting}
-          //   onOpenChange={() => setSubmitting(false)}
-          // />
           <SubmitRound5Dialog
             ballot={ballot!}
             open={isSubmitting}
