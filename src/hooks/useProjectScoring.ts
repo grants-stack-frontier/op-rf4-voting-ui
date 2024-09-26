@@ -6,7 +6,6 @@ import {
   ProjectsScored,
   addScoredProject,
   addSkippedProject,
-  clearProjectsScored,
   getProjectsScored,
   updateVotedProjectsFromAllocations,
 } from '@/utils/localStorage';
@@ -43,18 +42,19 @@ export const useProjectScoring = (
   const [isSaving, setIsSaving] = useState(false);
   const { mutateAsync: saveProjectImpact } = useSaveProjectImpact();
 
-  const totalProjects = useMemo(() => projects?.length ?? 0, [projects]);
+  // Ensure projects are loaded before calculating totalProjects
+  const totalProjects = useMemo(() => {
+    return projects && projects.length > 0 ? projects.length : undefined;
+  }, [projects]);
 
   // Calculate initial state during render
   const initialProjectsScored = useMemo(() => {
-    if (!walletAddress || !category || !allocations) {
+    if (!walletAddress || !category || !allocations || !totalProjects) {
       return undefined;
     }
     const storedProjectsScored = getProjectsScored(category, walletAddress);
     const totalAllocations = allocations.length;
-    console.log({ totalAllocations });
-    console.log({ totalProjects });
-    console.log({ storedProjectsScored });
+
     if (
       (storedProjectsScored.votedCount === 0 &&
         totalAllocations !== totalProjects) ||
@@ -78,7 +78,7 @@ export const useProjectScoring = (
       setProjectsScored(initialProjectsScored);
       setIsLoading(false);
     }
-  }, [initialProjectsScored, setProjectsScored, setIsLoading]);
+  }, [initialProjectsScored, setProjectsScored]);
 
   const handleScoreSelect = useCallback(
     async (score: ImpactScore) => {
@@ -90,7 +90,7 @@ export const useProjectScoring = (
         };
       }
 
-      let updatedProjectsScored: ProjectsScored;
+      let updatedProjectsScored;
 
       if (score === 'Skip') {
         updatedProjectsScored = addSkippedProject(category, id, walletAddress);
@@ -121,6 +121,7 @@ export const useProjectScoring = (
           }
         } catch (error) {
           toast({ variant: 'destructive', title: 'Error saving impact score' });
+          setIsSaving(false);
           return {
             updatedProjectsScored: projectsScored,
             allProjectsScored: false,
@@ -130,29 +131,30 @@ export const useProjectScoring = (
         }
       }
 
-      if (updatedProjectsScored.votedCount === totalProjects) {
+      setProjectsScored(updatedProjectsScored);
+
+      // Only set allProjectsScored if totalProjects is defined and greater than 0
+      if (
+        totalProjects &&
+        updatedProjectsScored.votedCount +
+          updatedProjectsScored.skippedCount ===
+          totalProjects
+      ) {
         setAllProjectsScored(true);
       }
 
-      if (allProjectsScored) {
-        clearProjectsScored(category, walletAddress);
-        updatedProjectsScored = {
-          votedCount: 0,
-          votedIds: [],
-          skippedCount: 0,
-          skippedIds: [],
-        };
-      }
-
-      setProjectsScored(updatedProjectsScored);
-
-      return { updatedProjectsScored, allProjectsScored };
+      return {
+        updatedProjectsScored,
+        allProjectsScored:
+          updatedProjectsScored.votedCount +
+            updatedProjectsScored.skippedCount ===
+          totalProjects,
+      };
     },
     [
       category,
       id,
       projectsScored,
-      allProjectsScored,
       walletAddress,
       totalProjects,
       saveProjectImpact,
