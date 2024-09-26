@@ -9,7 +9,13 @@ import {
 import { ImpactScore, scoreLabels } from '@/hooks/useProjectScoring';
 import { cn } from '@/lib/utils';
 import { RiCheckLine } from '@remixicon/react';
-import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import { Progress } from '../ui/progress';
 import { Skeleton } from '../ui/skeleton';
 
@@ -38,8 +44,12 @@ export function ReviewSidebar({
   currentProjectScore,
   ...props
 }: ReviewSidebarProps) {
-  const [localScore, setLocalScore] = useState<ImpactScore | undefined>(currentProjectScore);
-  const [allProjectsScored, setAllProjectsScored] = useState(votedCount === totalProjects);
+  const [localScore, setLocalScore] = useState<ImpactScore | undefined>(
+    currentProjectScore
+  );
+  const [allProjectsScored, setAllProjectsScored] = useState(
+    votedCount === totalProjects
+  );
   const handleScore = useCallback(
     (score: ImpactScore) => {
       if (score !== 'Skip') {
@@ -95,8 +105,8 @@ export function ReviewSidebar({
                     label !== 'Conflict of interest'
                     ? 'bg-green-200 text-green-600'
                     : isVoted &&
-                      Number(localScore) === 0 &&
-                      label === 'Conflict of interest'
+                        Number(localScore) === 0 &&
+                        label === 'Conflict of interest'
                       ? 'bg-red-200 text-red-600'
                       : ''
                 )}

@@ -68,7 +68,10 @@ export default function ProjectDetailsPage({
     if (!projectsScored || !ballot || !projects) return 0;
     const ballotAllocationsCount = ballot.project_allocations?.length ?? 0;
     const scoredCount = projectsScored.votedCount ?? 0;
-    if (scoredCount === projects?.length || ballotAllocationsCount === projects?.length && !isEditing) {
+    if (
+      scoredCount === projects?.length ||
+      (ballotAllocationsCount === projects?.length && !isEditing)
+    ) {
       setShowUnlockDialog(true);
     }
     // Use the maximum of scored count and ballot allocations
@@ -118,7 +121,10 @@ export default function ProjectDetailsPage({
 
       queryClient.invalidateQueries({ queryKey: ['budget', address, roundId] });
       queryClient.invalidateQueries({ queryKey: ['ballot', address, roundId] });
-      clearProjectsScored(currentProject?.applicationCategory ?? '', walletAddress || address);
+      clearProjectsScored(
+        currentProject?.applicationCategory ?? '',
+        walletAddress || address
+      );
       router.push('/ballot');
     }, 1000);
   }, [router, address, queryClient, roundId, walletAddress, currentProject]);
@@ -128,15 +134,17 @@ export default function ProjectDetailsPage({
       setIsEditing(true);
       const toastId = toast.success(
         `Nice work! You're ready to unlock your ballot and allocate
-              rewards`, {
-        duration: Infinity,
-        action: {
-          label: "Unlock Ballot",
-          onClick: () => {
-            handleUnlock();
-          }
+              rewards`,
+        {
+          duration: Infinity,
+          action: {
+            label: 'Unlock Ballot',
+            onClick: () => {
+              handleUnlock();
+            },
+          },
         }
-      });
+      );
 
       // Dismiss the toast when leaving the route or when wallet is disconnected
       return () => {
@@ -180,7 +188,14 @@ export default function ProjectDetailsPage({
         console.log('No more projects to vote on');
       }
     }
-  }, [sortedProjects, projectsScored, ballot, router, currentProject, allProjectsScored]);
+  }, [
+    sortedProjects,
+    projectsScored,
+    ballot,
+    router,
+    currentProject,
+    allProjectsScored,
+  ]);
 
   const handleScore = useCallback(
     async (score: ImpactScore) => {
@@ -224,7 +239,7 @@ export default function ProjectDetailsPage({
     return (
       <LoadingDialog
         isOpen={true}
-        setOpen={() => { }}
+        setOpen={() => {}}
         message="Loading project"
       />
     );
@@ -234,7 +249,7 @@ export default function ProjectDetailsPage({
     return (
       <LoadingDialog
         isOpen={true}
-        setOpen={() => { }}
+        setOpen={() => {}}
         message="Unlocking your ballot"
       />
     );
