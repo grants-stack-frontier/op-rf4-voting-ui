@@ -56,7 +56,8 @@ export default function ProjectDetailsPage({
   const [projectsScored, setProjectsScored] = useState<
     ProjectsScored | undefined
   >(undefined);
-  const [isUnlocked, setIsUnlocked] = useState(false);
+
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
 
   const {
     allProjectsScored,
@@ -82,9 +83,13 @@ export default function ProjectDetailsPage({
 
   useEffect(() => {
     if (address && allProjectsScored) {
-      setIsUnlocked(true);
+      const ballotUnlocked =
+        localStorage.getItem(`ballot_unlocked_${address}`) === 'true';
+      if (!ballotUnlocked) {
+        setShowUnlockDialog(true);
+      }
     }
-  }, [allProjectsScored, address]);
+  }, [address, allProjectsScored]);
 
   const handleNavigation = useCallback(() => {
     if (sortedProjects.length > 0 && projectsScored) {
@@ -164,12 +169,8 @@ export default function ProjectDetailsPage({
       <section className="flex-1 max-w-[720px]">
         <ProjectBreadcrumb id={id} />
         <UnlockBallotDialog
-          isOpen={isUnlocked}
-          setOpen={(open) => {
-            if (!open) {
-              setIsUnlocked(true);
-            }
-          }}
+          isOpen={showUnlockDialog}
+          setOpen={setShowUnlockDialog}
         />
         <ConflictOfInterestDialog
           isOpen={isConflictOfInterestDialogOpen}
@@ -179,7 +180,7 @@ export default function ProjectDetailsPage({
         <ProjectDetails data={currentProject} isPending={isLoading} />
         <PageView title={'project-details'} />
       </section>
-      {isUserCategory && walletAddress && !isUnlocked && (
+      {isUserCategory && walletAddress && !showUnlockDialog && (
         <aside className="max-w-[304px]">
           <ProjectReview
             onScoreSelect={handleScore}
