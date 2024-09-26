@@ -145,9 +145,17 @@ export function MetricsEditor() {
               refetch();
             }}
           >
-            <div className="mb-4">
-              <Image src={method.image} alt="Impact" width={220} height={92} />
-            </div>
+            <div
+              className="mb-4 w-[220px] h-[130px]"
+              style={{
+                backgroundImage: `url(${method.image.src})`,
+                backgroundSize: '100% 100%', // Stretch horizontally and vertically to fill the container
+                backgroundPosition: 'center', // Keep the image centered
+              }}
+            />
+
+            {/* <Image src={method.image} alt="Impact" width={220} height={130} />
+            </div> */}
 
             <div className="flex flex-row justify-between items-center">
               <div className="flex flex-row items-center gap-1">
