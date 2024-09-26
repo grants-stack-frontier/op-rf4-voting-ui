@@ -1,5 +1,4 @@
 import { Project } from '@/__generated__/api/agora.schemas';
-import { toast } from '@/components/ui/use-toast';
 import { HttpStatusCode } from '@/enums/http-status-codes';
 import { useSaveProjectImpact } from '@/hooks/useProjects';
 import {
@@ -10,6 +9,7 @@ import {
   updateVotedProjectsFromAllocations,
 } from '@/utils/localStorage';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { Address } from 'viem';
 import { Round5ProjectAllocation } from './useBallotRound5';
 
@@ -60,6 +60,7 @@ export const useProjectScoring = (
         totalAllocations !== totalProjects) ||
       storedProjectsScored.votedCount > totalAllocations
     ) {
+      console.log('storedProjectsScored', storedProjectsScored);
       return storedProjectsScored;
     } else {
       if (storedProjectsScored.votedCount === totalProjects) {
@@ -93,34 +94,42 @@ export const useProjectScoring = (
       let updatedProjectsScored;
 
       if (score === 'Skip') {
-        updatedProjectsScored = addSkippedProject(category, id, walletAddress);
+        if (
+          allocations &&
+          allocations.length > 0 &&
+          allocations.some((allocation) => allocation.project_id === id)
+        ) {
+          updatedProjectsScored = addScoredProject(category, id, walletAddress);
+        } else {
+          updatedProjectsScored = addSkippedProject(
+            category,
+            id,
+            walletAddress
+          );
+        }
       } else {
         setIsSaving(true);
-        toast({
-          variant: 'default',
-          loading: true,
-          title: 'Saving your impact score...',
-        });
         try {
-          const result = await saveProjectImpact({
+          const savePromise = saveProjectImpact({
             projectId: id,
             impact: score,
           });
+          toast.promise(savePromise, {
+            loading: 'Saving your impact score...',
+            success: 'Impact score was saved successfully!',
+            error: 'Error saving impact score',
+          });
+          const result = await savePromise;
           if (result.status === HttpStatusCode.OK) {
             updatedProjectsScored = addScoredProject(
               category,
               id,
               walletAddress
             );
-            toast({
-              variant: 'default',
-              title: 'Impact score was saved successfully!',
-            });
           } else {
             throw new Error('Error saving impact score');
           }
         } catch (error) {
-          toast({ variant: 'destructive', title: 'Error saving impact score' });
           setIsSaving(false);
           return {
             updatedProjectsScored: projectsScored,
@@ -134,26 +143,20 @@ export const useProjectScoring = (
       setProjectsScored(updatedProjectsScored);
 
       // Only set allProjectsScored if totalProjects is defined and greater than 0
-      if (
-        totalProjects &&
-        updatedProjectsScored.votedCount +
-          updatedProjectsScored.skippedCount ===
-          totalProjects
-      ) {
+      if (totalProjects && updatedProjectsScored.votedCount === totalProjects) {
+        // All projects must be voted on, including skipped projects. Skipping is not an impact score.
         setAllProjectsScored(true);
       }
 
       return {
         updatedProjectsScored,
-        allProjectsScored:
-          updatedProjectsScored.votedCount +
-            updatedProjectsScored.skippedCount ===
-          totalProjects,
+        allProjectsScored: updatedProjectsScored.votedCount === totalProjects, // All projects must be voted on, including skipped projects. Skipping is not an impact score.
       };
     },
     [
       category,
       id,
+      allocations,
       projectsScored,
       walletAddress,
       totalProjects,

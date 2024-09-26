@@ -9,7 +9,7 @@ import {
 import { ImpactScore, scoreLabels } from '@/hooks/useProjectScoring';
 import { cn } from '@/lib/utils';
 import { RiCheckLine } from '@remixicon/react';
-import { Dispatch, SetStateAction, useCallback, useMemo } from 'react';
+import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 import { Progress } from '../ui/progress';
 import { Skeleton } from '../ui/skeleton';
 
@@ -38,8 +38,13 @@ export function ReviewSidebar({
   currentProjectScore,
   ...props
 }: ReviewSidebarProps) {
+  const [localScore, setLocalScore] = useState<ImpactScore | undefined>(currentProjectScore);
+  const [allProjectsScored, setAllProjectsScored] = useState(votedCount === totalProjects);
   const handleScore = useCallback(
     (score: ImpactScore) => {
+      if (score !== 'Skip') {
+        setLocalScore(score);
+      }
       if (Number(score) === 0) {
         onConflictOfInterest(true);
       } else {
@@ -86,19 +91,23 @@ export function ReviewSidebar({
                       ? 'hover:bg-blue-200 hover:text-blue-600'
                       : '',
                   isVoted &&
-                    currentProjectScore === Number(score) &&
+                    Number(localScore) === Number(score) &&
                     label !== 'Conflict of interest'
                     ? 'bg-green-200 text-green-600'
                     : isVoted &&
-                        currentProjectScore === 0 &&
-                        label === 'Conflict of interest'
+                      Number(localScore) === 0 &&
+                      label === 'Conflict of interest'
                       ? 'bg-red-200 text-red-600'
                       : ''
                 )}
                 onClick={() => handleScore(score)}
-                disabled={isLoading || isSaving}
+                disabled={
+                  isLoading ||
+                  isSaving ||
+                  (score === 'Skip' && allProjectsScored)
+                }
               >
-                {isVoted && currentProjectScore === Number(score) && (
+                {isVoted && Number(localScore) === Number(score) && (
                   <RiCheckLine className="h-5 w-5 mr-2" />
                 )}
                 <span>{label}</span>
