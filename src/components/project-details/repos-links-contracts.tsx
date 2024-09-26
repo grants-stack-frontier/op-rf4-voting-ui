@@ -129,36 +129,43 @@ export function ReposLinksContracts({
                 </div>
                 <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                   <RiUserFill className="h-4 w-4" />{' '}
-                  <span>{Number(num_contributors)} contributors</span>
+                  <span>
+                    {Number(num_contributors).toLocaleString()} contributors
+                  </span>
                 </div>
                 <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                   <RiUserStarFill className="h-4 w-4" />{' '}
                   <span>
-                    {Number(num_trusted_contributors)} trusted contributors
+                    {Number(num_trusted_contributors).toLocaleString()} trusted
+                    contributors
                   </span>
                 </div>
                 <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                   <RiUserFill className="h-4 w-4" />{' '}
                   <span>
-                    {Number(num_contributors_last_6_months)} contributors last 6
-                    months
+                    {Number(num_contributors_last_6_months).toLocaleString()}{' '}
+                    contributors last 6 months
                   </span>
                 </div>
                 <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                   <RiGitForkFill className="h-4 w-4" />{' '}
-                  <span>{Number(num_forks)} forks</span>
+                  <span>{Number(num_forks).toLocaleString()} forks</span>
                 </div>
                 <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                   <RiGitForkFill className="h-4 w-4" />{' '}
-                  <span>{Number(num_trusted_forks)} trusted forks</span>
+                  <span>
+                    {Number(num_trusted_forks).toLocaleString()} trusted forks
+                  </span>
                 </div>
                 <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                   <RiStarFill className="h-4 w-4" />{' '}
-                  <span>{Number(num_stars)} stars</span>
+                  <span>{Number(num_stars).toLocaleString()} stars</span>
                 </div>
                 <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                   <RiStarFill className="h-4 w-4" />{' '}
-                  <span>{Number(num_trusted_stars)} trusted stars</span>
+                  <span>
+                    {Number(num_trusted_stars).toLocaleString()} trusted stars
+                  </span>
                 </div>
               </div>
             )}
