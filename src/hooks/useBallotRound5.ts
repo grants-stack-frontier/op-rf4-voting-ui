@@ -12,7 +12,7 @@ import { useAccount, useSignMessage } from 'wagmi';
 import { useToast } from '@/components/ui/use-toast';
 import { request } from '@/lib/request';
 import debounce from 'lodash.debounce';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useBallotRound5Context } from '@/components/ballot/provider5';
 import { CategoryId } from '@/types/shared';
 import { Loader2 } from 'lucide-react';
@@ -30,7 +30,7 @@ export type Round5ProjectAllocation = {
   name: string;
   image: string;
   position: number;
-  allocation: number;
+  allocation: string;
   impact: number;
 };
 
@@ -286,10 +286,19 @@ export function useIsSavingRound5Ballot() {
 
 export function useRound5BallotWeightSum() {
   const { ballot } = useBallotRound5Context();
-  return Math.round(
-    ballot?.project_allocations?.reduce(
-      (sum, x) => (sum += Number(x.allocation)),
-      0
-    ) ?? 0
-  );
+
+  const allocationSum = useMemo(() => {
+    if (!ballot || !ballot.project_allocations) return 0;
+
+    let sum = 0;
+    for (let i = 0; i < ballot.project_allocations.length; i++) {
+      const allocation =
+        parseFloat(ballot.project_allocations[i].allocation) || 0;
+      sum += Math.round(allocation * 100);
+    }
+    return sum / 100;
+  }, [ballot]);
+
+  console.log('allocationSum', allocationSum);
+  return allocationSum;
 }

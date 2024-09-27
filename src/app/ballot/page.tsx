@@ -27,7 +27,6 @@ import {
   useDistributionMethod,
   saveDistributionMethodToLocalStorage,
 } from '@/hooks/useBallotRound5';
-import { useIsBadgeholder } from '@/hooks/useIsBadgeholder';
 import { formatDate } from '@/lib/utils';
 import { ArrowDownToLineIcon, LoaderIcon, Menu } from 'lucide-react';
 import Image from 'next/image';
@@ -440,8 +439,8 @@ function YourBallot() {
 
                         const newProjectList = [...projectList];
                         newProjectList[i].allocation = isNaN(newAllocation)
-                          ? 0
-                          : newAllocation;
+                          ? '0'
+                          : inputValue;
                         newProjectList[i].allocationInput = inputValue;
                         setProjectList(newProjectList);
 
@@ -453,17 +452,18 @@ function YourBallot() {
                       onBlur={() => {
                         saveAllocation({
                           project_id: proj.project_id,
-                          allocation: proj.allocation,
+                          allocation: parseFloat(proj.allocationInput) || 0,
                         });
                       }}
+                      symbol="%"
+                      maxDecimals={2}
                     />
-                    <span className="absolute right-8 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                      %
-                    </span>
                   </div>
                   <div className="text-muted-foreground text-xs">
                     {formatAllocationOPAmount(
-                      (totalAllocationAmount * proj.allocation) / 100
+                      (totalAllocationAmount *
+                        (parseFloat(proj.allocation) || 0)) /
+                        100
                     )}{' '}
                     OP
                   </div>
@@ -548,8 +548,7 @@ function YourBallot() {
 
 function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
   const allocationSum = useRound5BallotWeightSum();
-  const isBadgeholder = useIsBadgeholder();
-  const [days, hours, minutes, seconds] = useVotingTimeLeft(votingEndDate);
+  const [seconds] = useVotingTimeLeft(votingEndDate);
 
   if (Number(seconds) < 0) {
     return null;
@@ -581,14 +580,20 @@ function WeightsError() {
       </span>
     );
 
-  if (allocationSum === 100) return null;
+  // Treat the allocation as complete if the remaining allocation is negligible
+  if (Math.abs(remainingAllocation) < 0.01) return null;
+
+  // Format the remainingAllocation to show up to 2 decimal places
+  const formattedRemainingAllocation = remainingAllocation
+    .toFixed(2)
+    .replace(/\.?0+$/, '');
 
   return (
     <span className="text-sm text-destructive">
       Percentages must equal 100% (
       {remainingAllocation > 0
-        ? `add ${remainingAllocation}% to your ballot`
-        : `remove ${Math.abs(remainingAllocation)}% from your ballot`}
+        ? `add ${formattedRemainingAllocation}% to your ballot`
+        : `remove ${Math.abs(Number(formattedRemainingAllocation))}% from your ballot`}
       )
     </span>
   );
