@@ -22,6 +22,9 @@ import Impact from '../../../public/chart-impact.svg';
 import TopBottom from '../../../public/chart-top-bottom.svg';
 import TopWeighted from '../../../public/chart-top-weighted.svg';
 import Custom from '../../../public/chart-custom.svg';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAccount } from 'wagmi';
+import { useBudget } from '@/hooks/useBudget';
 
 export function BlueCircleCheckIcon() {
   return (
@@ -40,28 +43,17 @@ export function BlueCircleCheckIcon() {
   );
 }
 
-export function MetricsEditor() {
+export function MetricsEditor({ budget }: { budget: number }) {
   const { ballot } = useBallotRound5Context();
   const { mutate: saveDistributionMethod } = useDistributionMethod();
   const { data: distributionMethod, refetch } =
     useDistributionMethodFromLocalStorage();
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const votingCategory = useVotingCategory();
-  const { totalBudget } = useBudgetContext();
 
   useEffect(() => {
     setSelectedMethod(distributionMethod || null);
   }, [distributionMethod]);
-
-  const budget = useMemo(() => {
-    if (ballot && votingCategory) {
-      const portion = ballot.category_allocations?.find(
-        (c) => c.category_slug === votingCategory
-      )?.allocation;
-      return Math.round((totalBudget * (portion || 0)) / 100);
-    }
-    return totalBudget / 3;
-  }, [ballot, votingCategory, totalBudget]);
 
   const allocationMethods = [
     {

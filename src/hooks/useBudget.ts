@@ -36,6 +36,9 @@ export function useBudget(roundId: number) {
         }
       );
     },
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const saveAllocation = useMutation({
