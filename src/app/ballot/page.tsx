@@ -35,25 +35,13 @@ import { useVotingCategory } from '@/hooks/useVotingCategory';
 import { NumberInput } from '@/components/ui/number-input';
 import { Input } from '@/components/ui/input';
 
-function formatAllocationOPAmount(amount?: number) {
-  if (amount === undefined) return 0;
+function formatAllocationOPAmount(amount?: number): string {
+  if (amount === undefined) return '0';
 
-  const value = amount.toString();
-  const pointIndex = value.indexOf('.');
-  const exists = pointIndex !== -1;
-  const numWithCommas = value
-    .slice(0, exists ? pointIndex : value.length)
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  if (exists) {
-    const cutoffPoint = 3;
-    const decimals = value.slice(pointIndex);
-    if (decimals.length <= cutoffPoint) {
-      return numWithCommas + decimals;
-    }
-    const float = parseFloat(decimals).toFixed(cutoffPoint);
-    return numWithCommas + float.slice(1);
-  }
-  return numWithCommas;
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 3,
+  }).format(amount);
 }
 
 const impactScores: { [key: number]: string } = {
