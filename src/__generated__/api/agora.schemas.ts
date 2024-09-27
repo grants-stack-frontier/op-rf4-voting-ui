@@ -581,8 +581,10 @@ export type ProjectPricingModel = {
 };
 
 export type ProjectImpactStatementStatement = {
-  answer?: string;
-  question?: string;
+  create?: {
+    answer?: string;
+    question?: string;
+  }[];
 };
 
 export type ProjectImpactStatement = {
