@@ -1,15 +1,15 @@
+import { BallotProvider } from '@/components/ballot/provider';
 import { BallotRound5Provider } from '@/components/ballot/provider5';
+import { BudgetProvider } from '@/components/budget/provider';
 import { ThemeProvider } from '@/components/theme-provider';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from '@/components/ui/sonner';
 import { cn } from '@/lib/utils';
 import '@rainbow-me/rainbowkit/styles.css';
 import { Inter } from 'next/font/google';
-import './globals.css';
-import { Provider } from './providers';
-import { BallotProvider } from '@/components/ballot/provider';
-import { BudgetProvider } from '@/components/budget/provider';
 import { ClientLayout } from './client-layout';
+import './globals.css';
 import { metadata } from './layout-metadata';
+import { Provider } from './providers';
 
 export { metadata };
 
@@ -45,7 +45,7 @@ export default function RootLayout({
             </BallotRound5Provider>
           </Provider>
         </ThemeProvider>
-        <Toaster />
+        <Toaster richColors />
       </body>
     </html>
   );

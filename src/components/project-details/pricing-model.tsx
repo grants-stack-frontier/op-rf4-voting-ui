@@ -9,7 +9,6 @@ export function PricingModel({
   pricingModel?: ProjectPricingModel | string;
 }) {
   if (!pricingModel) return null;
-  console.log('pricingModel', pricingModel);
 
   const formatType = (type: string) => {
     if (type === 'pay_to_use') {

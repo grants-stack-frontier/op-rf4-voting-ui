@@ -63,6 +63,7 @@
     "recharts": "^2.12.6",
     "sharp": "^0.33.4",
     "siwe": "^2.3.2",
+    "sonner": "^1.5.0",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "victory": "^37.0.2",

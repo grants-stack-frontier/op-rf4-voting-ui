@@ -44,7 +44,6 @@ export function GrantsFundingRevenue({
   };
 
   const renderItem = (item: any, type: string, index: number) => {
-    console.log('item', item);
     const { amount, date, details, link, grant, year } = item;
     const formattedAmount =
       amount && Number(amount) > 0
