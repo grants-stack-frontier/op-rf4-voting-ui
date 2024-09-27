@@ -12,11 +12,14 @@ import { useAccount, useSignMessage } from 'wagmi';
 import { useToast } from '@/components/ui/use-toast';
 import { request } from '@/lib/request';
 import debounce from 'lodash.debounce';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useBallotRound5Context } from '@/components/ballot/provider5';
 import { CategoryId } from '@/types/shared';
 import { Loader2 } from 'lucide-react';
-import { RetroFunding5BallotSubmissionContent } from '@/__generated__/api/agora.schemas';
+import {
+  RetroFunding5BallotSubmissionContent,
+  SubmitRetroFundingBallotBody,
+} from '@/__generated__/api/agora.schemas';
 import { submitRetroFundingBallot } from '@/__generated__/api/agora';
 
 export type Round5CategoryAllocation = {
@@ -135,7 +138,13 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
         message: JSON.stringify(ballot_content),
       });
 
-      return await submitRetroFundingBallot(5, address!, {
+      await submitRetroFundingBallot(5, address!, {
+        address,
+        ballot_content,
+        signature,
+      });
+
+      return saveBallotSubmissionToLocalStorage({
         address,
         ballot_content,
         signature,
@@ -155,6 +164,42 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
     onError: () =>
       toast({ variant: 'destructive', title: 'Error publishing ballot' }),
   });
+}
+
+export function useBallotSubmission() {
+  const { address } = useAccount();
+  return useQuery({
+    queryKey: ['ballot-submission-local-storage'],
+    queryFn: () => getBallotSubmissionFromLocalStorage(address),
+    initialData: getBallotSubmissionFromLocalStorage(address),
+  });
+}
+
+export function saveBallotSubmissionToLocalStorage(
+  submission: SubmitRetroFundingBallotBody
+) {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem(
+      'ballot-submission',
+      JSON.stringify({
+        submission,
+        timestamp: Date.now(),
+      })
+    );
+  }
+}
+
+export function getBallotSubmissionFromLocalStorage(
+  address: string | undefined
+): { submission: SubmitRetroFundingBallotBody; timestamp: number } | null {
+  if (typeof window !== 'undefined') {
+    const item = localStorage.getItem('ballot-submission');
+    const parsed = item ? JSON.parse(item) : null;
+    return parsed?.submission?.address.toLowerCase() === address?.toLowerCase()
+      ? parsed
+      : null;
+  }
+  return null;
 }
 
 export function useSaveRound5Position() {
@@ -286,10 +331,18 @@ export function useIsSavingRound5Ballot() {
 
 export function useRound5BallotWeightSum() {
   const { ballot } = useBallotRound5Context();
-  return Math.round(
-    ballot?.project_allocations?.reduce(
-      (sum, x) => (sum += Number(x.allocation)),
-      0
-    ) ?? 0
-  );
+
+  const allocationSum = useMemo(() => {
+    if (!ballot || !ballot.project_allocations) return 0;
+
+    let sum = 0;
+    for (let i = 0; i < ballot.project_allocations.length; i++) {
+      const allocation = ballot.project_allocations[i].allocation;
+      sum += Math.round(allocation * 100);
+    }
+    return sum / 100;
+  }, [ballot]);
+
+  console.log('allocationSum', allocationSum);
+  return allocationSum;
 }

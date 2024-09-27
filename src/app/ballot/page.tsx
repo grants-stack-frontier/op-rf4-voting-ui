@@ -4,11 +4,9 @@ import { Card } from '@/components/ui/card';
 import { useAccount } from 'wagmi';
 
 import { useBallotRound5Context } from '@/components/ballot/provider5';
-import { downloadImage } from '@/components/ballot/submit-dialog';
 import { SubmitRound5Dialog } from '@/components/ballot/submit-dialog5';
 import { PageView } from '@/components/common/page-view';
 import { SearchInput } from '@/components/common/search-input';
-import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -27,39 +25,24 @@ import {
   useDistributionMethod,
   saveDistributionMethodToLocalStorage,
 } from '@/hooks/useBallotRound5';
-import { useIsBadgeholder } from '@/hooks/useIsBadgeholder';
-import { formatDate } from '@/lib/utils';
-import { ArrowDownToLineIcon, LoaderIcon, Menu } from 'lucide-react';
-import Image from 'next/image';
+import { LoaderIcon, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { ComponentProps, useEffect, useMemo, useState } from 'react';
-import VotingSuccess from '../../../public/RetroFunding_Round4_IVoted@2x.png';
 import { MetricsEditor } from '../../components/metrics-editor';
 import { CategoryId } from '@/types/shared';
 import { useProjectsByCategory } from '@/hooks/useProjects';
 import { useVotingCategory } from '@/hooks/useVotingCategory';
 import { NumberInput } from '@/components/ui/number-input';
 import { Input } from '@/components/ui/input';
+import { useBudget } from '@/hooks/useBudget';
 
-function formatAllocationOPAmount(amount?: number) {
-  if (amount === undefined) return 0;
+function formatAllocationOPAmount(amount?: number): string {
+  if (amount === undefined) return '0';
 
-  const value = amount.toString();
-  const pointIndex = value.indexOf('.');
-  const exists = pointIndex !== -1;
-  const numWithCommas = value
-    .slice(0, exists ? pointIndex : value.length)
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  if (exists) {
-    const cutoffPoint = 3;
-    const decimals = value.slice(pointIndex);
-    if (decimals.length <= cutoffPoint) {
-      return numWithCommas + decimals;
-    }
-    const float = parseFloat(decimals).toFixed(cutoffPoint);
-    return numWithCommas + float.slice(1);
-  }
-  return numWithCommas;
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 3,
+  }).format(amount);
 }
 
 const impactScores: { [key: number]: string } = {
@@ -70,8 +53,6 @@ const impactScores: { [key: number]: string } = {
   4: 'High impact',
   5: 'Very high impact',
 };
-
-const totalAllocationAmount = 3_333_333;
 
 export default function BallotPage() {
   return (
@@ -130,6 +111,7 @@ function YourBallot() {
   const { ballot } = useBallotRound5Context();
   const { mutate: saveAllocation } = useSaveRound5Allocation();
   const { mutateAsync: savePosition } = useSaveRound5Position();
+  const { getBudget } = useBudget(5);
   // const { data: projects } = useProjects();
   const votingCategory = useVotingCategory();
   const { data: projects } = useProjectsByCategory(
@@ -139,6 +121,15 @@ function YourBallot() {
     useDistributionMethodFromLocalStorage();
 
   const { mutate: redistribute } = useDistributionMethod();
+  const budget = useMemo(() => {
+    if (getBudget.data?.budget && votingCategory) {
+      const portion = getBudget.data.allocations?.find(
+        (c) => c.category_slug === votingCategory
+      )?.allocation;
+      return Math.round((getBudget.data.budget * (Number(portion) || 0)) / 100);
+    }
+    return getBudget.data?.budget ? getBudget.data.budget / 3 : 0;
+  }, [getBudget.data, votingCategory]);
 
   console.log({ ballot });
   console.log({ projects });
@@ -223,7 +214,7 @@ function YourBallot() {
 
   return (
     <div className="space-y-4">
-      {ballot?.status === 'SUBMITTED' && (
+      {/* {ballot?.status === 'SUBMITTED' && (
         <Alert variant={'accent'}>
           <div className="flex gap-2 text-sm items-center">
             <p>
@@ -250,8 +241,7 @@ function YourBallot() {
             </div>
           </div>
         </Alert>
-      )}
-      {/* TO DO: Change to category based on badgeholder */}
+      )} */}
       <p>
         Your voting category is{' '}
         <a href={`/category/${votingCategory}`} className="underline">
@@ -262,7 +252,7 @@ function YourBallot() {
         ({ballot?.total_projects} projects)
       </p>
       <Card className="p-6 space-y-8">
-        <MetricsEditor />
+        <MetricsEditor budget={budget} />
         <SearchInput
           className="my-2"
           placeholder="Search projects..."
@@ -441,7 +431,7 @@ function YourBallot() {
                         const newProjectList = [...projectList];
                         newProjectList[i].allocation = isNaN(newAllocation)
                           ? 0
-                          : newAllocation;
+                          : Number(inputValue);
                         newProjectList[i].allocationInput = inputValue;
                         setProjectList(newProjectList);
 
@@ -453,17 +443,16 @@ function YourBallot() {
                       onBlur={() => {
                         saveAllocation({
                           project_id: proj.project_id,
-                          allocation: proj.allocation,
+                          allocation: parseFloat(proj.allocationInput) || 0,
                         });
                       }}
+                      symbol="%"
+                      maxDecimals={2}
                     />
-                    <span className="absolute right-8 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                      %
-                    </span>
                   </div>
                   <div className="text-muted-foreground text-xs">
                     {formatAllocationOPAmount(
-                      (totalAllocationAmount * proj.allocation) / 100
+                      (budget * (parseFloat(proj.allocationInput) || 0)) / 100
                     )}{' '}
                     OP
                   </div>
@@ -548,8 +537,7 @@ function YourBallot() {
 
 function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
   const allocationSum = useRound5BallotWeightSum();
-  const isBadgeholder = useIsBadgeholder();
-  const [days, hours, minutes, seconds] = useVotingTimeLeft(votingEndDate);
+  const [seconds] = useVotingTimeLeft(votingEndDate);
 
   if (Number(seconds) < 0) {
     return null;
@@ -581,14 +569,20 @@ function WeightsError() {
       </span>
     );
 
-  if (allocationSum === 100) return null;
+  // Treat the allocation as complete if the remaining allocation is negligible
+  if (Math.abs(remainingAllocation) < 0.01) return null;
+
+  // Format the remainingAllocation to show up to 2 decimal places
+  const formattedRemainingAllocation = remainingAllocation
+    .toFixed(2)
+    .replace(/\.?0+$/, '');
 
   return (
     <span className="text-sm text-destructive">
       Percentages must equal 100% (
       {remainingAllocation > 0
-        ? `add ${remainingAllocation}% to your ballot`
-        : `remove ${Math.abs(remainingAllocation)}% from your ballot`}
+        ? `add ${formattedRemainingAllocation}% to your ballot`
+        : `remove ${Math.abs(Number(formattedRemainingAllocation))}% from your ballot`}
       )
     </span>
   );
