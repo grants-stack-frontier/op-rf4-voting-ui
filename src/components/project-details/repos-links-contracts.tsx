@@ -126,8 +126,8 @@ export function ReposLinksContracts({
                   <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                     <RiUserStarFill className="h-4 w-4" />{' '}
                     <span>
-                      {Number(num_trusted_contributors).toLocaleString()} trusted
-                      contributors
+                      {Number(num_trusted_contributors).toLocaleString()}{' '}
+                      trusted contributors
                     </span>
                   </div>
                 )}
@@ -228,8 +228,9 @@ export function ReposLinksContracts({
         );
         const { name, blockExplorers } = chain ?? {};
         const { url } = blockExplorers?.default ?? {};
-        const icon = `https://icons.llamao.fi/icons/chains/rsz_${name === 'Mode Mainnet' ? 'mode' : name?.toLowerCase()
-          }.jpg`;
+        const icon = `https://icons.llamao.fi/icons/chains/rsz_${
+          name === 'Mode Mainnet' ? 'mode' : name?.toLowerCase()
+        }.jpg`;
         return (
           <Card className="shadow-none" key={index}>
             <CardContent className="px-2.5 py-3">
