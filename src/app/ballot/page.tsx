@@ -34,6 +34,7 @@ import { useProjectsByCategory } from '@/hooks/useProjects';
 import { useVotingCategory } from '@/hooks/useVotingCategory';
 import { NumberInput } from '@/components/ui/number-input';
 import { Input } from '@/components/ui/input';
+import { useBudget } from '@/hooks/useBudget';
 
 function formatAllocationOPAmount(amount?: number): string {
   if (amount === undefined) return '0';
@@ -52,8 +53,6 @@ const impactScores: { [key: number]: string } = {
   4: 'High impact',
   5: 'Very high impact',
 };
-
-const totalAllocationAmount = 3_333_333;
 
 export default function BallotPage() {
   return (
@@ -112,6 +111,7 @@ function YourBallot() {
   const { ballot } = useBallotRound5Context();
   const { mutate: saveAllocation } = useSaveRound5Allocation();
   const { mutateAsync: savePosition } = useSaveRound5Position();
+  const { getBudget } = useBudget(5);
   // const { data: projects } = useProjects();
   const votingCategory = useVotingCategory();
   const { data: projects } = useProjectsByCategory(
@@ -121,6 +121,15 @@ function YourBallot() {
     useDistributionMethodFromLocalStorage();
 
   const { mutate: redistribute } = useDistributionMethod();
+  const budget = useMemo(() => {
+    if (getBudget.data?.budget && votingCategory) {
+      const portion = getBudget.data.allocations?.find(
+        (c) => c.category_slug === votingCategory
+      )?.allocation;
+      return Math.round((getBudget.data.budget * (Number(portion) || 0)) / 100);
+    }
+    return getBudget.data?.budget ? getBudget.data.budget / 3 : 0;
+  }, [getBudget.data, votingCategory]);
 
   console.log({ ballot });
   console.log({ projects });
@@ -243,7 +252,7 @@ function YourBallot() {
         ({ballot?.total_projects} projects)
       </p>
       <Card className="p-6 space-y-8">
-        <MetricsEditor />
+        <MetricsEditor budget={budget} />
         <SearchInput
           className="my-2"
           placeholder="Search projects..."
@@ -443,9 +452,7 @@ function YourBallot() {
                   </div>
                   <div className="text-muted-foreground text-xs">
                     {formatAllocationOPAmount(
-                      (totalAllocationAmount *
-                        (parseFloat(proj.allocationInput) || 0)) /
-                        100
+                      (budget * (parseFloat(proj.allocationInput) || 0)) / 100
                     )}{' '}
                     OP
                   </div>
