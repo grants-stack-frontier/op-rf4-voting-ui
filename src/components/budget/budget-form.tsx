@@ -10,6 +10,7 @@ import { useBudget } from '@/hooks/useBudget';
 import { Round5Allocation } from '@/types/shared';
 import { updateRetroFundingRoundBudgetAllocation } from '@/__generated__/api/agora';
 import { useAccount } from 'wagmi';
+import { Category } from '@/data/categories';
 
 export function BudgetForm() {
   const { categories, error, isLoading, totalBudget, setTotalBudget } =
@@ -19,6 +20,7 @@ export function BudgetForm() {
   const { address } = useAccount();
 
   const [initialLoad, setInitialLoad] = useState(isLoading);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!isLoading) {
@@ -28,19 +30,27 @@ export function BudgetForm() {
   }, [isLoading]);
 
   useEffect(() => {
-    if (!initialLoad && totalBudget && categories && address) {
-      if (!getBudget.data?.budget) {
-        updateRetroFundingRoundBudgetAllocation(5, address, totalBudget).then(() => getBudget.refetch());
-      }
-      if (!getBudget.data?.allocations) {
-        saveAllocation.mutateAsync({
-          category_slug: categories[0].id,
-          allocation: 33.34, // TODO: calculate this
-          locked: false,
-        }).then(() => getBudget.refetch());
-      }
+    if (!initialLoad && totalBudget && (categories && categories.length > 0) && address && !isSaving) {
+      autoSetBudgetAndAllocation(address, categories);
     }
-  }, [initialLoad, getBudget.data, totalBudget, saveAllocation, categories, address]);
+  }, [initialLoad, getBudget.data, totalBudget, categories, address, isSaving]);
+
+  async function autoSetBudgetAndAllocation(address: string, categories: Category[]) {
+    setIsSaving(true);
+    const isAutosetting = !getBudget.data?.budget || !getBudget.data?.allocations || getBudget.data?.allocations.length !== categories.length
+    if (!getBudget.data?.budget) {
+      await updateRetroFundingRoundBudgetAllocation(5, address, totalBudget)
+    }
+    if (!getBudget.data?.allocations || getBudget.data?.allocations.length !== categories.length) {
+      await saveAllocation.mutateAsync({
+        category_slug: categories[0].id,
+        allocation: 33.34, // TODO: calculate this
+        locked: false,
+      })
+    }
+    if (isAutosetting) await getBudget.refetch()
+    setIsSaving(false);
+  }
 
   const handleBudgetChange = (value: number[]) => {
     const newBudget = value[0];
