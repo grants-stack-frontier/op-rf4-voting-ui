@@ -2,7 +2,6 @@ import { BallotProvider } from '@/components/ballot/provider';
 import { BallotRound5Provider } from '@/components/ballot/provider5';
 import { BudgetProvider } from '@/components/budget/provider';
 import { ThemeProvider } from '@/components/theme-provider';
-import { Toaster } from '@/components/ui/sonner';
 import { cn } from '@/lib/utils';
 import '@rainbow-me/rainbowkit/styles.css';
 import { Inter } from 'next/font/google';
@@ -45,7 +44,6 @@ export default function RootLayout({
             </BallotRound5Provider>
           </Provider>
         </ThemeProvider>
-        <Toaster richColors />
       </body>
     </html>
   );

@@ -9,7 +9,7 @@ import {
   updateVotedProjectsFromAllocations,
 } from '@/utils/localStorage';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/use-toast';
 import { Address } from 'viem';
 import { Round5ProjectAllocation } from './useBallotRound5';
 
@@ -110,26 +110,34 @@ export const useProjectScoring = (
       } else {
         setIsSaving(true);
         try {
-          const savePromise = saveProjectImpact({
+          toast({
+            title: 'Saving your impact score...',
+            variant: 'default',
+          });
+
+          const result = await saveProjectImpact({
             projectId: id,
             impact: score,
           });
-          toast.promise(savePromise, {
-            loading: 'Saving your impact score...',
-            success: 'Impact score was saved successfully!',
-            error: 'Error saving impact score',
-          });
-          const result = await savePromise;
+
           if (result.status === HttpStatusCode.OK) {
             updatedProjectsScored = addScoredProject(
               category,
               id,
               walletAddress
             );
+            toast({
+              title: 'Impact score was saved successfully!',
+              variant: 'default',
+            });
           } else {
             throw new Error('Error saving impact score');
           }
         } catch (error) {
+          toast({
+            title: 'Error saving impact score',
+            variant: 'destructive',
+          });
           setIsSaving(false);
           return {
             updatedProjectsScored: projectsScored,

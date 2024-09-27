@@ -1,64 +1,28 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '../ui/button';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Markdown } from '../markdown';
 
 export function ProjectDescription({ description }: { description?: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [truncatedText, setTruncatedText] = useState('');
-  const [isClampable, setIsClampable] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [showViewMore, setShowViewMore] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!description) return;
-
-    const processText = () => {
-      if (!containerRef.current) return;
-
-      const container = containerRef.current;
-      const tempElement = document.createElement('div');
-      tempElement.style.width = `${container.clientWidth}px`;
-      tempElement.style.position = 'absolute';
-      tempElement.style.visibility = 'hidden';
-      tempElement.style.whiteSpace = 'normal';
-      document.body.appendChild(tempElement);
-
-      const lineHeight = parseInt(
-        window.getComputedStyle(tempElement).lineHeight
-      );
-      const maxHeight = lineHeight * 3;
-
-      tempElement.textContent = description;
-      if (tempElement.offsetHeight <= maxHeight) {
-        setIsClampable(false);
-        setTruncatedText(description);
-      } else {
-        setIsClampable(true);
-        let low = 0;
-        let high = description.length;
-        let mid;
-        let result = '';
-
-        while (low <= high) {
-          mid = Math.floor((low + high) / 2);
-          tempElement.textContent =
-            description.slice(0, mid) + ' ... view more';
-
-          if (tempElement.offsetHeight <= maxHeight) {
-            result = description.slice(0, mid);
-            low = mid + 1;
-          } else {
-            high = mid - 1;
-          }
-        }
-
-        setTruncatedText(result);
+    const checkHeight = () => {
+      if (contentRef.current) {
+        const lineHeight = parseInt(
+          getComputedStyle(contentRef.current).lineHeight
+        );
+        const maxHeight = lineHeight * 3;
+        setShowViewMore(contentRef.current.scrollHeight > maxHeight);
       }
-
-      document.body.removeChild(tempElement);
     };
 
-    processText();
-    window.addEventListener('resize', processText);
-    return () => window.removeEventListener('resize', processText);
+    checkHeight();
+    window.addEventListener('resize', checkHeight);
+    return () => window.removeEventListener('resize', checkHeight);
   }, [description]);
 
   const toggleExpand = () => {
@@ -66,19 +30,30 @@ export function ProjectDescription({ description }: { description?: string }) {
   };
 
   return (
-    <div className="my-6" ref={containerRef}>
-      <div className="leading-6 dark:text-white">
-        {isExpanded ? description : truncatedText}
-        {isClampable && (
-          <Button
-            variant="link"
-            className="p-0 align-baseline ml-1 text-[16px] h-[24px]"
-            onClick={toggleExpand}
-          >
-            {isExpanded ? '... view less' : '... view more'}
-          </Button>
-        )}
+    <div className="my-6">
+      <div
+        ref={contentRef}
+        className={cn('prose dark:prose-invert', !isExpanded && 'line-clamp-3')}
+      >
+        <Markdown>{description}</Markdown>
       </div>
+      {showViewMore && (
+        <Button
+          variant="ghost"
+          className="mt-2 p-0 h-auto font-normal"
+          onClick={toggleExpand}
+        >
+          {isExpanded ? (
+            <>
+              View less <ChevronUp className="ml-1 h-4 w-4" />
+            </>
+          ) : (
+            <>
+              View more <ChevronDown className="ml-1 h-4 w-4" />
+            </>
+          )}
+        </Button>
+      )}
     </div>
   );
 }

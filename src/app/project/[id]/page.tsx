@@ -13,11 +13,9 @@ import { ImpactScore, useProjectScoring } from '@/hooks/useProjectScoring';
 import { useProjectSorting } from '@/hooks/useProjectSorting';
 import { useProjectById, useProjectsByCategory } from '@/hooks/useProjects';
 import { CategoryId } from '@/types/shared';
-import { ProjectsScored, clearProjectsScored } from '@/utils/localStorage';
-import { useQueryClient } from '@tanstack/react-query';
+import { ProjectsScored } from '@/utils/localStorage';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { toast } from 'sonner';
 import { Address } from 'viem';
 import { useAccount } from 'wagmi';
 
@@ -29,24 +27,19 @@ export default function ProjectDetailsPage({
   const { id } = params;
   const router = useRouter();
   const { data: session } = useSession();
-  const [isEditing, setIsEditing] = useState(false);
-  const [isUnlockedLoading, setIsUnlockedLoading] = useState(false);
-  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
   const { data: project, isPending: isProjectLoading } = useProjectById(id);
   const { data: projects, isPending: isProjectsLoading } =
     useProjectsByCategory(project?.applicationCategory as CategoryId);
   const { ballot } = useBallotRound5Context();
-  const { address, isConnected } = useAccount();
-  const queryClient = useQueryClient();
-  const roundId = 5;
+  const { address } = useAccount();
 
   const currentProject = useMemo(
     () => (project ? { ...project } : undefined),
     [project]
   );
   const walletAddress: Address | undefined = useMemo(
-    () => session?.siwe?.address || address,
-    [session?.siwe?.address, address]
+    () => session?.siwe?.address,
+    [session?.siwe?.address]
   );
   const userCategory: CategoryId | undefined = useMemo(
     () => session?.category as CategoryId | undefined,
@@ -64,19 +57,7 @@ export default function ProjectDetailsPage({
     ProjectsScored | undefined
   >(undefined);
 
-  const votedCount = useMemo(() => {
-    if (!projectsScored || !ballot || !projects) return 0;
-    const ballotAllocationsCount = ballot.project_allocations?.length ?? 0;
-    const scoredCount = projectsScored.votedCount ?? 0;
-    if (
-      scoredCount === projects?.length ||
-      (ballotAllocationsCount === projects?.length && !isEditing)
-    ) {
-      setShowUnlockDialog(true);
-    }
-    // Use the maximum of scored count and ballot allocations
-    return Math.max(scoredCount, ballotAllocationsCount);
-  }, [ballot, projectsScored, projects, isEditing]);
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
 
   const {
     allProjectsScored,
@@ -110,49 +91,6 @@ export default function ProjectDetailsPage({
     }
   }, [address, allProjectsScored]);
 
-  const handleUnlock = useCallback(() => {
-    setIsUnlockedLoading(true);
-    setTimeout(() => {
-      setIsUnlockedLoading(false);
-      setShowUnlockDialog(false);
-      if (address) {
-        localStorage.setItem(`ballot_unlocked_${address}`, 'true');
-      }
-
-      queryClient.invalidateQueries({ queryKey: ['budget', address, roundId] });
-      queryClient.invalidateQueries({ queryKey: ['ballot', address, roundId] });
-      clearProjectsScored(
-        currentProject?.applicationCategory ?? '',
-        walletAddress || address
-      );
-      router.push('/ballot');
-    }, 1000);
-  }, [router, address, queryClient, roundId, walletAddress, currentProject]);
-
-  useEffect(() => {
-    if (allProjectsScored && !showUnlockDialog) {
-      setIsEditing(true);
-      const toastId = toast.success(
-        `Nice work! You're ready to unlock your ballot and allocate
-              rewards`,
-        {
-          duration: Infinity,
-          action: {
-            label: 'Unlock Ballot',
-            onClick: () => {
-              handleUnlock();
-            },
-          },
-        }
-      );
-
-      // Dismiss the toast when leaving the route or when wallet is disconnected
-      return () => {
-        toast.dismiss(toastId);
-      };
-    }
-  }, [allProjectsScored, handleUnlock, showUnlockDialog]);
-
   const handleNavigation = useCallback(() => {
     if (sortedProjects.length > 0 && projectsScored) {
       // First, try to find a project that hasn't been voted or skipped
@@ -182,20 +120,10 @@ export default function ProjectDetailsPage({
       if (nextProject) {
         router.push(`/project/${nextProject.applicationId}`);
       } else {
-        if (allProjectsScored) {
-          setShowUnlockDialog(true);
-        }
         console.log('No more projects to vote on');
       }
     }
-  }, [
-    sortedProjects,
-    projectsScored,
-    ballot,
-    router,
-    currentProject,
-    allProjectsScored,
-  ]);
+  }, [sortedProjects, projectsScored, ballot, router, currentProject]);
 
   const handleScore = useCallback(
     async (score: ImpactScore) => {
@@ -245,27 +173,14 @@ export default function ProjectDetailsPage({
     );
   }
 
-  if (isUnlockedLoading) {
-    return (
-      <LoadingDialog
-        isOpen={true}
-        setOpen={() => {}}
-        message="Unlocking your ballot"
-      />
-    );
-  }
-
   return (
     <div className="flex gap-12 mx-auto">
       <section className="flex-1 max-w-[720px]">
         <ProjectBreadcrumb id={id} />
-        {!isEditing && (
-          <UnlockBallotDialog
-            isOpen={showUnlockDialog}
-            setOpen={setShowUnlockDialog}
-            onUnlock={handleUnlock}
-          />
-        )}
+        <UnlockBallotDialog
+          isOpen={showUnlockDialog}
+          setOpen={setShowUnlockDialog}
+        />
         <ConflictOfInterestDialog
           isOpen={isConflictOfInterestDialogOpen}
           setOpen={setIsConflictOfInterestDialogOpen}
@@ -274,12 +189,12 @@ export default function ProjectDetailsPage({
         <ProjectDetails data={currentProject} isPending={isLoading} />
         <PageView title={'project-details'} />
       </section>
-      {isUserCategory && walletAddress && (
+      {isUserCategory && walletAddress && !showUnlockDialog && (
         <aside className="max-w-[304px]">
           <ReviewSidebar
             onScoreSelect={handleScore}
             onConflictOfInterest={setIsConflictOfInterestDialogOpen}
-            votedCount={votedCount}
+            votedCount={projectsScored?.votedCount}
             totalProjects={sortedProjects.length}
             isLoading={isProjectScoringLoading}
             isSaving={isSaving}
