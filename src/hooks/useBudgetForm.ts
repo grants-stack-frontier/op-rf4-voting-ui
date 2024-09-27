@@ -73,7 +73,7 @@ export function useBudgetForm() {
   useEffect(() => {
     if (getBudget.data) {
       const newAllocations: Record<string, number> = {};
-      setTotalBudget(getBudget.data.budget ?? 2000000);
+      setTotalBudget(getBudget.data.budget ?? 8000000);
 
       getBudget.data.allocations?.forEach((allocation) => {
         if (allocation.category_slug !== undefined) {
