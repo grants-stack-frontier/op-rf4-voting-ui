@@ -47,6 +47,7 @@ export type Round5Ballot = {
   address: string;
   round_id: number;
   status: Round5BallotStatus;
+  budget?: number;
   created_at?: string;
   updated_at?: string;
   published_at?: string;
@@ -54,8 +55,8 @@ export type Round5Ballot = {
   project_allocations: Round5ProjectAllocation[];
   projects_to_be_evaluated: string[];
   total_projects: number;
+  payload_for_signature?: RetroFunding5BallotSubmissionContent;
   distribution_method?: string;
-  budget?: number;
 };
 
 export function useRound5Ballot(address?: string) {
@@ -117,40 +118,34 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
   return useMutation({
     mutationFn: async () => {
       const { data: ballot } = await refetch();
-      const ballot_content: RetroFunding5BallotSubmissionContent = {
-        budget: ballot?.budget,
-        category_allocation: ballot?.category_allocations.map(
-          ({ category_slug, allocation, locked }) => ({
-            category_slug,
-            allocation,
-            locked,
-          })
-        ),
-        projects_allocation: ballot?.project_allocations.map(
-          ({ project_id, allocation, impact }) => ({
-            project_id,
-            allocation,
-            impact,
-          })
-        ),
-      };
+      // const ballot_content: RetroFunding5BallotSubmissionContent = {
+      //   budget: ballot?.budget,
+      //   category_allocation: ballot?.category_allocations.map(
+      //     ({ category_slug, allocation, locked }) => ({
+      //       category_slug,
+      //       allocation,
+      //       locked,
+      //     })
+      //   ),
+      //   projects_allocation: ballot?.project_allocations.map(
+      //     ({ project_id, allocation, impact }) => ({
+      //       project_id,
+      //       allocation,
+      //       impact,
+      //     })
+      //   ),
+      // };
+      const ballot_content = ballot?.payload_for_signature;
       const signature = await signMessageAsync({
         message: JSON.stringify(ballot_content),
       });
 
-      await submitRetroFundingBallot(5, address!, {
+      const submission = await submitRetroFundingBallot(5, address!, {
         address,
         ballot_content,
         signature,
       });
-
-      return saveBallotSubmissionToLocalStorage({
-        address,
-        ballot_content,
-        signature,
-      });
-
-      // return request
+      // const submission = await request
       //   .post(`${agoraRoundsAPI}/ballots/${address}/submit`, {
       //     json: {
       //       address,
@@ -158,7 +153,15 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
       //       signature,
       //     },
       //   })
-      //   .json();
+      //   .json<any>();
+
+      saveBallotSubmissionToLocalStorage({
+        address,
+        ballot_content,
+        signature,
+      });
+
+      return submission;
     },
     onSuccess,
     onError: () =>
