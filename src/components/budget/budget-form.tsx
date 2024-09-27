@@ -6,19 +6,41 @@ import React, { useEffect, useState } from 'react';
 import { Slider } from '../ui/slider';
 import { CategoryItem } from './category-item';
 import { useBudgetContext } from './provider';
+import { useBudget } from '@/hooks/useBudget';
+import { Round5Allocation } from '@/types/shared';
+import { updateRetroFundingRoundBudgetAllocation } from '@/__generated__/api/agora';
+import { useAccount } from 'wagmi';
 
 export function BudgetForm() {
   const { categories, error, isLoading, totalBudget, setTotalBudget } =
     useBudgetContext();
   const router = useRouter();
+  const { getBudget, saveAllocation } = useBudget(5);
+  const { address } = useAccount();
 
   const [initialLoad, setInitialLoad] = useState(isLoading);
 
   useEffect(() => {
     if (!isLoading) {
       setInitialLoad(false);
+      console.log(getBudget.data);
     }
   }, [isLoading]);
+
+  useEffect(() => {
+    if (!initialLoad && totalBudget && categories && address) {
+      if (!getBudget.data?.budget) {
+        updateRetroFundingRoundBudgetAllocation(5, address, totalBudget).then(() => getBudget.refetch());
+      }
+      if (!getBudget.data?.allocations) {
+        saveAllocation.mutateAsync({
+          category_slug: categories[0].id,
+          allocation: 33.34, // TODO: calculate this
+          locked: false,
+        }).then(() => getBudget.refetch());
+      }
+    }
+  }, [initialLoad, getBudget.data, totalBudget, saveAllocation, categories, address]);
 
   const handleBudgetChange = (value: number[]) => {
     const newBudget = value[0];
