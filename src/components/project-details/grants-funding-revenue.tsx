@@ -45,10 +45,16 @@ export function GrantsFundingRevenue({
 
   const renderItem = (item: any, type: string, index: number) => {
     const { amount, date, details, link, grant, year } = item;
+    const isUSDType = type === 'Investment' || type === 'Venture Funding';
     const formattedAmount =
       amount && Number(amount) > 0
-        ? new Intl.NumberFormat('en-US').format(Number(amount))
+        ? new Intl.NumberFormat('en-US', {
+            style: isUSDType ? 'currency' : 'decimal',
+            currency: isUSDType ? 'USD' : undefined,
+            maximumFractionDigits: 0,
+          }).format(Number(amount))
         : amount;
+
     const getHeaderText = () => {
       if (type === 'Grant') {
         if (grant === 'retroFunding') {
@@ -87,12 +93,12 @@ export function GrantsFundingRevenue({
         )}
         {formattedAmount && (
           <div className="flex items-center gap-2 text-sm font-normal leading-5">
-            {type === 'Investment' ? (
+            {isUSDType ? (
               <RiMoneyDollarCircleFill className="h-5 w-5" />
             ) : (
               <Image src={Logo.src} alt="Logo" width={20} height={20} />
             )}
-            {formattedAmount} {type === 'Investment' ? '' : 'OP'}
+            {formattedAmount} {isUSDType ? '' : 'OP'}
           </div>
         )}
       </>
