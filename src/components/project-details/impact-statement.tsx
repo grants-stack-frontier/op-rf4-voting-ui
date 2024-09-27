@@ -37,10 +37,11 @@ export function ImpactStatement({
         </p>
       </div>
       {impactStatement?.statement &&
-        Array.isArray(impactStatement.statement) &&
-        impactStatement.statement.length > 0 && (
+        impactStatement.statement.create &&
+        Array.isArray(impactStatement.statement.create) &&
+        impactStatement.statement.create.length > 0 && (
           <>
-            {impactStatement.statement.map((statement, index) => (
+            {impactStatement.statement.create.map((statement, index) => (
               <div key={index} className="flex flex-col gap-6 mb-12">
                 <p className="border-l-4 pl-2 border-red-500 font-semibold">
                   {statement.question}

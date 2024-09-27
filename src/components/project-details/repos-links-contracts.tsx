@@ -104,54 +104,72 @@ export function ReposLinksContracts({
                 {typedRepo.description ?? 'No description'}
               </div>
             )}
-            <div className="grid grid-cols-3 gap-2 p-2">
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiTimeFill className="h-4 w-4" />{' '}
-                <span>
-                  {formatProjectAge(Number(age_of_project_years) ?? 0)} old
-                </span>
+            {typedRepo.metrics && (
+              <div className="grid grid-cols-3 gap-2 p-2">
+                {age_of_project_years && (
+                  <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                    <RiTimeFill className="h-4 w-4" />{' '}
+                    <span>
+                      {formatProjectAge(Number(age_of_project_years) ?? 0)} old
+                    </span>
+                  </div>
+                )}
+                {num_contributors && (
+                  <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                    <RiUserFill className="h-4 w-4" />{' '}
+                    <span>
+                      {Number(num_contributors).toLocaleString()} contributors
+                    </span>
+                  </div>
+                )}
+                {num_trusted_contributors && (
+                  <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                    <RiUserStarFill className="h-4 w-4" />{' '}
+                    <span>
+                      {Number(num_trusted_contributors).toLocaleString()} trusted
+                      contributors
+                    </span>
+                  </div>
+                )}
+                {num_contributors_last_6_months && (
+                  <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                    <RiUserFill className="h-4 w-4" />{' '}
+                    <span>
+                      {Number(num_contributors_last_6_months).toLocaleString()}{' '}
+                      contributors last 6 months
+                    </span>
+                  </div>
+                )}
+                {num_forks && (
+                  <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                    <RiGitForkFill className="h-4 w-4" />{' '}
+                    <span>{Number(num_forks).toLocaleString()} forks</span>
+                  </div>
+                )}
+                {num_trusted_forks && (
+                  <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                    <RiGitForkFill className="h-4 w-4" />{' '}
+                    <span>
+                      {Number(num_trusted_forks).toLocaleString()} trusted forks
+                    </span>
+                  </div>
+                )}
+                {num_stars && (
+                  <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                    <RiStarFill className="h-4 w-4" />{' '}
+                    <span>{Number(num_stars).toLocaleString()} stars</span>
+                  </div>
+                )}
+                {num_trusted_stars && (
+                  <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                    <RiStarFill className="h-4 w-4" />{' '}
+                    <span>
+                      {Number(num_trusted_stars).toLocaleString()} trusted stars
+                    </span>
+                  </div>
+                )}
               </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiUserFill className="h-4 w-4" />{' '}
-                <span>
-                  {Number(num_contributors).toLocaleString()} contributors
-                </span>
-              </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiUserStarFill className="h-4 w-4" />{' '}
-                <span>
-                  {Number(num_trusted_contributors).toLocaleString()} trusted
-                  contributors
-                </span>
-              </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiUserFill className="h-4 w-4" />{' '}
-                <span>
-                  {Number(num_contributors_last_6_months).toLocaleString()}{' '}
-                  contributors last 6 months
-                </span>
-              </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiGitForkFill className="h-4 w-4" />{' '}
-                <span>{Number(num_forks).toLocaleString()} forks</span>
-              </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiGitForkFill className="h-4 w-4" />{' '}
-                <span>
-                  {Number(num_trusted_forks).toLocaleString()} trusted forks
-                </span>
-              </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiStarFill className="h-4 w-4" />{' '}
-                <span>{Number(num_stars).toLocaleString()} stars</span>
-              </div>
-              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                <RiStarFill className="h-4 w-4" />{' '}
-                <span>
-                  {Number(num_trusted_stars).toLocaleString()} trusted stars
-                </span>
-              </div>
-            </div>
+            )}
           </CustomAccordion>
         );
       })}
@@ -210,9 +228,8 @@ export function ReposLinksContracts({
         );
         const { name, blockExplorers } = chain ?? {};
         const { url } = blockExplorers?.default ?? {};
-        const icon = `https://icons.llamao.fi/icons/chains/rsz_${
-          name === 'Mode Mainnet' ? 'mode' : name?.toLowerCase()
-        }.jpg`;
+        const icon = `https://icons.llamao.fi/icons/chains/rsz_${name === 'Mode Mainnet' ? 'mode' : name?.toLowerCase()
+          }.jpg`;
         return (
           <Card className="shadow-none" key={index}>
             <CardContent className="px-2.5 py-3">
