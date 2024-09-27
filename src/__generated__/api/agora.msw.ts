@@ -49,11 +49,6 @@ Not Live.
  */
 import { faker } from '@faker-js/faker';
 import { HttpResponse, delay, http } from 'msw';
-import {
-  RetroFundingRoundStatus,
-  VoteSupport,
-  VotingStrategy,
-} from './agora.schemas';
 import type {
   ApprovalProposalData,
   ApprovalProposalResults,
@@ -88,6 +83,11 @@ import type {
   StandardProposalResults,
   SubmitRetroFundingBallot200,
   VotingToken,
+} from './agora.schemas';
+import {
+  RetroFundingRoundStatus,
+  VoteSupport,
+  VotingStrategy,
 } from './agora.schemas';
 
 export const getGetSpecResponseMock = (): string => faker.word.sample();
@@ -1655,14 +1655,19 @@ export const getGetProjectsResponseMock = (
           ]),
           statement: faker.helpers.arrayElement([
             {
-              answer: faker.helpers.arrayElement([
-                faker.word.sample(),
-                undefined,
-              ]),
-              question: faker.helpers.arrayElement([
-                faker.word.sample(),
-                undefined,
-              ]),
+              create: Array.from(
+                { length: faker.number.int({ min: 1, max: 5 }) },
+                () => ({
+                  answer: faker.helpers.arrayElement([
+                    faker.lorem.sentence(),
+                    undefined,
+                  ]),
+                  question: faker.helpers.arrayElement([
+                    faker.lorem.sentence(),
+                    undefined,
+                  ]),
+                })
+              ),
             },
             undefined,
           ]),
@@ -2320,14 +2325,19 @@ export const getGetRetroFundingRoundProjectsResponseMock = (
           ]),
           statement: faker.helpers.arrayElement([
             {
-              answer: faker.helpers.arrayElement([
-                faker.word.sample(),
-                undefined,
-              ]),
-              question: faker.helpers.arrayElement([
-                faker.word.sample(),
-                undefined,
-              ]),
+              create: Array.from(
+                { length: faker.number.int({ min: 1, max: 5 }) },
+                () => ({
+                  answer: faker.helpers.arrayElement([
+                    faker.lorem.sentence(),
+                    undefined,
+                  ]),
+                  question: faker.helpers.arrayElement([
+                    faker.lorem.sentence(),
+                    undefined,
+                  ]),
+                })
+              ),
             },
             undefined,
           ]),
@@ -2537,11 +2547,19 @@ export const getGetRetroFundingRoundProjectByIdResponseMock = (
       category: faker.helpers.arrayElement([faker.word.sample(), undefined]),
       statement: faker.helpers.arrayElement([
         {
-          answer: faker.helpers.arrayElement([faker.word.sample(), undefined]),
-          question: faker.helpers.arrayElement([
-            faker.word.sample(),
-            undefined,
-          ]),
+          create: Array.from(
+            { length: faker.number.int({ min: 1, max: 5 }) },
+            () => ({
+              answer: faker.helpers.arrayElement([
+                faker.lorem.sentence(),
+                undefined,
+              ]),
+              question: faker.helpers.arrayElement([
+                faker.lorem.sentence(),
+                undefined,
+              ]),
+            })
+          ),
         },
         undefined,
       ]),

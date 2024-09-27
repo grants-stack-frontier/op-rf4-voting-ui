@@ -581,7 +581,7 @@ export type ProjectPricingModel = {
 };
 
 export type ProjectImpactStatementStatement = {
-  create: {
+  create?: {
     answer?: string;
     question?: string;
   }[];
