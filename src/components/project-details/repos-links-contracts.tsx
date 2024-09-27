@@ -106,7 +106,7 @@ export function ReposLinksContracts({
             )}
             {typedRepo.metrics && (
               <div className="grid grid-cols-3 gap-2 p-2">
-                {age_of_project_years && (
+                {age_of_project_years !== undefined && (
                   <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                     <RiTimeFill className="h-4 w-4" />{' '}
                     <span>
@@ -114,7 +114,7 @@ export function ReposLinksContracts({
                     </span>
                   </div>
                 )}
-                {num_contributors && (
+                {num_contributors !== undefined && (
                   <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                     <RiUserFill className="h-4 w-4" />{' '}
                     <span>
@@ -122,7 +122,7 @@ export function ReposLinksContracts({
                     </span>
                   </div>
                 )}
-                {num_trusted_contributors && (
+                {num_trusted_contributors !== undefined && (
                   <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                     <RiUserStarFill className="h-4 w-4" />{' '}
                     <span>
@@ -131,7 +131,7 @@ export function ReposLinksContracts({
                     </span>
                   </div>
                 )}
-                {num_contributors_last_6_months && (
+                {num_contributors_last_6_months !== undefined && (
                   <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                     <RiUserFill className="h-4 w-4" />{' '}
                     <span>
@@ -140,13 +140,13 @@ export function ReposLinksContracts({
                     </span>
                   </div>
                 )}
-                {num_forks && (
+                {num_forks !== undefined && (
                   <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                     <RiGitForkFill className="h-4 w-4" />{' '}
                     <span>{Number(num_forks).toLocaleString()} forks</span>
                   </div>
                 )}
-                {num_trusted_forks && (
+                {num_trusted_forks !== undefined && (
                   <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                     <RiGitForkFill className="h-4 w-4" />{' '}
                     <span>
@@ -154,13 +154,13 @@ export function ReposLinksContracts({
                     </span>
                   </div>
                 )}
-                {num_stars && (
+                {num_stars !== undefined && (
                   <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                     <RiStarFill className="h-4 w-4" />{' '}
                     <span>{Number(num_stars).toLocaleString()} stars</span>
                   </div>
                 )}
-                {num_trusted_stars && (
+                {num_trusted_stars !== undefined && (
                   <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
                     <RiStarFill className="h-4 w-4" />{' '}
                     <span>

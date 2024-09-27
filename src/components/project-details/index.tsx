@@ -66,7 +66,9 @@ export function ProjectDetails({
             contracts={contracts}
           />
           <Separator className="my-12" />
-          <ImpactStatement impactStatement={impactStatement} />
+          {impactStatement && (
+            <ImpactStatement impactStatement={impactStatement} />
+          )}
           <Separator className="my-12" />
           <PricingModel pricingModel={pricingModel} />
           <GrantsFundingRevenue grantsAndFunding={grantsAndFunding} />
