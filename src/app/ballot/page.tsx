@@ -4,11 +4,9 @@ import { Card } from '@/components/ui/card';
 import { useAccount } from 'wagmi';
 
 import { useBallotRound5Context } from '@/components/ballot/provider5';
-import { downloadImage } from '@/components/ballot/submit-dialog';
 import { SubmitRound5Dialog } from '@/components/ballot/submit-dialog5';
 import { PageView } from '@/components/common/page-view';
 import { SearchInput } from '@/components/common/search-input';
-import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -27,12 +25,9 @@ import {
   useDistributionMethod,
   saveDistributionMethodToLocalStorage,
 } from '@/hooks/useBallotRound5';
-import { formatDate } from '@/lib/utils';
-import { ArrowDownToLineIcon, LoaderIcon, Menu } from 'lucide-react';
-import Image from 'next/image';
+import { LoaderIcon, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { ComponentProps, useEffect, useMemo, useState } from 'react';
-import VotingSuccess from '../../../public/RetroFunding_Round4_IVoted@2x.png';
 import { MetricsEditor } from '../../components/metrics-editor';
 import { CategoryId } from '@/types/shared';
 import { useProjectsByCategory } from '@/hooks/useProjects';
@@ -438,8 +433,8 @@ function YourBallot() {
 
                         const newProjectList = [...projectList];
                         newProjectList[i].allocation = isNaN(newAllocation)
-                          ? '0'
-                          : inputValue;
+                          ? 0
+                          : Number(inputValue);
                         newProjectList[i].allocationInput = inputValue;
                         setProjectList(newProjectList);
 
@@ -461,7 +456,7 @@ function YourBallot() {
                   <div className="text-muted-foreground text-xs">
                     {formatAllocationOPAmount(
                       (totalAllocationAmount *
-                        (parseFloat(proj.allocation) || 0)) /
+                        (parseFloat(proj.allocationInput) || 0)) /
                         100
                     )}{' '}
                     OP

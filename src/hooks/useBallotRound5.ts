@@ -33,7 +33,7 @@ export type Round5ProjectAllocation = {
   name: string;
   image: string;
   position: number;
-  allocation: string;
+  allocation: number;
   impact: number;
 };
 
@@ -337,8 +337,7 @@ export function useRound5BallotWeightSum() {
 
     let sum = 0;
     for (let i = 0; i < ballot.project_allocations.length; i++) {
-      const allocation =
-        parseFloat(ballot.project_allocations[i].allocation) || 0;
+      const allocation = ballot.project_allocations[i].allocation;
       sum += Math.round(allocation * 100);
     }
     return sum / 100;
