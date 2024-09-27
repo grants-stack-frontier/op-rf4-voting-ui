@@ -138,27 +138,28 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
         message: JSON.stringify(ballot_content),
       });
 
-      await submitRetroFundingBallot(5, address!, {
+      // const submission = await submitRetroFundingBallot(5, address!, {
+      //   address,
+      //   ballot_content,
+      //   signature,
+      // });
+      const submission = await request
+        .post(`${agoraRoundsAPI}/ballots/${address}/submit`, {
+          json: {
+            address,
+            ballot_content,
+            signature,
+          },
+        })
+        .json<any>();
+
+      saveBallotSubmissionToLocalStorage({
         address,
         ballot_content,
         signature,
       });
 
-      return saveBallotSubmissionToLocalStorage({
-        address,
-        ballot_content,
-        signature,
-      });
-
-      // return request
-      //   .post(`${agoraRoundsAPI}/ballots/${address}/submit`, {
-      //     json: {
-      //       address,
-      //       ballot_content,
-      //       signature,
-      //     },
-      //   })
-      //   .json();
+      return submission;
     },
     onSuccess,
     onError: () =>
