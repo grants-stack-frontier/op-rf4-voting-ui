@@ -1,10 +1,7 @@
 'use client';
-import { Heading } from '@/components/ui/headings';
-
 import { cn } from '@/lib/utils';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { BallotFilter } from '../ballot/ballot-filter';
-import { DistributionChart } from '../metrics/distribution-chart';
 import { Card } from '../ui/card';
 import {
   DistributionMethod,
@@ -21,6 +18,10 @@ import { useVotingCategory } from '@/hooks/useVotingCategory';
 import { useBallotRound5Context } from '../ballot/provider5';
 import { useBudgetContext } from '../budget/provider';
 import { ResetButton } from './reset-button';
+import Impact from '../../../public/chart-impact.svg';
+import TopBottom from '../../../public/chart-top-bottom.svg';
+import TopWeighted from '../../../public/chart-top-weighted.svg';
+import Custom from '../../../public/chart-custom.svg';
 
 export function BlueCircleCheckIcon() {
   return (
@@ -39,124 +40,69 @@ export function BlueCircleCheckIcon() {
   );
 }
 
-function formatNumberWithCommas(number: number): string {
-  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-}
-
 export function MetricsEditor() {
   const { ballot } = useBallotRound5Context();
   const { mutate: saveDistributionMethod } = useDistributionMethod();
   const { data: distributionMethod, refetch } =
     useDistributionMethodFromLocalStorage();
+  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const votingCategory = useVotingCategory();
   const { totalBudget } = useBudgetContext();
 
+  useEffect(() => {
+    setSelectedMethod(distributionMethod || null);
+  }, [distributionMethod]);
+
   const budget = useMemo(() => {
     if (ballot && votingCategory) {
-      const portion = ballot.category_allocations.find(
+      const portion = ballot.category_allocations?.find(
         (c) => c.category_slug === votingCategory
       )?.allocation;
-      return formatNumberWithCommas(
-        Math.round((totalBudget * (portion || 0)) / 100)
-      );
-      // return formatNumberWithCommas(totalBudget);
+      return Math.round((totalBudget * (portion || 0)) / 100);
     }
-    return '0';
+    return totalBudget / 3;
   }, [ballot, votingCategory, totalBudget]);
 
-  const exponentialDecay = (
-    x: number,
-    initialValue: number = 100,
-    decayRate: number = 0.1
-  ): number => {
-    return initialValue * Math.exp(-decayRate * x);
-  };
-
-  const distributeTopWeighted = (
-    numPoints: number = 40
-  ): { x: number; y: number }[] => {
-    return Array.from({ length: numPoints }, (_, i) => ({
-      x: i,
-      y: Math.round(exponentialDecay(i)),
-    }));
-  };
-
-  const linearDecline = (
-    x: number,
-    initialValue: number = 100,
-    slope: number = 2.5
-  ): number => {
-    const y = initialValue - slope * x;
-    return Math.max(y, 0); // Ensure y doesn't go below 0
-  };
-
-  const distributeTopToBottomLinear = (
-    numPoints: number = 40
-  ): { x: number; y: number }[] => {
-    return Array.from({ length: numPoints }, (_, i) => ({
-      x: i,
-      y: Math.round(linearDecline(i)),
-    }));
-  };
-
-  // Dummy data for the allocation methods
   const allocationMethods = [
     {
-      data: [
-        { x: 0, y: 340 },
-        { x: 10, y: 340 },
-        { x: 10, y: 255 },
-        { x: 20, y: 255 },
-        { x: 20, y: 170 },
-        { x: 30, y: 170 },
-        { x: 30, y: 85 },
-        { x: 40, y: 85 },
-        { x: 40, y: 0 },
-        { x: 50, y: 0 },
-      ],
-      // data: distributeImpactGroups(),
-      formatChartTick: (tick: number) => `${tick}k`,
       name: 'Impact groups',
       description:
         'Reward allocation is proportionate and even among projects with the same impact score.',
       method: DistributionMethod.IMPACT_GROUPS,
+      image: Impact,
     },
     {
-      data: distributeTopToBottomLinear(),
-      formatChartTick: (tick: number) => `${tick}k`,
       name: 'Top to bottom',
       description:
         'Reward allocation is directly proportionate to stack rankings.',
       method: DistributionMethod.TOP_TO_BOTTOM,
+      image: TopBottom,
     },
     {
-      data: distributeTopWeighted(),
-      formatChartTick: (tick: number) => `${tick}k`,
       name: 'Top weighted',
       description:
         'Reward allocation is weighted toward projects at the top of your ballot.',
       method: DistributionMethod.TOP_WEIGHTED,
+      image: TopWeighted,
     },
     {
-      data: [],
-      formatChartTick: (tick: number) => `--k`,
       name: 'Custom',
-      description:
-        'Reward allocation is weighed heavily towards projects with higher percentages.',
+      description: 'Reward allocation is customized by you.',
       method: 'CUSTOM',
+      image: Custom,
     },
   ];
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h4 className="text-[20px] text-[#0F111A] font-semibold line-height-[28px]">
+        <h4 className="text-[20px] text-[#0F111A] font-semibold line-height-[28px] dark:text-white">
           Your ballot
         </h4>
         <BallotFilter />
       </div>
 
-      <div className="flex flex-col gap-4 text-[16px] line-height-[24px] mb-10 text-[#404454]">
+      <div className="flex flex-col gap-4 text-[16px] line-height-[24px] mb-10 text-[#404454] dark:text-[#B0B3B8]">
         <p>First, review your project rankings in the list below.</p>
         <p>
           Then, choose a method to easily allocate rewards across projects. You
@@ -165,7 +111,8 @@ export function MetricsEditor() {
         <p>
           OP calculations in this ballot are based on{' '}
           <a href="/budget" className="underline">
-            your category budget of {budget} OP
+            your category budget of {Math.ceil(Number(budget)).toLocaleString()}{' '}
+            OP
           </a>
           .
         </p>
@@ -185,11 +132,11 @@ export function MetricsEditor() {
         {allocationMethods.map((method, index) => (
           <Card
             key={index}
-            className={cn('cursor-pointer', {
-              'border-2 border-[#BCBFCD]': distributionMethod === method.method,
+            className={cn('cursor-pointer p-3', {
+              'border-2 border-[#BCBFCD]': selectedMethod === method.method,
             })}
             onClick={() => {
-              // setSelectedMethod(method.method);
+              setSelectedMethod(method.method);
               saveDistributionMethodToLocalStorage(method.method);
               if (
                 method.method === DistributionMethod.IMPACT_GROUPS ||
@@ -201,11 +148,16 @@ export function MetricsEditor() {
               refetch();
             }}
           >
-            <DistributionChart
-              data={method.data}
-              formatChartTick={method.formatChartTick}
+            <div
+              className="mb-4 w-[220px] h-[130px]"
+              style={{
+                backgroundImage: `url(${method.image.src})`,
+                backgroundSize: '100% 100%', // Stretch horizontally and vertically to fill the container
+                backgroundPosition: 'center', // Keep the image centered
+              }}
             />
-            <div className="mb-2 mx-4 flex flex-row justify-between items-center">
+
+            <div className="flex flex-row justify-between items-center">
               <div className="flex flex-row items-center gap-1">
                 {method.method === distributionMethod && (
                   <BlueCircleCheckIcon />

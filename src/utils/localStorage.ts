@@ -73,12 +73,18 @@ export const addSkippedProject = (
 
 export function clearProjectsScored(
   category: string,
-  walletAddress: Address
+  walletAddress: Address | undefined
 ): void {
+  if (typeof window === 'undefined') return;
   const stored = localStorage.getItem(PROJECTS_SCORED_KEY);
   if (stored) {
     const allData = JSON.parse(stored);
-    if (allData[walletAddress]) {
+    if (
+      walletAddress &&
+      allData[walletAddress] &&
+      category &&
+      allData[walletAddress][category]
+    ) {
       delete allData[walletAddress][category];
       if (Object.keys(allData[walletAddress]).length === 0) {
         delete allData[walletAddress];

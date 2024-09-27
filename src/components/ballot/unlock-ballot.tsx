@@ -3,6 +3,7 @@ import { RiLockUnlockFill } from '@remixicon/react';
 import { useRouter } from 'next/navigation';
 import { ComponentProps, useState, useCallback } from 'react';
 import { useAccount } from 'wagmi';
+import { useQueryClient } from '@tanstack/react-query';
 import { LoadingDialog } from '../common/loading-dialog';
 import {
   AlertDialog,
@@ -23,6 +24,8 @@ export function UnlockBallotDialog({
   const [isUnlockedLoading, setIsUnlockedLoading] = useState(false);
   const router = useRouter();
   const { address } = useAccount();
+  const queryClient = useQueryClient();
+  const roundId = 5;
 
   const handleUnlock = useCallback(() => {
     setIsUnlockedLoading(true);
@@ -32,9 +35,13 @@ export function UnlockBallotDialog({
       if (address) {
         localStorage.setItem(`ballot_unlocked_${address}`, 'true');
       }
+
+      queryClient.invalidateQueries({ queryKey: ['budget', address, roundId] });
+      queryClient.invalidateQueries({ queryKey: ['ballot', address, roundId] });
+
       router.push('/ballot');
-    }, 2000);
-  }, [router, setOpen, address]);
+    }, 1000);
+  }, [router, setOpen, address, queryClient, roundId]);
 
   return (
     <>

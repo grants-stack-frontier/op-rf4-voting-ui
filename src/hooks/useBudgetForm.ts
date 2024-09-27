@@ -243,17 +243,48 @@ export function useBudgetForm() {
 
   const toggleLock = useCallback(
     (categoryId: CategoryId) => {
-      setLockedFields((prev) => {
-        const newLockedState = !prev[categoryId];
-        saveAllocationToBackend(
-          categoryId,
-          allocations[categoryId],
-          newLockedState
-        );
-        return { ...prev, [categoryId]: newLockedState };
+      setLockedFields((prevLockedFields) => {
+        const newLockedState = !prevLockedFields[categoryId];
+        const newLockedFields = {
+          ...prevLockedFields,
+          [categoryId]: newLockedState,
+        };
+
+        setAllocations((prevAllocations) => {
+          const totalLockedAllocation = Object.entries(newLockedFields)
+            .filter(([id, isLocked]) => isLocked)
+            .reduce((sum, [id, _]) => sum + prevAllocations[id], 0);
+
+          const unlockedCategoryIds = Object.keys(newLockedFields).filter(
+            (id) => !newLockedFields[id]
+          );
+
+          const remainingAllocation = 100 - totalLockedAllocation;
+          const newAllocations = { ...prevAllocations };
+
+          if (unlockedCategoryIds.length > 0) {
+            const equalAllocation =
+              remainingAllocation / unlockedCategoryIds.length;
+            unlockedCategoryIds.forEach((id) => {
+              newAllocations[id] = equalAllocation;
+            });
+          }
+
+          Object.keys(newAllocations).forEach((id) => {
+            saveAllocationToBackend(
+              id as CategoryId,
+              newAllocations[id],
+              newLockedFields[id]
+            );
+          });
+
+          return newAllocations;
+        });
+
+        return newLockedFields;
       });
     },
-    [allocations, saveAllocationToBackend]
+    [saveAllocationToBackend]
   );
 
   const saveTotalBudgetToBackend = useCallback(

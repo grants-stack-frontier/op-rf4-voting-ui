@@ -81,28 +81,11 @@ export function ReposLinksContracts({
           num_stars,
           num_trusted_stars,
         } = typedRepo.metrics ?? {};
-        if (!typedRepo.description) {
-          return (
-            <Card className="shadow-none" key={index}>
-              <CardContent className="px-2.5 py-3">
-                <div className="flex items-center gap-2">
-                  <RiGithubFill className="h-5 w-5" />
-                  <Link
-                    className="text-sm font-medium leading-5 hover:underline"
-                    href={typedRepo.url}
-                    target="_blank"
-                  >
-                    {typedRepo.name || typedRepo.url}
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        }
+
         return (
           <CustomAccordion
             key={index}
-            value={typedRepo.name ?? ''}
+            value={`githubMetrics-${index}`}
             trigger={
               <div className="flex items-center gap-2">
                 <RiGithubFill className="h-5 w-5" />
@@ -116,52 +99,59 @@ export function ReposLinksContracts({
               </div>
             }
           >
-            <div className="p-2">
-              {typedRepo.description ?? 'No description'}
-            </div>
-            {typedRepo.metrics && (
-              <div className="grid grid-cols-3 gap-2 p-2">
-                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                  <RiTimeFill className="h-4 w-4" />{' '}
-                  <span>
-                    {formatProjectAge(Number(age_of_project_years) ?? 0)} old
-                  </span>
-                </div>
-                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                  <RiUserFill className="h-4 w-4" />{' '}
-                  <span>{Number(num_contributors)} contributors</span>
-                </div>
-                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                  <RiUserStarFill className="h-4 w-4" />{' '}
-                  <span>
-                    {Number(num_trusted_contributors)} trusted contributors
-                  </span>
-                </div>
-                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                  <RiUserFill className="h-4 w-4" />{' '}
-                  <span>
-                    {Number(num_contributors_last_6_months)} contributors last 6
-                    months
-                  </span>
-                </div>
-                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                  <RiGitForkFill className="h-4 w-4" />{' '}
-                  <span>{Number(num_forks)} forks</span>
-                </div>
-                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                  <RiGitForkFill className="h-4 w-4" />{' '}
-                  <span>{Number(num_trusted_forks)} trusted forks</span>
-                </div>
-                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                  <RiStarFill className="h-4 w-4" />{' '}
-                  <span>{Number(num_stars)} stars</span>
-                </div>
-                <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
-                  <RiStarFill className="h-4 w-4" />{' '}
-                  <span>{Number(num_trusted_stars)} trusted stars</span>
-                </div>
+            {typedRepo.description && (
+              <div className="p-2">
+                {typedRepo.description ?? 'No description'}
               </div>
             )}
+            <div className="grid grid-cols-3 gap-2 p-2">
+              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                <RiTimeFill className="h-4 w-4" />{' '}
+                <span>
+                  {formatProjectAge(Number(age_of_project_years) ?? 0)} old
+                </span>
+              </div>
+              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                <RiUserFill className="h-4 w-4" />{' '}
+                <span>
+                  {Number(num_contributors).toLocaleString()} contributors
+                </span>
+              </div>
+              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                <RiUserStarFill className="h-4 w-4" />{' '}
+                <span>
+                  {Number(num_trusted_contributors).toLocaleString()} trusted
+                  contributors
+                </span>
+              </div>
+              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                <RiUserFill className="h-4 w-4" />{' '}
+                <span>
+                  {Number(num_contributors_last_6_months).toLocaleString()}{' '}
+                  contributors last 6 months
+                </span>
+              </div>
+              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                <RiGitForkFill className="h-4 w-4" />{' '}
+                <span>{Number(num_forks).toLocaleString()} forks</span>
+              </div>
+              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                <RiGitForkFill className="h-4 w-4" />{' '}
+                <span>
+                  {Number(num_trusted_forks).toLocaleString()} trusted forks
+                </span>
+              </div>
+              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                <RiStarFill className="h-4 w-4" />{' '}
+                <span>{Number(num_stars).toLocaleString()} stars</span>
+              </div>
+              <div className="bg-secondary p-2 rounded-md flex items-center gap-2">
+                <RiStarFill className="h-4 w-4" />{' '}
+                <span>
+                  {Number(num_trusted_stars).toLocaleString()} trusted stars
+                </span>
+              </div>
+            </div>
           </CustomAccordion>
         );
       })}
@@ -189,24 +179,6 @@ export function ReposLinksContracts({
           url: string;
           description: string;
         };
-        if (!typedLink.description) {
-          return (
-            <Card className="shadow-none" key={index}>
-              <CardContent className="px-2.5 py-3">
-                <div className="flex items-center gap-2">
-                  <RiLink className="h-5 w-5" />
-                  <Link
-                    className="text-sm font-medium leading-5 hover:underline"
-                    href={typedLink.url}
-                    target="_blank"
-                  >
-                    {typedLink.name || typedLink.url}
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        }
         return (
           <CustomAccordion
             key={index}
@@ -224,9 +196,11 @@ export function ReposLinksContracts({
               </div>
             }
           >
-            <div className="p-2">
-              {typedLink.description ?? 'No description'}
-            </div>
+            {typedLink.description && (
+              <div className="p-2">
+                {typedLink.description ?? 'No description'}
+              </div>
+            )}
           </CustomAccordion>
         );
       })}
@@ -236,7 +210,9 @@ export function ReposLinksContracts({
         );
         const { name, blockExplorers } = chain ?? {};
         const { url } = blockExplorers?.default ?? {};
-        const icon = `https://icons.llamao.fi/icons/chains/rsz_${name === 'Mode Mainnet' ? 'mode' : name?.toLowerCase()}.jpg`;
+        const icon = `https://icons.llamao.fi/icons/chains/rsz_${
+          name === 'Mode Mainnet' ? 'mode' : name?.toLowerCase()
+        }.jpg`;
         return (
           <Card className="shadow-none" key={index}>
             <CardContent className="px-2.5 py-3">
