@@ -14,7 +14,7 @@ export function useBudgetForm() {
   const { address } = useAccount();
   const allProjectsByCategory = useAllProjectsByCategory();
   const { getBudget, saveAllocation } = useBudget(roundId);
-  const [totalBudget, setTotalBudget] = useState<number>(2000000);
+  const [totalBudget, setTotalBudget] = useState<number>(8000000);
   const [allocations, setAllocations] = useState<Record<string, number>>({});
   const [lockedFields, setLockedFields] = useState<Record<string, boolean>>({});
   const [error, setError] = useState('');
