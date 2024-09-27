@@ -4,11 +4,9 @@ import { Card } from '@/components/ui/card';
 import { useAccount } from 'wagmi';
 
 import { useBallotRound5Context } from '@/components/ballot/provider5';
-import { downloadImage } from '@/components/ballot/submit-dialog';
 import { SubmitRound5Dialog } from '@/components/ballot/submit-dialog5';
 import { PageView } from '@/components/common/page-view';
 import { SearchInput } from '@/components/common/search-input';
-import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -27,12 +25,9 @@ import {
   useDistributionMethod,
   saveDistributionMethodToLocalStorage,
 } from '@/hooks/useBallotRound5';
-import { formatDate } from '@/lib/utils';
-import { ArrowDownToLineIcon, LoaderIcon, Menu } from 'lucide-react';
-import Image from 'next/image';
+import { LoaderIcon, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { ComponentProps, useEffect, useMemo, useState } from 'react';
-import VotingSuccess from '../../../public/RetroFunding_Round4_IVoted@2x.png';
 import { MetricsEditor } from '../../components/metrics-editor';
 import { CategoryId } from '@/types/shared';
 import { useProjectsByCategory } from '@/hooks/useProjects';
@@ -40,25 +35,13 @@ import { useVotingCategory } from '@/hooks/useVotingCategory';
 import { NumberInput } from '@/components/ui/number-input';
 import { Input } from '@/components/ui/input';
 
-function formatAllocationOPAmount(amount?: number) {
-  if (amount === undefined) return 0;
+function formatAllocationOPAmount(amount?: number): string {
+  if (amount === undefined) return '0';
 
-  const value = amount.toString();
-  const pointIndex = value.indexOf('.');
-  const exists = pointIndex !== -1;
-  const numWithCommas = value
-    .slice(0, exists ? pointIndex : value.length)
-    .replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  if (exists) {
-    const cutoffPoint = 3;
-    const decimals = value.slice(pointIndex);
-    if (decimals.length <= cutoffPoint) {
-      return numWithCommas + decimals;
-    }
-    const float = parseFloat(decimals).toFixed(cutoffPoint);
-    return numWithCommas + float.slice(1);
-  }
-  return numWithCommas;
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 3,
+  }).format(amount);
 }
 
 const impactScores: { [key: number]: string } = {
@@ -438,8 +421,8 @@ function YourBallot() {
 
                         const newProjectList = [...projectList];
                         newProjectList[i].allocation = isNaN(newAllocation)
-                          ? '0'
-                          : inputValue;
+                          ? 0
+                          : Number(inputValue);
                         newProjectList[i].allocationInput = inputValue;
                         setProjectList(newProjectList);
 
@@ -461,7 +444,7 @@ function YourBallot() {
                   <div className="text-muted-foreground text-xs">
                     {formatAllocationOPAmount(
                       (totalAllocationAmount *
-                        (parseFloat(proj.allocation) || 0)) /
+                        (parseFloat(proj.allocationInput) || 0)) /
                         100
                     )}{' '}
                     OP
