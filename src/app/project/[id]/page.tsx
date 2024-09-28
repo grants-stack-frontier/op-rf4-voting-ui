@@ -91,6 +91,14 @@ export default function ProjectDetailsPage({
     }
   }, [address, allProjectsScored]);
 
+  const votedCount = useMemo(() => {
+    if (!projectsScored || !ballot || !projects) return 0;
+    const ballotAllocationsCount = ballot.project_allocations?.length ?? 0;
+    const scoredCount = projectsScored.votedCount ?? 0;
+    // Use the maximum of scored count and ballot allocations
+    return Math.max(scoredCount, ballotAllocationsCount);
+  }, [ballot, projectsScored, projects]);
+
   const handleNavigation = useCallback(() => {
     if (sortedProjects.length > 0 && projectsScored) {
       // First, try to find a project that hasn't been voted or skipped
@@ -167,7 +175,7 @@ export default function ProjectDetailsPage({
     return (
       <LoadingDialog
         isOpen={true}
-        setOpen={() => {}}
+        setOpen={() => { }}
         message="Loading project"
       />
     );
@@ -194,7 +202,7 @@ export default function ProjectDetailsPage({
           <ReviewSidebar
             onScoreSelect={handleScore}
             onConflictOfInterest={setIsConflictOfInterestDialogOpen}
-            votedCount={projectsScored?.votedCount}
+            votedCount={votedCount}
             totalProjects={sortedProjects.length}
             isLoading={isProjectScoringLoading}
             isSaving={isSaving}
