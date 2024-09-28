@@ -60,7 +60,6 @@ export const useProjectScoring = (
         totalAllocations !== totalProjects) ||
       storedProjectsScored.votedCount > totalAllocations
     ) {
-      console.log('storedProjectsScored', storedProjectsScored);
       return storedProjectsScored;
     } else {
       if (storedProjectsScored.votedCount === totalProjects) {

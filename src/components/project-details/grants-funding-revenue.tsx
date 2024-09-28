@@ -12,7 +12,6 @@ export function GrantsFundingRevenue({
 }: {
   grantsAndFunding?: ProjectGrantsAndFunding;
 }) {
-  console.log('grantsAndFunding', grantsAndFunding);
   if (
     !grantsAndFunding ||
     ((!grantsAndFunding.grants || grantsAndFunding.grants.length === 0) &&
@@ -132,7 +131,6 @@ export function GrantsFundingRevenue({
     );
   };
 
-  console.log('grantsAndFunding', grantsAndFunding);
   return (
     <div className="flex flex-col gap-2">
       <Heading className="text-sm font-medium leading-5" variant="h1">

@@ -47,7 +47,6 @@ function ImportBallotButton() {
 
   const importCSV = useCallback(
     (csvString: string) => {
-      console.log('import csv');
       // Parse CSV and build the ballot data (remove name column)
       const { data } = parse<Round4Allocation>(csvString);
       const allocations = data
@@ -64,7 +63,6 @@ function ImportBallotButton() {
           'One or more of the metric IDs were not correct and have been removed.'
         );
       }
-      console.log(allocations);
       editor.reset(allocations);
 
       mixpanel.track('Import CSV', { ballotSize: allocations.length });
@@ -119,7 +117,6 @@ export function exportBallot(ballot: Round4Allocation[]) {
     })),
     {}
   );
-  console.log(csv);
   mixpanel.track('Export CSV', { ballotSize: ballot.length });
   window.open(`data:text/csv;charset=utf-8,${csv}`);
 }

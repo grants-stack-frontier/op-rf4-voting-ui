@@ -9,14 +9,12 @@ export const request = ky.extend({
     beforeRequest: [
       async (request) => {
         const token = getToken();
-        console.log({ token });
         if (token) {
           const decodedToken = decodeJwt<{
             siwe: { address: Address };
             isBadgeholder?: boolean;
             category: string;
           }>(token!);
-          console.log({ decodedToken });
           request.headers.set('Authorization', `Bearer ${token}`);
           request.headers.set('Content-Type', 'application/json');
         }

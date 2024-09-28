@@ -131,19 +131,6 @@ function YourBallot() {
     return getBudget.data?.budget ? getBudget.data.budget / 3 : 0;
   }, [getBudget.data, votingCategory]);
 
-  console.log({ ballot });
-  console.log({ projects });
-  console.log(
-    'Diff:',
-    projects?.filter(
-      (p) =>
-        !ballot?.project_allocations?.find(
-          (p2) =>
-            p2.project_id?.toLowerCase() === p.applicationId?.toLowerCase()
-        )
-    )
-  );
-
   const [projectList, setProjectList] = useState<ProjectAllocationState[]>(
     sortAndPrepProjects(ballot?.project_allocations || [], 'no-conflict')
   );
@@ -346,7 +333,6 @@ function YourBallot() {
                         onChange={async (e) => {
                           const newIndex =
                             parseInt(e.currentTarget.value, 10) - 1;
-                          console.log({ newIndex });
                           if (
                             isMovable &&
                             // newIndex >= 0 &&
@@ -380,10 +366,6 @@ function YourBallot() {
                             Number(proj.position) !==
                               Number(proj.positionInput) - 1
                           ) {
-                            console.log({
-                              position: proj.position,
-                              positionInput: proj.positionInput,
-                            });
                             const newProjects = [...projectList];
                             const [movedProject] = newProjects.splice(i, 1);
                             newProjects.splice(newIndex, 0, movedProject);

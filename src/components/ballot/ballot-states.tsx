@@ -39,7 +39,6 @@ export function EmptyBallot() {
       toBeEvaluated: 0,
     };
   }, [ballot]);
-  console.log('Ballot (Empty Card):', ballot);
   return (
     <>
       <p>

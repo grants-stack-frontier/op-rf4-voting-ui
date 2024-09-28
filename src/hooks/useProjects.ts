@@ -138,14 +138,12 @@ export function useSaveProjects() {
         impact: 0 | 1 | 2 | 3 | 4 | 5;
       }[]
     ) => {
-      console.log('Saving projects from import:', projects, projects.length);
       await request
         .post(`${agoraRoundsAPI}/ballots/${address}/projects`, {
           json: { projects },
         })
         .json<any>()
         .then((r) => {
-          console.log(r);
           queryClient.setQueryData(['ballot-round5', address], r);
           return r;
         });
