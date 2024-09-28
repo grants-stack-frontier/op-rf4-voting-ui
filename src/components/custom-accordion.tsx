@@ -25,7 +25,7 @@ export function CustomAccordion({
     >
       <AccordionItem className="border-b-0" value={value}>
         <AccordionTrigger className="hover:no-underline px-3 py-2.5">
-          <div className="flex items-center gap-2">{trigger}</div>
+          <div className="flex items-center gap-3">{trigger}</div>
         </AccordionTrigger>
         <AccordionContent>{children}</AccordionContent>
       </AccordionItem>
