@@ -12,6 +12,7 @@ export function GrantsFundingRevenue({
 }: {
   grantsAndFunding?: ProjectGrantsAndFunding;
 }) {
+  console.log('grantsAndFunding', grantsAndFunding);
   if (
     !grantsAndFunding ||
     ((!grantsAndFunding.grants || grantsAndFunding.grants.length === 0) &&
@@ -44,7 +45,7 @@ export function GrantsFundingRevenue({
   };
 
   const renderItem = (item: any, type: string, index: number) => {
-    const { amount, date, details, link, grant, year } = item;
+    const { amount, date, details, link, grant, year, fundingRound } = item;
     const isUSDType = type === 'Investment' || type === 'Venture Funding';
     const formattedAmount =
       amount && Number(amount) > 0
@@ -85,6 +86,12 @@ export function GrantsFundingRevenue({
             </p>
           </Link>
         )}
+        {fundingRound && (
+          <div className="flex items-center gap-2 text-sm font-normal leading-5">
+            <RiTimeFill className="h-5 w-5" />
+            Round {fundingRound}
+          </div>
+        )}
         {(date || year) && (
           <div className="flex items-center gap-2 text-sm font-normal leading-5">
             <RiTimeFill className="h-5 w-5" />
@@ -118,13 +125,14 @@ export function GrantsFundingRevenue({
 
     return (
       <Card className="shadow-none" key={`${type}-${grant || amount}-${index}`}>
-        <CardContent className="flex items-center gap-2 px-2.5 py-3">
+        <CardContent className="flex items-center gap-3 px-2.5 py-3">
           {header}
         </CardContent>
       </Card>
     );
   };
 
+  console.log('grantsAndFunding', grantsAndFunding);
   return (
     <div className="flex flex-col gap-2">
       <Heading className="text-sm font-medium leading-5" variant="h1">
