@@ -117,7 +117,7 @@ function YourBallot() {
   const { data: projects } = useProjectsByCategory(
     votingCategory as CategoryId
   );
-  const { data: distributionMethod, refetch } =
+  const { data: distributionMethod, refetch, update: updateDistributionMethodLocally } =
     useDistributionMethodFromLocalStorage();
 
   const { mutate: redistribute } = useDistributionMethod();
@@ -417,10 +417,9 @@ function YourBallot() {
                         newProjectList[i].allocationInput = inputValue;
                         setProjectList(newProjectList);
 
-                        saveDistributionMethodToLocalStorage(
+                        updateDistributionMethodLocally(
                           DistributionMethod.CUSTOM
                         );
-                        refetch();
                       }}
                       onBlur={() => {
                         saveAllocation({
