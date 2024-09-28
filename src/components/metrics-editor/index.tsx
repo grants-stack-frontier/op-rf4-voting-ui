@@ -1,6 +1,6 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { useMemo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { BallotFilter } from '../ballot/ballot-filter';
 import { Card } from '../ui/card';
 import {
@@ -14,17 +14,12 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from '@/components/ui/hover-card';
-import { useVotingCategory } from '@/hooks/useVotingCategory';
-import { useBallotRound5Context } from '../ballot/provider5';
-import { useBudgetContext } from '../budget/provider';
 import { ResetButton } from './reset-button';
 import Impact from '../../../public/chart-impact.svg';
 import TopBottom from '../../../public/chart-top-bottom.svg';
 import TopWeighted from '../../../public/chart-top-weighted.svg';
 import Custom from '../../../public/chart-custom.svg';
-import { useQueryClient } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
-import { useBudget } from '@/hooks/useBudget';
 
 export function BlueCircleCheckIcon() {
   return (
@@ -44,15 +39,18 @@ export function BlueCircleCheckIcon() {
 }
 
 export function MetricsEditor({ budget }: { budget: number }) {
-  const { ballot } = useBallotRound5Context();
+  const { address } = useAccount();
   const { mutate: saveDistributionMethod } = useDistributionMethod();
   const { data: distributionMethod, refetch } =
     useDistributionMethodFromLocalStorage();
-  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
-  const votingCategory = useVotingCategory();
+  const [selectedMethod, setSelectedMethod] =
+    useState<DistributionMethod | null>(null);
 
   useEffect(() => {
-    setSelectedMethod(distributionMethod || null);
+    if (distributionMethod) {
+      console.log('distributionMethod', distributionMethod);
+      setSelectedMethod(distributionMethod as DistributionMethod);
+    }
   }, [distributionMethod]);
 
   const allocationMethods = [
@@ -128,8 +126,11 @@ export function MetricsEditor({ budget }: { budget: number }) {
               'border-2 border-[#BCBFCD]': selectedMethod === method.method,
             })}
             onClick={() => {
-              setSelectedMethod(method.method);
-              saveDistributionMethodToLocalStorage(method.method);
+              setSelectedMethod(method.method as DistributionMethod);
+              saveDistributionMethodToLocalStorage(
+                method.method as DistributionMethod,
+                address
+              );
               if (
                 method.method === DistributionMethod.IMPACT_GROUPS ||
                 method.method === DistributionMethod.TOP_TO_BOTTOM ||

@@ -199,7 +199,7 @@ export default function ProjectDetailsPage({
     return (
       <LoadingDialog
         isOpen={true}
-        setOpen={() => { }}
+        setOpen={() => {}}
         message="Loading project"
       />
     );
