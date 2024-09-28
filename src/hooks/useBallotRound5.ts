@@ -247,60 +247,71 @@ export enum DistributionMethod {
 }
 
 export function saveDistributionMethodToLocalStorage(
-  method: DistributionMethod | string
+  method: DistributionMethod | null,
+  address?: string
 ) {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('distributionMethod', method);
+  if (typeof window !== 'undefined' && address) {
+    const storageKey = `distributionMethod_${address.toLowerCase()}`;
+    if (method === null) {
+      localStorage.removeItem(storageKey);
+    } else {
+      localStorage.setItem(storageKey, method);
+    }
   }
 }
 
-export function getDistributionMethodFromLocalStorage():
-  | DistributionMethod
-  | string
-  | null {
+export function getDistributionMethodFromLocalStorage(
+  address: string
+): DistributionMethod | null {
   if (typeof window !== 'undefined') {
-    const savedMethod = localStorage.getItem('distributionMethod');
+    const storageKey = `distributionMethod_${address.toLowerCase()}`;
+    const savedMethod = localStorage.getItem(storageKey);
     return savedMethod as DistributionMethod | null;
   }
   return null;
 }
 
 export function useDistributionMethodFromLocalStorage() {
+  const { address } = useAccount();
   const queryClient = useQueryClient();
 
-  const getDistributionMethod = useQuery({
-    queryKey: ['distribution-method-local-storage'],
-    queryFn: () => getDistributionMethodFromLocalStorage(),
-    initialData: getDistributionMethodFromLocalStorage,
+  const query = useQuery({
+    queryKey: ['distribution-method-local-storage', address],
+    queryFn: () => getDistributionMethodFromLocalStorage(address!),
+    enabled: !!address,
   });
 
   const update = useMutation({
-    mutationKey: ['update-distribution-method-local-storage'],
-    mutationFn: async (method: DistributionMethod) => {
-      saveDistributionMethodToLocalStorage(method);
-      queryClient.setQueryData(['distribution-method-local-storage'], method);
+    mutationFn: async (method: DistributionMethod | null) => {
+      saveDistributionMethodToLocalStorage(method, address!);
+      return method;
+    },
+    onSuccess: (method) => {
+      queryClient.setQueryData(
+        ['distribution-method-local-storage', address],
+        method
+      );
     },
   });
 
+  const reset = () => {
+    update.mutate(null);
+  };
+
   return {
-    ...getDistributionMethod,
+    ...query,
     update: update.mutate,
+    reset,
   };
 }
 
 export function useDistributionMethod() {
   const { address } = useAccount();
-  // return useQuery({
-  //   enabled: Boolean(address),
-  //   queryKey: ["distribution-method", address],
-  //   queryFn: async () =>
-  //     request.post(`${agoraRoundsAPI}/ballots/${address}/distribution_method`, {
-  //       json: { distribution_method },
-  //     }).json(),
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
   return useMutation({
-    mutationKey: ['save-round5-distribution-method'],
+    mutationKey: ['save-round5-distribution-method', address],
     mutationFn: async (distribution_method: DistributionMethod) => {
       const res = await request
         .post(
@@ -311,11 +322,11 @@ export function useDistributionMethod() {
         .then((r) => {
           console.log('Distribution method response:', r);
           queryClient.setQueryData(['ballot-round5', address], r);
+          saveDistributionMethodToLocalStorage(distribution_method, address!);
           return r;
         });
       return res;
     },
-    // onSuccess: debounceToast,
     onMutate: () =>
       toast({
         title: 'Loading...',
