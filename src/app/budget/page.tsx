@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { DisconnectedState } from '@/components/common/disconnected-state';
 import { useAccount } from 'wagmi';
 import { Loader2 } from 'lucide-react';
+import { PostSubmissionBanner } from '@/components/ballot/post-submission-banner';
 
 export default function BudgetBallotPage() {
   const { isConnecting, isConnected } = useAccount();
@@ -43,6 +44,7 @@ export default function BudgetBallotPage() {
     <BudgetProvider>
       <div className="flex flex-row gap-12">
         <section className="flex-grow max-w-[720px] space-y-6">
+          <PostSubmissionBanner />
           <BallotTabs />
           <p className="text-gray-600">
             Decide on the budget for this round, and then decide how much should

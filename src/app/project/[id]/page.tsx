@@ -33,6 +33,8 @@ export default function ProjectDetailsPage({
   const { ballot } = useBallotRound5Context();
   const { address } = useAccount();
 
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
+
   const currentProject = useMemo(
     () => (project ? { ...project } : undefined),
     [project]
@@ -57,8 +59,6 @@ export default function ProjectDetailsPage({
     ProjectsScored | undefined
   >(undefined);
 
-  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
-
   const {
     allProjectsScored,
     handleScoreSelect,
@@ -81,15 +81,31 @@ export default function ProjectDetailsPage({
     currentProject?.applicationId ?? id
   );
 
+  const isLastProject = useMemo(() => {
+    if (!projectsScored || !sortedProjects) return false;
+    return projectsScored.votedCount === sortedProjects.length - 1;
+  }, [projectsScored, sortedProjects]);
+
   useEffect(() => {
     if (address && allProjectsScored) {
-      const ballotUnlocked =
-        localStorage.getItem(`ballot_unlocked_${address}`) === 'true';
-      if (!ballotUnlocked) {
+      const dialogShown = localStorage.getItem(
+        `unlock_dialog_shown_${address}`
+      );
+      const ballotUnlocked = localStorage.getItem(`ballot_unlocked_${address}`);
+      if (!dialogShown && !ballotUnlocked) {
         setShowUnlockDialog(true);
+        localStorage.setItem(`unlock_dialog_shown_${address}`, 'true');
       }
     }
   }, [address, allProjectsScored]);
+
+  const votedCount = useMemo(() => {
+    if (!projectsScored || !ballot || !projects) return 0;
+    const ballotAllocationsCount = ballot.project_allocations?.length ?? 0;
+    const scoredCount = projectsScored.votedCount ?? 0;
+    // Use the maximum of scored count and ballot allocations
+    return Math.max(scoredCount, ballotAllocationsCount);
+  }, [ballot, projectsScored, projects]);
 
   const handleNavigation = useCallback(() => {
     if (sortedProjects.length > 0 && projectsScored) {
@@ -127,10 +143,26 @@ export default function ProjectDetailsPage({
 
   const handleScore = useCallback(
     async (score: ImpactScore) => {
-      await handleScoreSelect(score);
-      handleNavigation();
+      const { allProjectsScored } = await handleScoreSelect(score);
+
+      if (isLastProject || allProjectsScored) {
+        const dialogShown = localStorage.getItem(
+          `unlock_dialog_shown_${address}`
+        );
+        const ballotUnlocked = localStorage.getItem(
+          `ballot_unlocked_${address}`
+        );
+        if (!dialogShown && !ballotUnlocked) {
+          setShowUnlockDialog(true);
+          localStorage.setItem(`unlock_dialog_shown_${address}`, 'true');
+        } else {
+          handleNavigation();
+        }
+      } else {
+        handleNavigation();
+      }
     },
-    [handleScoreSelect, handleNavigation]
+    [handleScoreSelect, handleNavigation, isLastProject, address]
   );
 
   const {
@@ -167,7 +199,7 @@ export default function ProjectDetailsPage({
     return (
       <LoadingDialog
         isOpen={true}
-        setOpen={() => {}}
+        setOpen={() => { }}
         message="Loading project"
       />
     );
@@ -194,7 +226,7 @@ export default function ProjectDetailsPage({
           <ReviewSidebar
             onScoreSelect={handleScore}
             onConflictOfInterest={setIsConflictOfInterestDialogOpen}
-            votedCount={projectsScored?.votedCount}
+            votedCount={votedCount}
             totalProjects={sortedProjects.length}
             isLoading={isProjectScoringLoading}
             isSaving={isSaving}

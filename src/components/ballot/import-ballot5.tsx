@@ -1,6 +1,17 @@
 'use client';
 
+import { useSession } from '@/hooks/useAuth';
+import {
+  Round5ProjectAllocation,
+  useRound5Ballot,
+} from '@/hooks/useBallotRound5';
+import { ImpactScore } from '@/hooks/useProjectImpact';
+import { useProjectsByCategory, useSaveProjects } from '@/hooks/useProjects';
+import { format, parse } from '@/lib/csv';
+import mixpanel from '@/lib/mixpanel';
+import { CategoryId } from '@/types/shared';
 import { ComponentProps, useCallback, useRef } from 'react';
+import { useAccount } from 'wagmi';
 import { Button } from '../ui/button';
 import {
   Dialog,
@@ -9,24 +20,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../ui/dialog';
-import { format, parse } from '@/lib/csv';
-import {
-  Round5ProjectAllocation,
-  useRound5Ballot,
-  useSaveRound5Allocation,
-} from '@/hooks/useBallotRound5';
-import mixpanel from '@/lib/mixpanel';
-import { useBallotRound5Context } from './provider5';
-import {
-  useProjects,
-  useProjectsByCategory,
-  useSaveProjects,
-} from '@/hooks/useProjects';
-import { ImpactScore } from '@/hooks/useProjectImpact';
-import { useAccount } from 'wagmi';
 import { toast } from '../ui/use-toast';
-import { useSession } from '@/hooks/useAuth';
-import { CategoryId } from '@/types/shared';
+import { useBallotRound5Context } from './provider5';
 
 export function ImportBallotDialog({
   isOpen,
@@ -182,5 +177,19 @@ export function exportRound5Ballot(ballot: Round5ProjectAllocation[]) {
   );
   console.log(csv);
   mixpanel.track('Export CSV', { ballotSize: ballot.length });
-  window.open(`data:text/csv;charset=utf-8,${csv}`);
+
+  // Create a Blob with the CSV content
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+
+  // Create a temporary anchor element and trigger the download
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'ballot_template.csv');
+  document.body.appendChild(link);
+  link.click();
+
+  // Clean up
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }

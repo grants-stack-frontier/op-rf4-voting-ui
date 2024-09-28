@@ -538,13 +538,21 @@ function YourBallot() {
 function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
   const allocationSum = useRound5BallotWeightSum();
   const [seconds] = useVotingTimeLeft(votingEndDate);
+  const {
+    getBudget: { data: budgetData },
+  } = useBudget(5);
+
+  const isBudgetIncomplete =
+    !budgetData?.budget ||
+    !budgetData.allocations ||
+    budgetData.allocations.length == 0;
 
   if (Number(seconds) < 0) {
     return null;
   }
   return (
     <Button
-      disabled={allocationSum !== 100}
+      disabled={allocationSum !== 100 || isBudgetIncomplete}
       variant={'destructive'}
       type="submit"
       onClick={onClick}
@@ -561,6 +569,9 @@ function WeightsError() {
   }, [allocationSum]);
 
   const { data: distributionMethod } = useDistributionMethodFromLocalStorage();
+  const {
+    getBudget: { data: budgetData },
+  } = useBudget(5);
 
   if (!distributionMethod)
     return (
@@ -568,6 +579,23 @@ function WeightsError() {
         Choose an allocation method at the top of this ballot.
       </span>
     );
+
+  const isBudgetIncomplete =
+    !budgetData?.budget ||
+    !budgetData.allocations ||
+    budgetData.allocations.length == 0;
+
+  if (Math.abs(remainingAllocation) < 0.01 && isBudgetIncomplete) {
+    return (
+      <span className="text-sm text-destructive">
+        Please set{' '}
+        <a href={`/budget`} className="underline">
+          your budget and category allocations
+        </a>{' '}
+        before submitting.
+      </span>
+    );
+  }
 
   // Treat the allocation as complete if the remaining allocation is negligible
   if (Math.abs(remainingAllocation) < 0.01) return null;
