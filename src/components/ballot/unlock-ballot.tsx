@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
 } from '../ui/alert-dialog';
 import { Button } from '../ui/button';
+import { useBallotRound5Context } from '@/components/ballot/provider5';
 
 export function UnlockBallotDialog({
   isOpen,
@@ -26,22 +27,34 @@ export function UnlockBallotDialog({
   const { address } = useAccount();
   const queryClient = useQueryClient();
   const roundId = 5;
+  const { updateBallotState } = useBallotRound5Context();
 
-  const handleUnlock = useCallback(() => {
+  const handleUnlock = useCallback(async () => {
     setIsUnlockedLoading(true);
-    setTimeout(() => {
-      setIsUnlockedLoading(false);
-      setOpen?.(false);
+    try {
       if (address) {
         localStorage.setItem(`ballot_unlocked_${address}`, 'true');
       }
 
-      queryClient.invalidateQueries({ queryKey: ['budget', address, roundId] });
-      queryClient.invalidateQueries({ queryKey: ['ballot', address, roundId] });
+      await updateBallotState();
 
+      await queryClient.invalidateQueries({
+        queryKey: ['budget', address, roundId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ['ballot', address, roundId],
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setOpen?.(false);
       router.push('/ballot');
-    }, 1000);
-  }, [router, setOpen, address, queryClient, roundId]);
+    } catch (error) {
+      console.error('Error unlocking ballot:', error);
+    } finally {
+      setIsUnlockedLoading(false);
+    }
+  }, [router, setOpen, address, queryClient, roundId, updateBallotState]);
 
   return (
     <>

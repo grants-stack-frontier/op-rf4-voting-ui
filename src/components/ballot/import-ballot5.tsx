@@ -3,13 +3,10 @@
 import { useSession } from '@/hooks/useAuth';
 import {
   Round5ProjectAllocation,
-  useRound5Ballot
+  useRound5Ballot,
 } from '@/hooks/useBallotRound5';
 import { ImpactScore } from '@/hooks/useProjectImpact';
-import {
-  useProjectsByCategory,
-  useSaveProjects
-} from '@/hooks/useProjects';
+import { useProjectsByCategory, useSaveProjects } from '@/hooks/useProjects';
 import { format, parse } from '@/lib/csv';
 import mixpanel from '@/lib/mixpanel';
 import { CategoryId } from '@/types/shared';
@@ -154,11 +151,11 @@ function ExportBallotButton() {
   const { ballot } = useBallotRound5Context();
   const emptyBallot: any[] = ballot
     ? ballot.project_allocations.map((alloc) => ({
-      project_id: alloc.project_id,
-      name: alloc.name,
-      allocation: 0,
-      impact: alloc.impact,
-    }))
+        project_id: alloc.project_id,
+        name: alloc.name,
+        allocation: 0,
+        impact: alloc.impact,
+      }))
     : [{ project_id: '0x0', name: 'Some project', allocation: 0, impact: 0 }];
 
   return (
