@@ -538,9 +538,14 @@ function YourBallot() {
 function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
   const allocationSum = useRound5BallotWeightSum();
   const [seconds] = useVotingTimeLeft(votingEndDate);
-  const { getBudget: { data: budgetData } } = useBudget(5);
+  const {
+    getBudget: { data: budgetData },
+  } = useBudget(5);
 
-  const isBudgetIncomplete = !budgetData?.budget || !budgetData.allocations || budgetData.allocations.length == 0
+  const isBudgetIncomplete =
+    !budgetData?.budget ||
+    !budgetData.allocations ||
+    budgetData.allocations.length == 0;
 
   if (Number(seconds) < 0) {
     return null;
@@ -564,7 +569,9 @@ function WeightsError() {
   }, [allocationSum]);
 
   const { data: distributionMethod } = useDistributionMethodFromLocalStorage();
-  const { getBudget: { data: budgetData } } = useBudget(5);
+  const {
+    getBudget: { data: budgetData },
+  } = useBudget(5);
 
   if (!distributionMethod)
     return (
@@ -573,12 +580,21 @@ function WeightsError() {
       </span>
     );
 
-  const isBudgetIncomplete = !budgetData?.budget || !budgetData.allocations || budgetData.allocations.length == 0
+  const isBudgetIncomplete =
+    !budgetData?.budget ||
+    !budgetData.allocations ||
+    budgetData.allocations.length == 0;
 
   if (Math.abs(remainingAllocation) < 0.01 && isBudgetIncomplete) {
-    return <span className="text-sm text-destructive">
-      Please set <a href={`/budget`} className="underline">your budget and category allocations</a> before submitting.
-    </span>
+    return (
+      <span className="text-sm text-destructive">
+        Please set{' '}
+        <a href={`/budget`} className="underline">
+          your budget and category allocations
+        </a>{' '}
+        before submitting.
+      </span>
+    );
   }
 
   // Treat the allocation as complete if the remaining allocation is negligible

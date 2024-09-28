@@ -30,25 +30,41 @@ export function BudgetForm() {
   }, [isLoading]);
 
   useEffect(() => {
-    if (!initialLoad && totalBudget && (categories && categories.length > 0) && address && !isSaving) {
+    if (
+      !initialLoad &&
+      totalBudget &&
+      categories &&
+      categories.length > 0 &&
+      address &&
+      !isSaving
+    ) {
       autoSetBudgetAndAllocation(address, categories);
     }
   }, [initialLoad, getBudget.data, totalBudget, categories, address, isSaving]);
 
-  async function autoSetBudgetAndAllocation(address: string, categories: Category[]) {
+  async function autoSetBudgetAndAllocation(
+    address: string,
+    categories: Category[]
+  ) {
     setIsSaving(true);
-    const isAutosetting = !getBudget.data?.budget || !getBudget.data?.allocations || getBudget.data?.allocations.length !== categories.length
+    const isAutosetting =
+      !getBudget.data?.budget ||
+      !getBudget.data?.allocations ||
+      getBudget.data?.allocations.length !== categories.length;
     if (!getBudget.data?.budget) {
-      await updateRetroFundingRoundBudgetAllocation(5, address, totalBudget)
+      await updateRetroFundingRoundBudgetAllocation(5, address, totalBudget);
     }
-    if (!getBudget.data?.allocations || getBudget.data?.allocations.length !== categories.length) {
+    if (
+      !getBudget.data?.allocations ||
+      getBudget.data?.allocations.length !== categories.length
+    ) {
       await saveAllocation.mutateAsync({
         category_slug: categories[0].id,
         allocation: 33.34, // TODO: calculate this
         locked: false,
-      })
+      });
     }
-    if (isAutosetting) await getBudget.refetch()
+    if (isAutosetting) await getBudget.refetch();
     setIsSaving(false);
   }
 

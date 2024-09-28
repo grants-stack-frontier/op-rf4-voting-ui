@@ -33,6 +33,8 @@ export default function ProjectDetailsPage({
   const { ballot } = useBallotRound5Context();
   const { address } = useAccount();
 
+  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
+
   const currentProject = useMemo(
     () => (project ? { ...project } : undefined),
     [project]
@@ -57,8 +59,6 @@ export default function ProjectDetailsPage({
     ProjectsScored | undefined
   >(undefined);
 
-  const [showUnlockDialog, setShowUnlockDialog] = useState(false);
-
   const {
     allProjectsScored,
     handleScoreSelect,
@@ -81,12 +81,20 @@ export default function ProjectDetailsPage({
     currentProject?.applicationId ?? id
   );
 
+  const isLastProject = useMemo(() => {
+    if (!projectsScored || !sortedProjects) return false;
+    return projectsScored.votedCount === sortedProjects.length - 1;
+  }, [projectsScored, sortedProjects]);
+
   useEffect(() => {
     if (address && allProjectsScored) {
-      const ballotUnlocked =
-        localStorage.getItem(`ballot_unlocked_${address}`) === 'true';
-      if (!ballotUnlocked) {
+      const dialogShown = localStorage.getItem(
+        `unlock_dialog_shown_${address}`
+      );
+      const ballotUnlocked = localStorage.getItem(`ballot_unlocked_${address}`);
+      if (!dialogShown && !ballotUnlocked) {
         setShowUnlockDialog(true);
+        localStorage.setItem(`unlock_dialog_shown_${address}`, 'true');
       }
     }
   }, [address, allProjectsScored]);
@@ -127,10 +135,26 @@ export default function ProjectDetailsPage({
 
   const handleScore = useCallback(
     async (score: ImpactScore) => {
-      await handleScoreSelect(score);
-      handleNavigation();
+      const { allProjectsScored } = await handleScoreSelect(score);
+
+      if (isLastProject || allProjectsScored) {
+        const dialogShown = localStorage.getItem(
+          `unlock_dialog_shown_${address}`
+        );
+        const ballotUnlocked = localStorage.getItem(
+          `ballot_unlocked_${address}`
+        );
+        if (!dialogShown && !ballotUnlocked) {
+          setShowUnlockDialog(true);
+          localStorage.setItem(`unlock_dialog_shown_${address}`, 'true');
+        } else {
+          handleNavigation();
+        }
+      } else {
+        handleNavigation();
+      }
     },
-    [handleScoreSelect, handleNavigation]
+    [handleScoreSelect, handleNavigation, isLastProject, address]
   );
 
   const {
