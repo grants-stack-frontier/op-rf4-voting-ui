@@ -60,7 +60,6 @@ function ImportBallotButton({ onClose }: { onClose: () => void }) {
 
   const importCSV = useCallback(
     (csvString: string) => {
-      console.log('import csv');
       // Parse CSV and build the ballot data (remove name column)
       const { data } = parse<Round5ProjectAllocation>(csvString);
       const allocations = data.map(({ project_id, allocation, impact }) => ({
@@ -74,7 +73,6 @@ function ImportBallotButton({ onClose }: { onClose: () => void }) {
           'One or more of the project IDs were not correct and have been removed.'
         );
       }
-      console.log(allocations);
 
       editor.reset(
         allocations.map((alloc) => ({
@@ -110,7 +108,6 @@ function ImportBallotButton({ onClose }: { onClose: () => void }) {
           onClose();
         })
         .catch((e) => {
-          console.log(e);
           toast({
             title: 'Error importing ballot',
             variant: 'destructive',
@@ -175,7 +172,6 @@ export function exportRound5Ballot(ballot: Round5ProjectAllocation[]) {
     })),
     {}
   );
-  console.log(csv);
   mixpanel.track('Export CSV', { ballotSize: ballot.length });
 
   // Create a Blob with the CSV content

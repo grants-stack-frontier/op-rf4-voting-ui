@@ -39,7 +39,6 @@ export function EmptyBallot() {
       toBeEvaluated: 0,
     };
   }, [ballot]);
-  console.log('Ballot (Empty Card):', ballot);
   return (
     <>
       <p>
@@ -68,9 +67,9 @@ export function EmptyBallot() {
           {quantities.total} projects
         </Text>
         <div className="flex gap-2">
-          <Link href={`/project/${ballot?.projects_to_be_evaluated[0]}`}>
+          {/* <Link href={`/project/${ballot?.projects_to_be_evaluated[0]}`}>
             <Button variant="destructive">Score projects</Button>
-          </Link>
+          </Link> */}
           {/* <Button variant="outline" onClick={() => setOpen(true)}>
           Import ballot
         </Button> */}
@@ -139,48 +138,36 @@ function EmptyCard({
 function PairwiseCard() {
   return (
     <Card className="px-6 py-4 bg-[#F2F3F8]">
-      <Link
-        href="https://www.pairwise.vote/retrofunding5"
-        target="_blank"
-        className="w-full"
-        passHref
-      >
-        <div className="w-full flex items-center justify-between gap-4">
-          <Image
-            src={PairwiseLogo}
-            alt="Pairwise Logo"
-            width={112}
-            height={28}
-          />
-          <Separator orientation="vertical" className="h-10" />
-          <p className="text-sm text-left dark:text-black">
-            Alternatively, you can compare projects with{' '}
-            <a
-              href="https://www.pairwise.vote/retrofunding5"
-              target="_blank"
-              className="underline"
-            >
-              Pairwise
-            </a>
-            . Return here to complete and submit your ballot.
-          </p>
-          <Link href="https://www.pairwise.vote/retrofunding5" target="_blank">
-            <svg
-              className="cursor-pointer"
-              width="20"
-              height="20"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M13.3364 7.84518L6.16426 15.0173L4.98575 13.8388L12.1579 6.66667H5.83643V5H15.0031V14.1667H13.3364V7.84518Z"
-                fill="#0F111A"
-              />
-            </svg>
-          </Link>
-        </div>
-      </Link>
+      <div className="w-full flex items-center justify-between gap-4">
+        <Image src={PairwiseLogo} alt="Pairwise Logo" width={112} height={28} />
+        <Separator orientation="vertical" className="h-10" />
+        <p className="text-sm text-left dark:text-black">
+          Alternatively, you can compare projects with{' '}
+          <a
+            href="https://www.pairwise.vote/retrofunding5"
+            target="_blank"
+            className="underline"
+          >
+            Pairwise
+          </a>
+          . Return here to complete and submit your ballot.
+        </p>
+        <Link href="https://www.pairwise.vote/retrofunding5" target="_blank">
+          <svg
+            className="cursor-pointer"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M13.3364 7.84518L6.16426 15.0173L4.98575 13.8388L12.1579 6.66667H5.83643V5H15.0031V14.1667H13.3364V7.84518Z"
+              fill="#0F111A"
+            />
+          </svg>
+        </Link>
+      </div>
     </Card>
   );
 }

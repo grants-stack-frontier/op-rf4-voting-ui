@@ -64,7 +64,6 @@ export function useProjectSorting(
         router.push(`/project/${nextProject.applicationId}`);
       } else {
         // If no next project is found, you might want to handle this case
-        console.log('No more projects to vote on');
         // Optionally, redirect to a summary page or show a message
       }
     }

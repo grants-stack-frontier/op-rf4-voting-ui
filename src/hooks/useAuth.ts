@@ -25,7 +25,6 @@ export function useVerify() {
       const { access_token, ...rest } = await ky
         .post('/api/agora/auth/verify', { json })
         .json<{ access_token: string }>();
-      console.log(rest);
       mixpanel.track('Sign In', { status: 'success' });
       setToken(access_token);
       // Trigger a refetch of the session

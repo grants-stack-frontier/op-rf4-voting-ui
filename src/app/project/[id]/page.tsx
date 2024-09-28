@@ -135,8 +135,6 @@ export default function ProjectDetailsPage({
 
       if (nextProject) {
         router.push(`/project/${nextProject.applicationId}`);
-      } else {
-        console.log('No more projects to vote on');
       }
     }
   }, [sortedProjects, projectsScored, ballot, router, currentProject]);

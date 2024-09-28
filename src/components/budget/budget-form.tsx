@@ -25,7 +25,6 @@ export function BudgetForm() {
   useEffect(() => {
     if (!isLoading) {
       setInitialLoad(false);
-      console.log(getBudget.data);
     }
   }, [isLoading]);
 

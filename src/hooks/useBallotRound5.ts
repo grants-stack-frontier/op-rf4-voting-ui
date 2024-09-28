@@ -15,7 +15,6 @@ import debounce from 'lodash.debounce';
 import { useMemo, useRef } from 'react';
 import { useBallotRound5Context } from '@/components/ballot/provider5';
 import { CategoryId } from '@/types/shared';
-import { Loader2 } from 'lucide-react';
 import {
   RetroFunding5BallotSubmissionContent,
   SubmitRetroFundingBallotBody,
@@ -101,7 +100,6 @@ export function useSaveRound5Allocation() {
           queryClient.setQueryData(['ballot-round5', address], r);
           return r;
         });
-      console.log('Allocation response:', res);
       return res;
     },
     // onSuccess: debounceToast,
@@ -320,7 +318,6 @@ export function useDistributionMethod() {
         )
         .json<Round5Ballot>()
         .then((r) => {
-          console.log('Distribution method response:', r);
           queryClient.setQueryData(['ballot-round5', address], r);
           saveDistributionMethodToLocalStorage(distribution_method, address!);
           return r;
@@ -357,6 +354,5 @@ export function useRound5BallotWeightSum() {
     return sum / 100;
   }, [ballot]);
 
-  console.log('allocationSum', allocationSum);
   return allocationSum;
 }
