@@ -8,10 +8,13 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import SunnySVG from '../../public/sunny.svg';
+import { useSession } from '@/hooks/useAuth';
+import { SignMessage } from '@/components/auth/sign-message';
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const [hasMounted, setHasMounted] = useState(false);
   const { isConnecting, isConnected } = useAccount();
+  const { data: session, isLoading: isSessionLoading } = useSession();
 
   useEffect(() => {
     setHasMounted(true);
@@ -20,6 +23,8 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   if (!hasMounted) {
     return null;
   }
+
+  const showSignaturePrompt = isConnected && !isSessionLoading && !session;
 
   return (
     <main className="">
@@ -35,11 +40,13 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         <Callouts />
       </div>
       <div className="hidden sm:flex gap-8 max-w-[1072px] mx-auto py-16 justify-center">
-        {isConnecting ? (
+        {isConnecting || isSessionLoading ? (
           <div className="flex justify-center items-center h-screen">
             <Loader2 className="h-8 w-8 animate-spin" />
           </div>
-        ) : isConnected ? (
+        ) : showSignaturePrompt ? (
+          <SignMessage />
+        ) : isConnected && session ? (
           children
         ) : (
           <DisconnectedState />
