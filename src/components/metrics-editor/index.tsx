@@ -43,15 +43,6 @@ export function MetricsEditor({ budget }: { budget: number }) {
   const { mutate: saveDistributionMethod } = useDistributionMethod();
   const { data: distributionMethod, refetch } =
     useDistributionMethodFromLocalStorage();
-  const [selectedMethod, setSelectedMethod] =
-    useState<DistributionMethod | null>(null);
-
-  useEffect(() => {
-    if (distributionMethod) {
-      console.log('distributionMethod', distributionMethod);
-      setSelectedMethod(distributionMethod as DistributionMethod);
-    }
-  }, [distributionMethod]);
 
   const allocationMethods = [
     {
@@ -119,14 +110,13 @@ export function MetricsEditor({ budget }: { budget: number }) {
         {distributionMethod && <ResetButton />}
       </div>
       <div className="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-4">
-        {allocationMethods.map((method, index) => (
+        {allocationMethods.map((method) => (
           <Card
-            key={index}
+            key={method.name}
             className={cn('cursor-pointer p-3', {
-              'border-2 border-[#BCBFCD]': selectedMethod === method.method,
+              'border-2 border-[#BCBFCD]': distributionMethod === method.method,
             })}
             onClick={() => {
-              setSelectedMethod(method.method as DistributionMethod);
               saveDistributionMethodToLocalStorage(
                 method.method as DistributionMethod,
                 address

@@ -247,18 +247,22 @@ export enum DistributionMethod {
 }
 
 export function saveDistributionMethodToLocalStorage(
-  method: DistributionMethod | string,
+  method: DistributionMethod | null,
   address?: string
 ) {
   if (typeof window !== 'undefined' && address) {
     const storageKey = `distributionMethod_${address.toLowerCase()}`;
-    localStorage.setItem(storageKey, method);
+    if (method === null) {
+      localStorage.removeItem(storageKey);
+    } else {
+      localStorage.setItem(storageKey, method);
+    }
   }
 }
 
 export function getDistributionMethodFromLocalStorage(
   address: string
-): DistributionMethod | string | null {
+): DistributionMethod | null {
   if (typeof window !== 'undefined') {
     const storageKey = `distributionMethod_${address.toLowerCase()}`;
     const savedMethod = localStorage.getItem(storageKey);
@@ -271,17 +275,18 @@ export function useDistributionMethodFromLocalStorage() {
   const { address } = useAccount();
   const queryClient = useQueryClient();
 
-  const getDistributionMethod = useQuery({
+  const query = useQuery({
     queryKey: ['distribution-method-local-storage', address],
     queryFn: () => getDistributionMethodFromLocalStorage(address!),
-    initialData: () => getDistributionMethodFromLocalStorage(address!),
     enabled: !!address,
   });
 
   const update = useMutation({
-    mutationKey: ['update-distribution-method-local-storage', address],
-    mutationFn: async (method: DistributionMethod) => {
+    mutationFn: async (method: DistributionMethod | null) => {
       saveDistributionMethodToLocalStorage(method, address!);
+      return method;
+    },
+    onSuccess: (method) => {
       queryClient.setQueryData(
         ['distribution-method-local-storage', address],
         method
@@ -289,9 +294,14 @@ export function useDistributionMethodFromLocalStorage() {
     },
   });
 
+  const reset = () => {
+    update.mutate(null);
+  };
+
   return {
-    ...getDistributionMethod,
+    ...query,
     update: update.mutate,
+    reset,
   };
 }
 
