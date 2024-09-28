@@ -18,7 +18,7 @@ export function BallotFilter() {
   return (
     <div className="flex gap-2">
       <DropdownMenu>
-        <DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild>
           <Button
             variant={'ghost'}
             size={'icon'}

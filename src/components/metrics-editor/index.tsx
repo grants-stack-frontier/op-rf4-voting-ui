@@ -1,6 +1,5 @@
 'use client';
 import { cn } from '@/lib/utils';
-import { useState, useEffect } from 'react';
 import { BallotFilter } from '../ballot/ballot-filter';
 import { Card } from '../ui/card';
 import {

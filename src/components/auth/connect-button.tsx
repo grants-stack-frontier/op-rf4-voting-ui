@@ -14,7 +14,7 @@ import { forwardRef } from 'react';
 import mixpanel from '@/lib/mixpanel';
 import { useDisconnect } from '@/hooks/useAuth';
 
-export function ConnectButton({}) {
+export function ConnectButton() {
   const { disconnect } = useDisconnect();
 
   return (
@@ -70,7 +70,7 @@ export function ConnectButton({}) {
 
               return (
                 <DropdownMenu>
-                  <DropdownMenuTrigger>
+                  <DropdownMenuTrigger asChild>
                     <UserButton {...account} />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -88,29 +88,28 @@ export function ConnectButton({}) {
   );
 }
 
-const UserButton = forwardRef(function UserButton(
-  { displayName, ensAvatar }: { displayName: string; ensAvatar?: string },
-  ref
-) {
+const UserButton = forwardRef<
+  HTMLDivElement,
+  { displayName: string; ensAvatar?: string }
+>(function UserButton({ displayName, ensAvatar }, ref) {
   return (
-    <Button
-      variant="outline"
-      icon={() =>
-        ensAvatar ? (
-          <Image
-            alt={displayName}
-            width={24}
-            height={24}
-            className="size-6 rounded-full mr-2"
-            src={ensAvatar}
-          />
-        ) : (
-          <div className="bg-gray-200 size-6 mr-2 rounded-full" />
-        )
-      }
+    <div
+      ref={ref}
+      className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
     >
+      {ensAvatar ? (
+        <Image
+          alt={displayName}
+          width={24}
+          height={24}
+          className="size-6 rounded-full mr-2"
+          src={ensAvatar}
+        />
+      ) : (
+        <div className="bg-gray-200 size-6 mr-2 rounded-full" />
+      )}
       {displayName}
       <ChevronDown className="size-4 ml-2" />
-    </Button>
+    </div>
   );
 });
