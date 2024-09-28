@@ -15,7 +15,6 @@ import debounce from 'lodash.debounce';
 import { useMemo, useRef } from 'react';
 import { useBallotRound5Context } from '@/components/ballot/provider5';
 import { CategoryId } from '@/types/shared';
-import { Loader2 } from 'lucide-react';
 import {
   RetroFunding5BallotSubmissionContent,
   SubmitRetroFundingBallotBody,

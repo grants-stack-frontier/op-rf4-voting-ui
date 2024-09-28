@@ -70,7 +70,7 @@ export function ConnectButton() {
 
               return (
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                  <DropdownMenuTrigger>
                     <UserButton {...account} />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
