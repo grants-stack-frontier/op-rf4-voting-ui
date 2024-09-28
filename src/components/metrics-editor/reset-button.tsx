@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useState } from 'react';
 import { Button } from '../ui/button';
 import {
   Dialog,
@@ -8,20 +9,26 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from '../ui/dialog';
-import { DialogTrigger } from '@radix-ui/react-dialog';
 import { useBallotRound5Context } from '../ballot/provider5';
 import { useSaveProjects } from '@/hooks/useProjects';
 import { ImpactScore } from '@/hooks/useProjectImpact';
 import { useDistributionMethodFromLocalStorage } from '@/hooks/useBallotRound5';
+import { useAccount } from 'wagmi';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function ResetButton() {
+  const [isOpen, setIsOpen] = useState(false);
   const { ballot } = useBallotRound5Context();
   const { mutateAsync: saveProjects, isPending } = useSaveProjects();
-  const { refetch } = useDistributionMethodFromLocalStorage();
+  const { reset: resetDistributionMethod } =
+    useDistributionMethodFromLocalStorage();
+  const { address } = useAccount();
+  const queryClient = useQueryClient();
 
   const handleReset = async () => {
-    if (!ballot?.project_allocations) return;
+    if (!ballot?.project_allocations || !address) return;
     await saveProjects(
       ballot.project_allocations.map((project) => ({
         project_id: project.project_id,
@@ -29,12 +36,16 @@ export function ResetButton() {
         impact: project.impact as ImpactScore,
       }))
     );
-    localStorage.removeItem('distributionMethod');
-    refetch();
+
+    resetDistributionMethod();
+
+    queryClient.invalidateQueries({ queryKey: ['ballot-round5', address] });
+
+    setIsOpen(false);
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <div className="cursor-pointer flex flex-row items-center gap-1">
           <p className="font-semibold text-sm hover:underline">Reset</p>
@@ -70,7 +81,11 @@ export function ResetButton() {
             Reset ballot
           </Button>
           <DialogClose asChild>
-            <Button className="w-full" variant="outline">
+            <Button
+              className="w-full"
+              variant="outline"
+              onClick={() => setIsOpen(false)}
+            >
               Cancel
             </Button>
           </DialogClose>

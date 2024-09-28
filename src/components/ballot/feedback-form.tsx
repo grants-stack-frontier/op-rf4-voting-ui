@@ -47,11 +47,9 @@ export function Feedback({ onSubmit = () => {} }) {
   return (
     <form
       onSubmit={handleSubmit((values) => {
-        console.log('next', values);
         if (index < questions.length - 1) {
           setValue('index', index + 1);
         } else {
-          console.log('submit', values);
           mutate(values, {
             onSuccess: onSubmit,
             onError: onSubmit, // Skips feedback if error (for testing)

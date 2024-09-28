@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { SiweMessage } from 'siwe';
 import { useAccount, useChainId, useSignMessage } from 'wagmi';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '../ui/button';
 import {
   Dialog,

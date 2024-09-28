@@ -29,7 +29,6 @@ export const customFetch = async <T>(
   url: string,
   options: RequestInit
 ): Promise<T> => {
-  console.log('Calling custom fetch for URL: ', url);
   const requestHeaders = getHeaders(options.headers);
 
   const requestInit: RequestInit = {

@@ -10,7 +10,6 @@ export function ManualDialog({
   onOpenChange,
 }: PropsWithChildren<Partial<ComponentProps<typeof Dialog>>>) {
   useEffect(() => {
-    console.log('mixlanel', open);
     if (open) track();
   }, [open]);
 
