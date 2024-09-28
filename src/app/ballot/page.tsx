@@ -147,6 +147,17 @@ function YourBallot() {
     );
   }, [ballot]);
 
+  useEffect(() => {
+    if (ballot && distributionMethod === DistributionMethod.CUSTOM) {
+      setProjectList(
+        sortAndPrepProjects(ballot?.project_allocations || [], 'no-conflict')
+      );
+      setConflicts(
+        sortAndPrepProjects(ballot?.project_allocations || [], 'conflict')
+      );
+    }
+  }, [ballot, distributionMethod]);
+
   type Filter = 'conflict' | 'no-conflict';
   function sortAndPrepProjects(
     newProjects: Round5ProjectAllocation[],
