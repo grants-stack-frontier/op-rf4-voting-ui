@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
-import { Button } from '../ui/button';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Markdown } from '../markdown';
+import { Button } from '../ui/button';
 
 export function ProjectDescription({ description }: { description?: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -35,7 +35,7 @@ export function ProjectDescription({ description }: { description?: string }) {
         ref={contentRef}
         className={cn('prose dark:prose-invert', !isExpanded && 'line-clamp-3')}
       >
-        <Markdown>{description}</Markdown>
+        <Markdown className="dark:text-white">{description}</Markdown>
       </div>
       {showViewMore && (
         <Button
