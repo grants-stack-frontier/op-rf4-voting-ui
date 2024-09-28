@@ -117,8 +117,11 @@ function YourBallot() {
   const { data: projects } = useProjectsByCategory(
     votingCategory as CategoryId
   );
-  const { data: distributionMethod, refetch, update: updateDistributionMethodLocally } =
-    useDistributionMethodFromLocalStorage();
+  const {
+    data: distributionMethod,
+    refetch,
+    update: updateDistributionMethodLocally,
+  } = useDistributionMethodFromLocalStorage();
 
   const { mutate: redistribute } = useDistributionMethod();
   const budget = useMemo(() => {
