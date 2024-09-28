@@ -6,19 +6,51 @@ import React, { useEffect, useState } from 'react';
 import { Slider } from '../ui/slider';
 import { CategoryItem } from './category-item';
 import { useBudgetContext } from './provider';
+import { useBudget } from '@/hooks/useBudget';
+import { Round5Allocation } from '@/types/shared';
+import { updateRetroFundingRoundBudgetAllocation } from '@/__generated__/api/agora';
+import { useAccount } from 'wagmi';
+import { Category } from '@/data/categories';
 
 export function BudgetForm() {
   const { categories, error, isLoading, totalBudget, setTotalBudget } =
     useBudgetContext();
   const router = useRouter();
+  const { getBudget, saveAllocation } = useBudget(5);
+  const { address } = useAccount();
 
   const [initialLoad, setInitialLoad] = useState(isLoading);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!isLoading) {
       setInitialLoad(false);
+      console.log(getBudget.data);
     }
   }, [isLoading]);
+
+  useEffect(() => {
+    if (!initialLoad && totalBudget && (categories && categories.length > 0) && address && !isSaving) {
+      autoSetBudgetAndAllocation(address, categories);
+    }
+  }, [initialLoad, getBudget.data, totalBudget, categories, address, isSaving]);
+
+  async function autoSetBudgetAndAllocation(address: string, categories: Category[]) {
+    setIsSaving(true);
+    const isAutosetting = !getBudget.data?.budget || !getBudget.data?.allocations || getBudget.data?.allocations.length !== categories.length
+    if (!getBudget.data?.budget) {
+      await updateRetroFundingRoundBudgetAllocation(5, address, totalBudget)
+    }
+    if (!getBudget.data?.allocations || getBudget.data?.allocations.length !== categories.length) {
+      await saveAllocation.mutateAsync({
+        category_slug: categories[0].id,
+        allocation: 33.34, // TODO: calculate this
+        locked: false,
+      })
+    }
+    if (isAutosetting) await getBudget.refetch()
+    setIsSaving(false);
+  }
 
   const handleBudgetChange = (value: number[]) => {
     const newBudget = value[0];
