@@ -9,6 +9,7 @@ import { ClientLayout } from './client-layout';
 import './globals.css';
 import { metadata } from './layout-metadata';
 import { Provider } from './providers';
+import { Toaster } from '@/components/ui/toaster';
 
 export { metadata };
 
@@ -44,6 +45,7 @@ export default function RootLayout({
             </BallotRound5Provider>
           </Provider>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );
