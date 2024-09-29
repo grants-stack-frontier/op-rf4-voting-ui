@@ -68,7 +68,7 @@ export function MetricsEditor({ budget }: { budget: number }) {
     {
       name: 'Custom',
       description: 'Reward allocation is customized by you.',
-      method: 'CUSTOM',
+      method: DistributionMethod.CUSTOM,
       image: Custom,
     },
   ];

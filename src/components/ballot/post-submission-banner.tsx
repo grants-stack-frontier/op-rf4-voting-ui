@@ -8,6 +8,7 @@ import { Button } from '../ui/button';
 import { ArrowDownToLineIcon } from 'lucide-react';
 import { votingEndDate } from '@/config';
 import { downloadImage } from './submit-dialog5';
+import { useBallotRound5Context } from './provider5';
 
 const monthNames = [
   'Jan',
@@ -29,15 +30,17 @@ const getMonthName = (monthNumber: number) => {
 };
 
 export function PostSubmissionBanner() {
-  const { data } = useBallotSubmission();
-  if (!data) return null;
+  // const { data } = useBallotSubmission();
+  const { ballot } = useBallotRound5Context();
+
+  if (!ballot || ballot.status !== 'SUBMITTED' || !ballot.submitted_at) return null;
 
   const dueDate = `${getMonthName(votingEndDate.getMonth() + 1)} ${votingEndDate.getDate()}`;
-  const submittedDate = new Date(data.timestamp).toLocaleDateString('en-US', {
+  const submittedDate = new Date(ballot.submitted_at).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
   });
-  const submittedTime = new Date(data.timestamp).toLocaleTimeString('en-US', {
+  const submittedTime = new Date(ballot.submitted_at).toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
   });

@@ -125,6 +125,7 @@ export function useSaveProjectImpact() {
   });
 }
 
+export type SaveProjectsActionType = 'reset' | 'import';
 export function useSaveProjects() {
   const { address } = useAccount();
   const queryClient = useQueryClient();
@@ -132,11 +133,14 @@ export function useSaveProjects() {
   return useMutation({
     mutationKey: ['save-projects'],
     mutationFn: async (
-      projects: {
-        project_id: string;
-        allocation: string;
-        impact: 0 | 1 | 2 | 3 | 4 | 5;
-      }[]
+      { projects }: {
+        projects: {
+          project_id: string;
+          allocation: string;
+          impact: 0 | 1 | 2 | 3 | 4 | 5;
+        }[];
+        action?: SaveProjectsActionType;
+      }
     ) => {
       await request
         .post(`${agoraRoundsAPI}/ballots/${address}/projects`, {
@@ -149,10 +153,17 @@ export function useSaveProjects() {
         });
     },
     onMutate: () => {
-      toast({ title: 'Saving projects...' });
+      toast({ title: 'Loading', loading: true });
     },
-    onError: () =>
-      toast({ variant: 'destructive', title: 'Error saving projects' }),
+    onError: (_, { action }) => {
+      if (action === 'reset') {
+        toast({ variant: 'destructive', title: 'Error resetting ballot' });
+      } else if (action === 'import') {
+        toast({ variant: 'destructive', title: 'Error importing ballot' });
+      } else {
+        toast({ variant: 'destructive', title: 'Error saving ballot' });
+      }
+    },
   });
 }
 

@@ -2,7 +2,9 @@
 
 import { useSession } from '@/hooks/useAuth';
 import {
+  DistributionMethod,
   Round5ProjectAllocation,
+  useDistributionMethodFromLocalStorage,
   useRound5Ballot,
 } from '@/hooks/useBallotRound5';
 import { ImpactScore } from '@/hooks/useProjectImpact';
@@ -55,6 +57,7 @@ function ImportBallotButton({ onClose }: { onClose: () => void }) {
   const { data: projects } = useProjectsByCategory(
     session?.category as CategoryId
   );
+  const { update } = useDistributionMethodFromLocalStorage()
 
   const ref = useRef<HTMLInputElement>(null);
 
@@ -93,18 +96,16 @@ function ImportBallotButton({ onClose }: { onClose: () => void }) {
 
       mixpanel.track('Import CSV', { ballotSize: allocations.length });
 
-      saveProjects(
-        allocations.filter(
+      saveProjects({
+        projects: allocations.filter(
           (alloc) =>
             !!projects?.find((p) => p.applicationId === alloc.project_id)
-        )
-      )
+        ),
+        action: 'import',
+      })
         .then(() => {
+          update(DistributionMethod.CUSTOM);
           refetch();
-          toast({
-            title: 'Ballot imported successfully',
-            variant: 'default',
-          });
           onClose();
         })
         .catch((e) => {
