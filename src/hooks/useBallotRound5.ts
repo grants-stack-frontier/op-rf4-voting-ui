@@ -327,7 +327,8 @@ export function useDistributionMethod() {
     },
     onMutate: () =>
       toast({
-        title: 'Loading...',
+        title: 'Loading',
+        loading: true,
       }),
     onError: () =>
       toast({
