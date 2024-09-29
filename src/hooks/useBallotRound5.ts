@@ -50,6 +50,7 @@ export type Round5Ballot = {
   created_at?: string;
   updated_at?: string;
   published_at?: string;
+  submitted_at?: string;
   category_allocations: Round5CategoryAllocation[];
   project_allocations: Round5ProjectAllocation[];
   projects_to_be_evaluated: string[];
