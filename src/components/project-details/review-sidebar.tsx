@@ -9,21 +9,15 @@ import {
 import { ImpactScore, scoreLabels } from '@/hooks/useProjectScoring';
 import { cn } from '@/lib/utils';
 import { RiCheckLine } from '@remixicon/react';
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useMemo,
-  useState,
-} from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Progress } from '../ui/progress';
 import { Skeleton } from '../ui/skeleton';
+import { ConflictOfInterestDialog } from '../common/conflict-of-interest-dialog';
 
 type CardProps = React.ComponentProps<typeof Card>;
 
 interface ReviewSidebarProps extends CardProps {
   onScoreSelect: (score: ImpactScore) => void;
-  onConflictOfInterest: Dispatch<SetStateAction<boolean>>;
   totalProjects: number;
   votedCount: number | undefined;
   isSaving: boolean;
@@ -35,7 +29,6 @@ interface ReviewSidebarProps extends CardProps {
 export function ReviewSidebar({
   className,
   onScoreSelect,
-  onConflictOfInterest,
   totalProjects,
   votedCount,
   isVoted,
@@ -50,18 +43,22 @@ export function ReviewSidebar({
   const [allProjectsScored, setAllProjectsScored] = useState(
     votedCount === totalProjects
   );
+  const [isConflictOfInterestDialogOpen, setIsConflictOfInterestDialogOpen] =
+    useState(false);
+
   const handleScore = useCallback(
     (score: ImpactScore) => {
-      if (score !== 'Skip') {
-        setLocalScore(score);
-      }
       if (Number(score) === 0) {
-        onConflictOfInterest(true);
+        setIsConflictOfInterestDialogOpen(true);
+        return;
       } else {
         onScoreSelect(score);
       }
+      if (score !== 'Skip') {
+        setLocalScore(score);
+      }
     },
-    [onConflictOfInterest, onScoreSelect]
+    [setIsConflictOfInterestDialogOpen, onScoreSelect]
   );
 
   const sortedScores = useMemo(() => {
@@ -143,6 +140,14 @@ export function ReviewSidebar({
           </>
         )}
       </CardFooter>
+      <ConflictOfInterestDialog
+        isOpen={isConflictOfInterestDialogOpen}
+        setOpen={setIsConflictOfInterestDialogOpen}
+        onConfirm={() => {
+          onScoreSelect(0);
+          setLocalScore(0);
+        }}
+      />
     </Card>
   );
 }
