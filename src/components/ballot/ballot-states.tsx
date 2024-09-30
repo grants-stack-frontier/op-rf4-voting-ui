@@ -144,7 +144,7 @@ function PairwiseCard() {
         <p className="text-sm text-left dark:text-black">
           Alternatively, you can compare projects with{' '}
           <a
-            href="https://www.pairwise.vote/retrofunding5"
+            href="https://rf5.pairwise.vote"
             target="_blank"
             className="underline"
           >
@@ -152,7 +152,7 @@ function PairwiseCard() {
           </a>
           . Return here to complete and submit your ballot.
         </p>
-        <Link href="https://www.pairwise.vote/retrofunding5" target="_blank">
+        <Link href="https://rf5.pairwise.vote" target="_blank">
           <svg
             className="cursor-pointer"
             width="20"
