@@ -139,11 +139,17 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
         message: JSON.stringify(ballot_content),
       });
 
-      const submission = await submitRetroFundingBallot(5, address!, {
-        address,
-        ballot_content,
-        signature,
-      });
+      let submission;
+      try {
+        submission = await submitRetroFundingBallot(5, address!, {
+          address,
+          ballot_content,
+          signature,
+        });
+      } catch (error) {
+        console.error(error);
+        throw new Error('Error submitting ballot');
+      }
       // const submission = await request
       //   .post(`${agoraRoundsAPI}/ballots/${address}/submit`, {
       //     json: {
@@ -164,7 +170,7 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
     },
     onSuccess,
     onError: () =>
-      toast({ variant: 'destructive', title: 'Error publishing ballot' }),
+      toast({ variant: 'destructive', title: 'Error submitting ballot' }),
   });
 }
 
