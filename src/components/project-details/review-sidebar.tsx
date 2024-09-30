@@ -87,9 +87,7 @@ export function ReviewSidebar({
         <div className="flex flex-col gap-2">
           {sortedScores.map(([score, label]) => {
             const isDisabled =
-              isLoading ||
-              isSaving ||
-              (score === 'Skip' && allProjectsScored);
+              isLoading || isSaving || (score === 'Skip' && allProjectsScored);
             return (
               <Button
                 key={score}
@@ -105,8 +103,8 @@ export function ReviewSidebar({
                     label !== 'Conflict of interest'
                     ? 'bg-green-200 text-green-600'
                     : isVoted &&
-                      Number(localScore) === 0 &&
-                      label === 'Conflict of interest'
+                        Number(localScore) === 0 &&
+                        label === 'Conflict of interest'
                       ? 'bg-red-200 text-red-600'
                       : ''
                 )}

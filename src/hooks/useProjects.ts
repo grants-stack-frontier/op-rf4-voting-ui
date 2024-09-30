@@ -5,12 +5,12 @@ import {
   getRetroFundingRoundProjectByIdResponse,
   getRetroFundingRoundProjects,
   getRetroFundingRoundProjectsResponse,
-  updateRetroFundingRoundProjectImpact
+  updateRetroFundingRoundProjectImpact,
 } from '@/__generated__/api/agora';
 import {
   GetRetroFundingRoundProjectsCategory,
   PageMetadata,
-  Project
+  Project,
 } from '@/__generated__/api/agora.schemas';
 import { toast } from '@/components/ui/use-toast';
 import { agoraRoundsAPI } from '@/config';

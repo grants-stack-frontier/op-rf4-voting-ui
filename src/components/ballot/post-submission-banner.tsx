@@ -33,17 +33,24 @@ export function PostSubmissionBanner() {
   // const { data } = useBallotSubmission();
   const { ballot } = useBallotRound5Context();
 
-  if (!ballot || ballot.status !== 'SUBMITTED' || !ballot.submitted_at) return null;
+  if (!ballot || ballot.status !== 'SUBMITTED' || !ballot.submitted_at)
+    return null;
 
   const dueDate = `${getMonthName(votingEndDate.getMonth() + 1)} ${votingEndDate.getDate()}`;
-  const submittedDate = new Date(ballot.submitted_at).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-  });
-  const submittedTime = new Date(ballot.submitted_at).toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+  const submittedDate = new Date(ballot.submitted_at).toLocaleDateString(
+    'en-US',
+    {
+      month: 'short',
+      day: 'numeric',
+    }
+  );
+  const submittedTime = new Date(ballot.submitted_at).toLocaleTimeString(
+    'en-US',
+    {
+      hour: 'numeric',
+      minute: '2-digit',
+    }
+  );
   return (
     <Card className="p-4 bg-[#D6E4FF] rounded-[12px]">
       <div className="w-full flex items-center justify-between gap-3 text-[#3374DB]">

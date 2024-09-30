@@ -67,11 +67,7 @@ export default function ProjectDetailsPage({
     [userCategory, project?.applicationCategory]
   );
 
-  const {
-    allProjectsScored,
-    handleScoreSelect,
-    isSaving,
-  } = useProjectScoring(
+  const { allProjectsScored, handleScoreSelect, isSaving } = useProjectScoring(
     currentProject?.applicationCategory ?? '',
     currentProject?.applicationId ?? '',
     walletAddress,
@@ -136,24 +132,15 @@ export default function ProjectDetailsPage({
   }, [ballot, currentProject]);
 
   const isLoading = useMemo(
-    () =>
-      isProjectsLoading ||
-      isProjectLoading ||
-      !currentProject ||
-      !projects,
-    [
-      isProjectsLoading,
-      isProjectLoading,
-      currentProject,
-      projects,
-    ]
+    () => isProjectsLoading || isProjectLoading || !currentProject || !projects,
+    [isProjectsLoading, isProjectLoading, currentProject, projects]
   );
 
   if (isLoading) {
     return (
       <LoadingDialog
         isOpen={true}
-        setOpen={() => { }}
+        setOpen={() => {}}
         message="Loading project"
       />
     );
