@@ -67,9 +67,9 @@ export function EmptyBallot() {
           {quantities.total} projects
         </Text>
         <div className="flex gap-2">
-          {/* <Link href={`/project/${ballot?.projects_to_be_evaluated[0]}`}>
+          <Link href={`/project/${ballot?.projects_to_be_evaluated[0]}`}>
             <Button variant="destructive">Score projects</Button>
-          </Link> */}
+          </Link>
           {/* <Button variant="outline" onClick={() => setOpen(true)}>
           Import ballot
         </Button> */}

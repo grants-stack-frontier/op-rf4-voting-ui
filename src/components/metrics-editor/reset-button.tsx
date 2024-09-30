@@ -29,13 +29,14 @@ export function ResetButton() {
 
   const handleReset = async () => {
     if (!ballot?.project_allocations || !address) return;
-    await saveProjects(
-      ballot.project_allocations.map((project) => ({
+    await saveProjects({
+      projects: ballot.project_allocations.map((project) => ({
         project_id: project.project_id,
         allocation: '0',
         impact: project.impact as ImpactScore,
-      }))
-    );
+      })),
+      action: 'reset',
+    });
 
     resetDistributionMethod();
 

@@ -117,8 +117,11 @@ function YourBallot() {
   const { data: projects } = useProjectsByCategory(
     votingCategory as CategoryId
   );
-  const { data: distributionMethod, refetch } =
-    useDistributionMethodFromLocalStorage();
+  const {
+    data: distributionMethod,
+    refetch,
+    update: updateDistributionMethodLocally,
+  } = useDistributionMethodFromLocalStorage();
 
   const { mutate: redistribute } = useDistributionMethod();
   const budget = useMemo(() => {
@@ -146,6 +149,17 @@ function YourBallot() {
       sortAndPrepProjects(ballot?.project_allocations || [], 'conflict')
     );
   }, [ballot]);
+
+  useEffect(() => {
+    if (ballot && distributionMethod === DistributionMethod.CUSTOM) {
+      setProjectList(
+        sortAndPrepProjects(ballot?.project_allocations || [], 'no-conflict')
+      );
+      setConflicts(
+        sortAndPrepProjects(ballot?.project_allocations || [], 'conflict')
+      );
+    }
+  }, [ballot, distributionMethod]);
 
   type Filter = 'conflict' | 'no-conflict';
   function sortAndPrepProjects(
@@ -417,10 +431,9 @@ function YourBallot() {
                         newProjectList[i].allocationInput = inputValue;
                         setProjectList(newProjectList);
 
-                        saveDistributionMethodToLocalStorage(
+                        updateDistributionMethodLocally(
                           DistributionMethod.CUSTOM
                         );
-                        refetch();
                       }}
                       onBlur={() => {
                         saveAllocation({
