@@ -14,6 +14,7 @@ import { Progress } from '../ui/progress';
 import { Skeleton } from '../ui/skeleton';
 import { ConflictOfInterestDialog } from '../common/conflict-of-interest-dialog';
 import { ScoringProgressBar } from '../ballot/scoring-progress';
+import { useBallotRound5Context } from '../ballot/provider5';
 
 type CardProps = React.ComponentProps<typeof Card>;
 
@@ -41,8 +42,12 @@ export function ReviewSidebar({
   const [localScore, setLocalScore] = useState<ImpactScore | undefined>(
     currentProjectScore
   );
+  const { ballot } = useBallotRound5Context();
+  // const [allProjectsScored, setAllProjectsScored] = useState(
+  //   votedCount === totalProjects
+  // );
   const [allProjectsScored, setAllProjectsScored] = useState(
-    votedCount === totalProjects
+    ballot?.projects_to_be_evaluated.length === ballot?.total_projects
   );
   const [isConflictOfInterestDialogOpen, setIsConflictOfInterestDialogOpen] =
     useState(false);
