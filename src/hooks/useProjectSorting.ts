@@ -1,16 +1,41 @@
 import { Project } from '@/__generated__/api/agora.schemas';
-import { ProjectsScored } from '@/utils/localStorage';
+import { getProjectsSkipped } from '@/utils/localStorage';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo } from 'react';
+import { Address } from 'viem';
 import { Round5Ballot } from './useBallotRound5';
 
 export function useProjectSorting(
   projects: Project[] | undefined,
   ballot: Round5Ballot | undefined,
-  projectsScored: ProjectsScored | undefined,
-  currentId: string
+  currentProject: Project | undefined,
+  walletAddress: Address | undefined
 ) {
   const router = useRouter();
+  const projectsSkipped = useMemo(() => {
+    if (!walletAddress) return { skippedProjectIds: [] };
+    return getProjectsSkipped(
+      currentProject?.applicationCategory ?? '',
+      walletAddress
+    );
+  }, [currentProject, walletAddress]);
+
+  const projectsScored = useMemo(() => {
+    if (ballot) {
+      return {
+        total: ballot.total_projects,
+        votedCount: ballot.project_allocations?.length,
+        allocations: ballot.project_allocations,
+        toBeEvaluated: ballot.projects_to_be_evaluated,
+      };
+    }
+    return {
+      total: 0,
+      votedCount: 0,
+      allocations: [],
+      toBeEvaluated: 0,
+    };
+  }, [ballot]);
 
   const sortedProjects = useMemo(() => {
     if (!projects || !ballot || !projectsScored) return [];
@@ -19,31 +44,33 @@ export function useProjectSorting(
       const aId = a.applicationId ?? '';
       const bId = b.applicationId ?? '';
 
-      const aVoted =
-        ballot.project_allocations.some((p) => p.project_id === aId) ||
-        projectsScored.votedIds.includes(aId);
-      const bVoted =
-        ballot.project_allocations.some((p) => p.project_id === bId) ||
-        projectsScored.votedIds.includes(bId);
+      const aVoted = projectsScored.allocations.some(
+        (p) => p.project_id === aId
+      );
+      const bVoted = projectsScored.allocations.some(
+        (p) => p.project_id === bId
+      );
 
-      const aSkipped = projectsScored?.skippedIds?.includes(aId) ?? false;
-      const bSkipped = projectsScored?.skippedIds?.includes(bId) ?? false;
+      const aSkipped =
+        projectsSkipped.skippedProjectIds?.includes(aId) ?? false;
+      const bSkipped =
+        projectsSkipped.skippedProjectIds?.includes(bId) ?? false;
 
       if (aVoted !== bVoted) return aVoted ? 1 : -1;
       if (aSkipped !== bSkipped) return aSkipped ? 1 : -1;
       return (a.name ?? '').localeCompare(b.name ?? '');
     });
-  }, [projects, ballot, projectsScored]);
+  }, [projects, ballot, projectsScored, projectsSkipped]);
 
   const isVoted = useMemo(() => {
     if (!ballot || !projects || !projectsScored) return false;
-    const project = projects.find((p) => p.applicationId === currentId);
-    return (
-      ballot.project_allocations.some(
-        (p) => p.project_id === project?.applicationId
-      ) || projectsScored.votedIds.includes(project?.applicationId ?? currentId)
+    const project = projects.find(
+      (p) => p.applicationId === currentProject?.applicationId
     );
-  }, [ballot, projects, projectsScored, currentId]);
+    return ballot.project_allocations.some(
+      (p) => p.project_id === project?.applicationId
+    );
+  }, [ballot, projects, projectsScored, currentProject]);
 
   const handleNavigation = useCallback(() => {
     if (!projectsScored) return;
@@ -51,10 +78,8 @@ export function useProjectSorting(
       const nextProject = sortedProjects.find((p) => {
         const nextId = p.applicationId ?? '';
         return (
-          nextId !== currentId &&
-          !projectsScored?.votedIds?.includes(nextId) &&
-          !projectsScored?.skippedIds?.includes(nextId) &&
-          !ballot?.project_allocations?.some(
+          nextId !== currentProject?.applicationId &&
+          !projectsScored.allocations.some(
             (allocation) => allocation.project_id === nextId
           )
         );
@@ -67,7 +92,7 @@ export function useProjectSorting(
         // Optionally, redirect to a summary page or show a message
       }
     }
-  }, [sortedProjects, projectsScored, ballot, router, currentId]);
+  }, [sortedProjects, projectsScored, router, currentProject]);
 
   return { sortedProjects, isVoted, handleNavigation };
 }

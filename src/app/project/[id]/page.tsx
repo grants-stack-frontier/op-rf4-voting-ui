@@ -1,7 +1,6 @@
 'use client';
 import { useBallotRound5Context } from '@/components/ballot/provider5';
 import { UnlockBallotDialog } from '@/components/ballot/unlock-ballot';
-import { ConflictOfInterestDialog } from '@/components/common/conflict-of-interest-dialog';
 import { LoadingDialog } from '@/components/common/loading-dialog';
 import { PageView } from '@/components/common/page-view';
 import { ProjectDetails } from '@/components/project-details';
@@ -12,8 +11,6 @@ import { ImpactScore, useProjectScoring } from '@/hooks/useProjectScoring';
 import { useProjectSorting } from '@/hooks/useProjectSorting';
 import { useProjectById, useProjectsByCategory } from '@/hooks/useProjects';
 import { CategoryId } from '@/types/shared';
-import { ProjectsScored } from '@/utils/localStorage';
-import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Address } from 'viem';
 import { useAccount } from 'wagmi';
@@ -24,7 +21,6 @@ export default function ProjectDetailsPage({
   params: { id: string };
 }) {
   const { id } = params;
-  const router = useRouter();
   const { data: session } = useSession();
   const { data: project, isPending: isProjectLoading } = useProjectById(id);
   const { data: projects, isPending: isProjectsLoading } =
@@ -33,11 +29,28 @@ export default function ProjectDetailsPage({
   const { address } = useAccount();
 
   const [showUnlockDialog, setShowUnlockDialog] = useState(false);
+  const projectsScored = useMemo(() => {
+    if (ballot) {
+      return {
+        total: ballot.total_projects,
+        votedCount: ballot.project_allocations?.length,
+        allocations: ballot.project_allocations,
+        toBeEvaluated: ballot.projects_to_be_evaluated,
+      };
+    }
+    return {
+      total: 0,
+      votedCount: 0,
+      allocations: [],
+      toBeEvaluated: 0,
+    };
+  }, [ballot]);
 
   const currentProject = useMemo(
     () => (project ? { ...project } : undefined),
     [project]
   );
+
   const walletAddress: Address | undefined = useMemo(
     () => session?.siwe?.address,
     [session?.siwe?.address]
@@ -54,30 +67,22 @@ export default function ProjectDetailsPage({
     [userCategory, project?.applicationCategory]
   );
 
-  const [projectsScored, setProjectsScored] = useState<
-    ProjectsScored | undefined
-  >(undefined);
-
   const {
     allProjectsScored,
     handleScoreSelect,
-    isLoading: isProjectScoringLoading,
     isSaving,
   } = useProjectScoring(
     currentProject?.applicationCategory ?? '',
     currentProject?.applicationId ?? '',
     walletAddress,
-    ballot?.project_allocations,
-    projects,
-    projectsScored,
-    setProjectsScored
+    ballot
   );
 
-  const { sortedProjects, isVoted } = useProjectSorting(
+  const { sortedProjects, isVoted, handleNavigation } = useProjectSorting(
     projects,
     ballot,
-    projectsScored,
-    currentProject?.applicationId ?? id
+    currentProject,
+    walletAddress
   );
 
   const isLastProject = useMemo(() => {
@@ -97,46 +102,6 @@ export default function ProjectDetailsPage({
       }
     }
   }, [address, allProjectsScored]);
-
-  const votedCount = useMemo(() => {
-    if (!projectsScored || !ballot || !projects) return 0;
-    const ballotAllocationsCount = ballot.project_allocations?.length ?? 0;
-    const scoredCount = projectsScored.votedCount ?? 0;
-    // Use the maximum of scored count and ballot allocations
-    return Math.max(scoredCount, ballotAllocationsCount);
-  }, [ballot, projectsScored, projects]);
-
-  const handleNavigation = useCallback(() => {
-    if (sortedProjects.length > 0 && projectsScored) {
-      // First, try to find a project that hasn't been voted or skipped
-      let nextProject = sortedProjects.find((p) => {
-        const nextId = p.applicationId ?? '';
-        return (
-          nextId !== currentProject?.applicationId &&
-          !projectsScored?.votedIds?.includes(nextId) &&
-          !projectsScored?.skippedIds?.includes(nextId) &&
-          !ballot?.project_allocations?.some(
-            (allocation) => allocation.project_id === nextId
-          )
-        );
-      });
-
-      if (!nextProject) {
-        // If no unvoted and unskipped projects, try to find a skipped project
-        nextProject = sortedProjects.find((p) => {
-          const nextId = p.applicationId ?? '';
-          return (
-            nextId !== currentProject?.applicationId &&
-            projectsScored?.skippedIds?.includes(nextId)
-          );
-        });
-      }
-
-      if (nextProject) {
-        router.push(`/project/${nextProject.applicationId}`);
-      }
-    }
-  }, [sortedProjects, projectsScored, ballot, router, currentProject]);
 
   const handleScore = useCallback(
     async (score: ImpactScore) => {
@@ -175,13 +140,11 @@ export default function ProjectDetailsPage({
       isProjectsLoading ||
       isProjectLoading ||
       !currentProject ||
-      isProjectScoringLoading ||
       !projects,
     [
       isProjectsLoading,
       isProjectLoading,
       currentProject,
-      isProjectScoringLoading,
       projects,
     ]
   );
@@ -190,7 +153,7 @@ export default function ProjectDetailsPage({
     return (
       <LoadingDialog
         isOpen={true}
-        setOpen={() => {}}
+        setOpen={() => { }}
         message="Loading project"
       />
     );
@@ -211,9 +174,7 @@ export default function ProjectDetailsPage({
         <aside className="max-w-[304px]">
           <ReviewSidebar
             onScoreSelect={handleScore}
-            votedCount={votedCount}
-            totalProjects={sortedProjects.length}
-            isLoading={isProjectScoringLoading}
+            isLoading={isLoading}
             isSaving={isSaving}
             isVoted={isVoted}
             currentProjectScore={currentProjectScore}

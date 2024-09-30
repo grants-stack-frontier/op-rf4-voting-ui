@@ -1,82 +1,77 @@
 import { Address } from 'viem';
 
-const PROJECTS_SCORED_KEY = 'projectsScored';
+const PROJECTS_SKIPPED_KEY = 'projectsSkipped';
 const INTRO_SEEN_KEY = 'introSeen';
 
-export type ProjectsScored = {
-  votedCount: number;
-  votedIds: string[];
-  skippedCount: number;
-  skippedIds: string[];
+export type ProjectsSkipped = {
+  skippedProjectIds: string[];
 };
 
-export const getProjectsScored = (
+export const getProjectsSkipped = (
   category: string,
   walletAddress: Address
-): ProjectsScored => {
-  if (typeof window === 'undefined')
-    return { votedCount: 0, votedIds: [], skippedCount: 0, skippedIds: [] };
-  const stored = localStorage.getItem(PROJECTS_SCORED_KEY);
+): ProjectsSkipped => {
+  if (typeof window === 'undefined') return { skippedProjectIds: [] };
+  const stored = localStorage.getItem(PROJECTS_SKIPPED_KEY);
   const allData = stored ? JSON.parse(stored) : {};
   return (
     allData[walletAddress]?.[category] || {
-      votedCount: 0,
-      votedIds: [],
-      skippedCount: 0,
-      skippedIds: [],
+      skippedProjectIds: [],
     }
   );
 };
 
-export const setProjectsScored = (
+export const setProjectsSkipped = (
   category: string,
   walletAddress: Address,
-  data: ProjectsScored
+  data: ProjectsSkipped | undefined
 ): void => {
   if (typeof window === 'undefined') return;
-  const stored = localStorage.getItem(PROJECTS_SCORED_KEY);
+  const stored = localStorage.getItem(PROJECTS_SKIPPED_KEY);
   const allData = stored ? JSON.parse(stored) : {};
   if (!allData[walletAddress]) {
     allData[walletAddress] = {};
   }
-  allData[walletAddress][category] = data;
-  localStorage.setItem(PROJECTS_SCORED_KEY, JSON.stringify(allData));
-};
-
-export const addScoredProject = (
-  category: string,
-  projectId: string,
-  walletAddress: Address
-): ProjectsScored => {
-  const current = getProjectsScored(category, walletAddress);
-  if (!current.votedIds.includes(projectId)) {
-    current.votedCount += 1;
-    current.votedIds.push(projectId);
-    setProjectsScored(category, walletAddress, current);
+  if (data) {
+    allData[walletAddress][category] = data;
+  } else {
+    delete allData[walletAddress][category];
   }
-  return current;
+  localStorage.setItem(PROJECTS_SKIPPED_KEY, JSON.stringify(allData));
 };
 
 export const addSkippedProject = (
   category: string,
   projectId: string,
   walletAddress: Address
-): ProjectsScored => {
-  const current = getProjectsScored(category, walletAddress);
-  if (!current.skippedIds?.includes(projectId)) {
-    current.skippedCount += 1;
-    current.skippedIds.push(projectId);
-    setProjectsScored(category, walletAddress, current);
+): ProjectsSkipped => {
+  const current = getProjectsSkipped(category, walletAddress);
+  if (!current.skippedProjectIds?.includes(projectId)) {
+    current.skippedProjectIds.push(projectId);
+    setProjectsSkipped(category, walletAddress, current);
   }
   return current;
 };
 
-export function clearProjectsScored(
+export function removeSkippedProject(
+  category: string,
+  projectId: string,
+  walletAddress: Address
+): ProjectsSkipped {
+  const current = getProjectsSkipped(category, walletAddress);
+  current.skippedProjectIds = current.skippedProjectIds.filter(
+    (id) => id !== projectId
+  );
+  setProjectsSkipped(category, walletAddress, current);
+  return current;
+}
+
+export function clearProjectsSkipped(
   category: string,
   walletAddress: Address | undefined
 ): void {
   if (typeof window === 'undefined') return;
-  const stored = localStorage.getItem(PROJECTS_SCORED_KEY);
+  const stored = localStorage.getItem(PROJECTS_SKIPPED_KEY);
   if (stored) {
     const allData = JSON.parse(stored);
     if (
@@ -90,7 +85,7 @@ export function clearProjectsScored(
         delete allData[walletAddress];
       }
     }
-    localStorage.setItem(PROJECTS_SCORED_KEY, JSON.stringify(allData));
+    localStorage.setItem(PROJECTS_SKIPPED_KEY, JSON.stringify(allData));
   }
 }
 
@@ -108,31 +103,3 @@ export const markIntroAsSeen = (walletAddress: Address): void => {
   allData[walletAddress] = true;
   localStorage.setItem(INTRO_SEEN_KEY, JSON.stringify(allData));
 };
-
-export function updateVotedProjectsFromAllocations(
-  category: string,
-  walletAddress: Address,
-  allocations: { project_id: string }[] | undefined
-): ProjectsScored {
-  const current = getProjectsScored(category, walletAddress);
-
-  if (allocations && allocations.length > 0) {
-    const votedIds = Array.from(new Set(allocations.map((a) => a.project_id)));
-    const newVotedIdsString = JSON.stringify(votedIds.sort());
-    const currentVotedIdsString = JSON.stringify(current.votedIds.sort());
-
-    if (newVotedIdsString !== currentVotedIdsString) {
-      const updatedData: ProjectsScored = {
-        ...current,
-        votedCount: votedIds.length,
-        votedIds: votedIds,
-      };
-
-      setProjectsScored(category, walletAddress, updatedData);
-
-      return updatedData;
-    }
-  }
-
-  return current;
-}
