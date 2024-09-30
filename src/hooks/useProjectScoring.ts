@@ -4,6 +4,7 @@ import { useSaveProjectImpact } from '@/hooks/useProjects';
 import {
   ProjectsSkipped,
   addSkippedProject,
+  getProjectsSkipped,
   removeSkippedProject,
   setProjectsSkipped,
 } from '@/utils/localStorage';
@@ -76,11 +77,17 @@ export const useProjectScoring = (
             impact: score,
           });
           if (result.status === HttpStatusCode.OK) {
-            if (updatedProjectsSkipped?.skippedProjectIds?.includes(id)) {
+            const projectsSkipped = getProjectsSkipped(category, walletAddress);
+            if (projectsSkipped?.skippedProjectIds?.includes(id)) {
               updatedProjectsSkipped = removeSkippedProject(
                 category,
                 id,
                 walletAddress
+              );
+              setProjectsSkipped(
+                category,
+                walletAddress,
+                updatedProjectsSkipped
               );
             }
           }
