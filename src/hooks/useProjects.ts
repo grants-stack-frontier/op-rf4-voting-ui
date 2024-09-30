@@ -23,7 +23,6 @@ import { ImpactScore } from './useProjectScoring';
 import { toast } from '@/components/ui/use-toast';
 import { request } from '@/lib/request';
 import { agoraRoundsAPI } from '@/config';
-import { Round5Ballot } from './useBallotRound5';
 
 export const categoryMap: Record<CategoryType, string> = {
   ETHEREUM_CORE_CONTRIBUTIONS: 'eth_core',
@@ -106,6 +105,7 @@ export function useProjectsByCategory(categoryId: CategoryId) {
 
 export function useSaveProjectImpact() {
   const { address } = useAccount();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ['save-project-impact'],
     mutationFn: async ({
@@ -120,7 +120,10 @@ export function useSaveProjectImpact() {
         address as string,
         projectId,
         impact as number
-      );
+      ).then((r) => {
+        queryClient.setQueryData(['ballot-round5', address], r.data);
+        return r;
+      });
     },
   });
 }
