@@ -13,6 +13,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Progress } from '../ui/progress';
 import { Skeleton } from '../ui/skeleton';
 import { ConflictOfInterestDialog } from '../common/conflict-of-interest-dialog';
+import { ScoringProgressBar } from '../ballot/scoring-progress';
 
 type CardProps = React.ComponentProps<typeof Card>;
 
@@ -130,14 +131,15 @@ export function ReviewSidebar({
             <Skeleton className="h-2 w-full" />
           </div>
         ) : (
-          <>
-            <Progress
-              value={(votedCount ? votedCount / totalProjects : 0) * 100}
-            />
-            <p className="text-sm text-muted-foreground">
-              You&apos;ve scored {votedCount} out of {totalProjects} projects
-            </p>
-          </>
+          // <>
+          //   <Progress
+          //     value={(votedCount ? votedCount / totalProjects : 0) * 100}
+          //   />
+          //   <p className="text-sm text-muted-foreground">
+          //     You&apos;ve scored {votedCount} out of {totalProjects} projects
+          //   </p>
+          // </>
+          <ScoringProgressBar />
         )}
       </CardFooter>
       <ConflictOfInterestDialog
