@@ -8,7 +8,6 @@ import { ProjectDetails } from '@/components/project-details';
 import { ProjectBreadcrumb } from '@/components/project-details/project-breadcrumb';
 import { ReviewSidebar } from '@/components/project-details/review-sidebar';
 import { useSession } from '@/hooks/useAuth';
-import { useConflictOfInterest } from '@/hooks/useConflictOfInterest';
 import { ImpactScore, useProjectScoring } from '@/hooks/useProjectScoring';
 import { useProjectSorting } from '@/hooks/useProjectSorting';
 import { useProjectById, useProjectsByCategory } from '@/hooks/useProjects';
@@ -163,12 +162,6 @@ export default function ProjectDetailsPage({
     [handleScoreSelect, handleNavigation, isLastProject, address]
   );
 
-  const {
-    isConflictOfInterestDialogOpen,
-    setIsConflictOfInterestDialogOpen,
-    handleConflictOfInterestConfirm,
-  } = useConflictOfInterest(handleScore);
-
   const currentProjectScore = useMemo(() => {
     if (!ballot || !currentProject) return undefined;
     const allocation = ballot.project_allocations?.find(
@@ -211,11 +204,6 @@ export default function ProjectDetailsPage({
           isOpen={showUnlockDialog}
           setOpen={setShowUnlockDialog}
         />
-        <ConflictOfInterestDialog
-          isOpen={isConflictOfInterestDialogOpen}
-          setOpen={setIsConflictOfInterestDialogOpen}
-          onConfirm={handleConflictOfInterestConfirm}
-        />
         <ProjectDetails data={currentProject} isPending={isLoading} />
         <PageView title={'project-details'} />
       </section>
@@ -223,7 +211,6 @@ export default function ProjectDetailsPage({
         <aside className="max-w-[304px]">
           <ReviewSidebar
             onScoreSelect={handleScore}
-            onConflictOfInterest={setIsConflictOfInterestDialogOpen}
             votedCount={votedCount}
             totalProjects={sortedProjects.length}
             isLoading={isProjectScoringLoading}
