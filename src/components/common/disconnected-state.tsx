@@ -1,27 +1,46 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Heading } from '@/components/ui/headings';
 import { Text } from '@/components/ui/text';
 import { ConnectButton } from '@/components/auth/connect-button';
 
 export const DisconnectedState = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      if (supportsHEVCAlpha()) {
+        video.src = '/SunnyVote_playOnce_700px_HEVC.mov';
+      } else {
+        video.src = '/SunnyVote_playOnce_700px.webm';
+      }
+    }
+  }, []);
+
+  function supportsHEVCAlpha() {
+    const navigator = window.navigator;
+    const ua = navigator.userAgent.toLowerCase();
+    const hasMediaCapabilities = !!(
+      navigator.mediaCapabilities && navigator.mediaCapabilities.decodingInfo
+    );
+    const isSafari =
+      ua.indexOf('safari') !== -1 &&
+      ua.indexOf('chrome') === -1 &&
+      ua.indexOf('version/') !== -1;
+    return isSafari && hasMediaCapabilities;
+  }
+
   return (
     <div className="max-w-screen-md mx-auto">
       <section className="flex flex-col items-center gap-4">
         <video
-          className="max-w-lg w-100"
-          width={'100%'}
-          height={'auto'}
+          ref={videoRef}
+          className="max-w-lg w-full"
           autoPlay
           muted
           loop
           playsInline
-        >
-          <source
-            src="./public/SunnyVote_playOnce_700px_HEVC.mov"
-            type="video/quicktime"
-          />
-          <source src="./SunnyVote_playOnce_700px.webm" type="video/webm" />
-        </video>
+        />
         <div className="flex flex-col items-center gap-4">
           <div className="uppercase tracking-widest">Vote</div>
           <Heading variant={'h2'}>Retro Funding Round 5: OP Stack</Heading>
