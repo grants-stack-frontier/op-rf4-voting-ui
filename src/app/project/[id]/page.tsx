@@ -101,7 +101,8 @@ export default function ProjectDetailsPage({
         `unlock_dialog_shown_${address}`
       );
       const ballotUnlocked = localStorage.getItem(`ballot_unlocked_${address}`);
-      if (dialogShown) localStorage.removeItem(`unlock_dialog_shown_${address}`);
+      if (dialogShown)
+        localStorage.removeItem(`unlock_dialog_shown_${address}`);
       if (ballotUnlocked) localStorage.removeItem(`ballot_unlocked_${address}`);
     }
   }, [address, allProjectsScored]);
