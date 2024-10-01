@@ -6,24 +6,20 @@ import {
   getRetroFundingRoundProjects,
   getRetroFundingRoundProjectsResponse,
   updateRetroFundingRoundProjectImpact,
-  updateRetroFundingRoundProjects,
 } from '@/__generated__/api/agora';
 import {
   GetRetroFundingRoundProjectsCategory,
   PageMetadata,
   Project,
-  UpdateRetroFundingRoundProjectsBody,
-  UpdateRetroFundingRoundProjectsBodyProjectsItem,
 } from '@/__generated__/api/agora.schemas';
+import { toast } from '@/components/ui/use-toast';
+import { agoraRoundsAPI } from '@/config';
 import { CategoryType } from '@/data/categories';
+import { request } from '@/lib/request';
 import { CategoryId } from '@/types/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAccount } from 'wagmi';
 import { ImpactScore } from './useProjectScoring';
-import { toast } from '@/components/ui/use-toast';
-import { request } from '@/lib/request';
-import { agoraRoundsAPI } from '@/config';
-import { Round5Ballot } from './useBallotRound5';
 
 export const categoryMap: Record<CategoryType, string> = {
   ETHEREUM_CORE_CONTRIBUTIONS: 'eth_core',
@@ -106,6 +102,7 @@ export function useProjectsByCategory(categoryId: CategoryId) {
 
 export function useSaveProjectImpact() {
   const { address } = useAccount();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ['save-project-impact'],
     mutationFn: async ({
@@ -120,8 +117,21 @@ export function useSaveProjectImpact() {
         address as string,
         projectId,
         impact as number
-      );
+      ).then((r) => {
+        queryClient.setQueryData(['ballot-round5', address], r.data);
+        return r;
+      });
     },
+    onSuccess: () =>
+      toast({
+        title: 'Impact score was saved successfully!',
+        variant: 'default',
+      }),
+    onError: () =>
+      toast({
+        title: 'Error saving impact score',
+        variant: 'destructive',
+      }),
   });
 }
 
@@ -132,16 +142,16 @@ export function useSaveProjects() {
 
   return useMutation({
     mutationKey: ['save-projects'],
-    mutationFn: async (
-      { projects }: {
-        projects: {
-          project_id: string;
-          allocation: string;
-          impact: 0 | 1 | 2 | 3 | 4 | 5;
-        }[];
-        action?: SaveProjectsActionType;
-      }
-    ) => {
+    mutationFn: async ({
+      projects,
+    }: {
+      projects: {
+        project_id: string;
+        allocation: string;
+        impact: 0 | 1 | 2 | 3 | 4 | 5;
+      }[];
+      action?: SaveProjectsActionType;
+    }) => {
       await request
         .post(`${agoraRoundsAPI}/ballots/${address}/projects`, {
           json: { projects },
