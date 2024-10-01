@@ -57,7 +57,7 @@ function ImportBallotButton({ onClose }: { onClose: () => void }) {
   const { data: projects } = useProjectsByCategory(
     session?.category as CategoryId
   );
-  const { update } = useDistributionMethodFromLocalStorage()
+  const { update } = useDistributionMethodFromLocalStorage();
 
   const ref = useRef<HTMLInputElement>(null);
 
