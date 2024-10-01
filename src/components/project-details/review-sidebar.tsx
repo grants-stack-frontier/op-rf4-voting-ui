@@ -34,9 +34,6 @@ export function ReviewSidebar({
   currentProjectScore,
   ...props
 }: ReviewSidebarProps) {
-  const [localScore, setLocalScore] = useState<ImpactScore | undefined>(
-    currentProjectScore
-  );
   const { ballot } = useBallotRound5Context();
   const allProjectsScored = useMemo(() => {
     return ballot?.projects_to_be_evaluated?.length === ballot?.total_projects;
@@ -52,9 +49,6 @@ export function ReviewSidebar({
         return;
       } else {
         onScoreSelect(score);
-      }
-      if (score !== 'Skip') {
-        setLocalScore(score);
       }
     },
     [setIsConflictOfInterestDialogOpen, onScoreSelect]
@@ -99,21 +93,22 @@ export function ReviewSidebar({
                       ? 'hover:bg-blue-200 hover:text-blue-600'
                       : '',
                   isVoted &&
-                    Number(localScore) === Number(score) &&
+                    Number(currentProjectScore) === Number(score) &&
                     label !== 'Conflict of interest'
                     ? 'bg-green-200 text-green-600'
                     : isVoted &&
-                        Number(localScore) === 0 &&
-                        label === 'Conflict of interest'
+                      Number(currentProjectScore) === 0 &&
+                      label === 'Conflict of interest'
                       ? 'bg-red-200 text-red-600'
                       : ''
                 )}
                 onClick={() => handleScore(score)}
                 disabled={isDisabled}
               >
-                {isVoted && Number(localScore) === Number(score) && (
-                  <RiCheckLine className="h-5 w-5 mr-2" />
-                )}
+                {isVoted &&
+                  Number(currentProjectScore) === Number(score) && (
+                    <RiCheckLine className="h-5 w-5 mr-2" />
+                  )}
                 <span>{label}</span>
               </Button>
             );
@@ -143,7 +138,6 @@ export function ReviewSidebar({
         setOpen={setIsConflictOfInterestDialogOpen}
         onConfirm={() => {
           onScoreSelect(0);
-          setLocalScore(0);
         }}
       />
     </Card>

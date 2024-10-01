@@ -4,19 +4,19 @@ const PROJECTS_SKIPPED_KEY = 'projectsSkipped';
 const INTRO_SEEN_KEY = 'introSeen';
 
 export type ProjectsSkipped = {
-  skippedProjectIds: string[];
+  ids: string[];
 };
 
 export const getProjectsSkipped = (
   category: string,
   walletAddress: Address
 ): ProjectsSkipped => {
-  if (typeof window === 'undefined') return { skippedProjectIds: [] };
+  if (typeof window === 'undefined') return { ids: [] };
   const stored = localStorage.getItem(PROJECTS_SKIPPED_KEY);
   const allData = stored ? JSON.parse(stored) : {};
   return (
     allData[walletAddress]?.[category] || {
-      skippedProjectIds: [],
+      ids: [],
     }
   );
 };
@@ -46,8 +46,8 @@ export const addSkippedProject = (
   walletAddress: Address
 ): ProjectsSkipped => {
   const current = getProjectsSkipped(category, walletAddress);
-  if (!current.skippedProjectIds?.includes(projectId)) {
-    current.skippedProjectIds.push(projectId);
+  if (!current.ids?.includes(projectId)) {
+    current.ids.push(projectId);
     setProjectsSkipped(category, walletAddress, current);
   }
   return current;
@@ -59,9 +59,7 @@ export function removeSkippedProject(
   walletAddress: Address
 ): ProjectsSkipped {
   const current = getProjectsSkipped(category, walletAddress);
-  current.skippedProjectIds = current.skippedProjectIds.filter(
-    (id) => id !== projectId
-  );
+  current.ids = current.ids.filter((id) => id !== projectId);
   setProjectsSkipped(category, walletAddress, current);
   return current;
 }

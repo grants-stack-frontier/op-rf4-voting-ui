@@ -13,7 +13,7 @@ export function useProjectSorting(
 ) {
   const router = useRouter();
   const projectsSkipped = useMemo(() => {
-    if (!walletAddress) return { skippedProjectIds: [] };
+    if (!walletAddress) return { ids: [] };
     return getProjectsSkipped(
       currentProject?.applicationCategory ?? '',
       walletAddress
@@ -51,13 +51,13 @@ export function useProjectSorting(
         (p) => p.project_id === bId
       );
 
-      const aSkipped =
-        projectsSkipped.skippedProjectIds?.includes(aId) ?? false;
-      const bSkipped =
-        projectsSkipped.skippedProjectIds?.includes(bId) ?? false;
+      const aSkipped = projectsSkipped.ids?.includes(aId) ?? false;
+      const bSkipped = projectsSkipped.ids?.includes(bId) ?? false;
 
-      if (aVoted !== bVoted) return aVoted ? 1 : -1;
-      if (aSkipped !== bSkipped) return aSkipped ? 1 : -1;
+      const aProcessed = aVoted || aSkipped;
+      const bProcessed = bVoted || bSkipped;
+
+      if (aProcessed !== bProcessed) return aProcessed ? 1 : -1;
       return (a.name ?? '').localeCompare(b.name ?? '');
     });
   }, [projects, ballot, projectsScored, projectsSkipped]);
@@ -75,15 +75,27 @@ export function useProjectSorting(
   const handleNavigation = useCallback(() => {
     if (!projectsScored) return;
     if (sortedProjects.length > 0) {
-      const nextProject = sortedProjects.find((p) => {
+      let nextProject = sortedProjects.find((p) => {
         const nextId = p.applicationId ?? '';
         return (
           nextId !== currentProject?.applicationId &&
+          !projectsSkipped.ids?.includes(nextId) &&
           !projectsScored.allocations.some(
             (allocation) => allocation.project_id === nextId
           )
         );
       });
+
+      if (!nextProject) {
+        // If no unvoted and unskipped projects, try to find a skipped project
+        nextProject = sortedProjects.find((p) => {
+          const nextId = p.applicationId ?? '';
+          return (
+            nextId !== currentProject?.applicationId &&
+            projectsSkipped.ids?.includes(nextId)
+          );
+        });
+      }
 
       if (nextProject) {
         router.push(`/project/${nextProject.applicationId}`);
@@ -92,7 +104,7 @@ export function useProjectSorting(
         // Optionally, redirect to a summary page or show a message
       }
     }
-  }, [sortedProjects, projectsScored, router, currentProject]);
+  }, [sortedProjects, projectsScored, router, projectsSkipped, currentProject]);
 
   return { sortedProjects, isVoted, handleNavigation };
 }

@@ -61,6 +61,7 @@ export const useProjectScoring = (
         };
       }
 
+      const projectsSkipped = getProjectsSkipped(category, walletAddress);
       let updatedProjectsSkipped: ProjectsSkipped | undefined;
 
       if (score === 'Skip') {
@@ -77,17 +78,12 @@ export const useProjectScoring = (
             impact: score,
           });
           if (result.status === HttpStatusCode.OK) {
-            const projectsSkipped = getProjectsSkipped(category, walletAddress);
-            if (projectsSkipped?.skippedProjectIds?.includes(id)) {
+            if (projectsSkipped?.ids?.includes(id)) {
+              console.log('removing skipped project');
               updatedProjectsSkipped = removeSkippedProject(
                 category,
                 id,
                 walletAddress
-              );
-              setProjectsSkipped(
-                category,
-                walletAddress,
-                updatedProjectsSkipped
               );
             }
           }
@@ -100,9 +96,11 @@ export const useProjectScoring = (
           setIsSaving(false);
         }
       }
-
-      setProjectsSkipped(category, walletAddress, updatedProjectsSkipped);
-
+      if (!!updatedProjectsSkipped) {
+        setProjectsSkipped(category, walletAddress, updatedProjectsSkipped);
+      } else {
+        setProjectsSkipped(category, walletAddress, projectsSkipped);
+      }
       // Only set allProjectsScored if totalProjects is defined and greater than 0
       if (
         projectsScored.total > 0 &&
