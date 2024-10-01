@@ -44,7 +44,6 @@ export default function BudgetBallotPage() {
     <BudgetProvider>
       <div className="flex flex-row gap-12">
         <section className="flex-grow max-w-[720px] space-y-6">
-          <PostSubmissionBanner />
           <BallotTabs />
           <p className="text-gray-600">
             Decide on the budget for this round, and then decide how much should
