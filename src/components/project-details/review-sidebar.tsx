@@ -97,18 +97,17 @@ export function ReviewSidebar({
                     label !== 'Conflict of interest'
                     ? 'bg-green-200 text-green-600'
                     : isVoted &&
-                      Number(currentProjectScore) === 0 &&
-                      label === 'Conflict of interest'
+                        Number(currentProjectScore) === 0 &&
+                        label === 'Conflict of interest'
                       ? 'bg-red-200 text-red-600'
                       : ''
                 )}
                 onClick={() => handleScore(score)}
                 disabled={isDisabled}
               >
-                {isVoted &&
-                  Number(currentProjectScore) === Number(score) && (
-                    <RiCheckLine className="h-5 w-5 mr-2" />
-                  )}
+                {isVoted && Number(currentProjectScore) === Number(score) && (
+                  <RiCheckLine className="h-5 w-5 mr-2" />
+                )}
                 <span>{label}</span>
               </Button>
             );
