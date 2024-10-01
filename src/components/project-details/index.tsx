@@ -11,6 +11,7 @@ import { ProjectDescription } from './project-description';
 import { ProjectHeader } from './project-header';
 import { ReposLinksContracts } from './repos-links-contracts';
 import { SocialLinksList } from './social-links';
+import { Testimonials } from './testimonials';
 
 export function ProjectDetails({
   data,
@@ -32,6 +33,7 @@ export function ProjectDetails({
     grantsAndFunding,
     pricingModel,
     impactStatement,
+    testimonials,
     contracts,
     team,
   } = data ?? {};
@@ -65,6 +67,7 @@ export function ProjectDetails({
             links={links}
             contracts={contracts}
           />
+          <Testimonials testimonials={testimonials} />
           <Separator className="my-12" />
           {impactStatement && (
             <ImpactStatement impactStatement={impactStatement} />
