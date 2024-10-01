@@ -70,7 +70,8 @@ export const useProjectScoring = (
         setIsSaving(true);
         try {
           toast({
-            title: 'Saving your impact score...',
+            loading: true,
+            title: 'Saving your impact score',
             variant: 'default',
           });
           const result = await saveProjectImpact({
