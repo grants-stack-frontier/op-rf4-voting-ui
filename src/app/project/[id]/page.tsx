@@ -96,6 +96,13 @@ export default function ProjectDetailsPage({
         setShowUnlockDialog(true);
         localStorage.setItem(`unlock_dialog_shown_${address}`, 'true');
       }
+    } else if (address && !allProjectsScored) {
+      const dialogShown = localStorage.getItem(
+        `unlock_dialog_shown_${address}`
+      );
+      const ballotUnlocked = localStorage.getItem(`ballot_unlocked_${address}`);
+      if (dialogShown) localStorage.removeItem(`unlock_dialog_shown_${address}`);
+      if (ballotUnlocked) localStorage.removeItem(`ballot_unlocked_${address}`);
     }
   }, [address, allProjectsScored]);
 
