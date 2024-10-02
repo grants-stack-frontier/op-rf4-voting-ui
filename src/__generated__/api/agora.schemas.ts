@@ -623,6 +623,7 @@ export interface Project {
   projectId?: string;
   socialLinks?: SocialLinks;
   team?: string[];
+  testimonials?: string[] | string;
 }
 
 export type ProjectGrantsAndFundingVentureFundingItem = {
