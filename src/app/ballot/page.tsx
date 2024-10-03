@@ -29,7 +29,7 @@ import Link from 'next/link';
 import { ComponentProps, useEffect, useMemo, useState } from 'react';
 import { MetricsEditor } from '../../components/metrics-editor';
 import { CategoryId } from '@/types/shared';
-import { useProjectsByCategory } from '@/hooks/useProjects';
+import { useProjectsByCategory, useSaveProjects } from '@/hooks/useProjects';
 import { useVotingCategory } from '@/hooks/useVotingCategory';
 import { NumberInput } from '@/components/ui/number-input';
 import { Input } from '@/components/ui/input';
@@ -112,13 +112,14 @@ function YourBallot() {
   const { ballot } = useBallotRound5Context();
   const { mutate: saveAllocation } = useSaveRound5Allocation();
   const { mutateAsync: savePosition } = useSaveRound5Position();
+  const allocationSum = useRound5BallotWeightSum();
+  const { isPending: isResetting } = useSaveProjects();
   const { getBudget } = useBudget(5);
-  // const { data: projects } = useProjects();
   const votingCategory = useVotingCategory();
   const { data: projects } = useProjectsByCategory(
     votingCategory as CategoryId
   );
-  const { data: distributionMethod, update: updateDistributionMethodLocally } =
+  const { data: distributionMethod, update: updateDistributionMethodLocally, isPending: isUpdatingDistributionMethod } =
     useDistributionMethodFromLocalStorage();
 
   const { mutate: redistribute } = useDistributionMethod();
@@ -156,8 +157,12 @@ function YourBallot() {
       setConflicts(
         sortAndPrepProjects(ballot?.project_allocations || [], 'conflict')
       );
+    } else if (ballot && !distributionMethod && allocationSum > 0 && !isResetting && !isUpdatingDistributionMethod) {
+      updateDistributionMethodLocally(DistributionMethod.CUSTOM);
+    } else if (ballot && (!distributionMethod || distributionMethod === DistributionMethod.CUSTOM) && allocationSum === 0 && !isResetting && !isUpdatingDistributionMethod) {
+      updateDistributionMethodLocally(null);
     }
-  }, [ballot, distributionMethod]);
+  }, [ballot, distributionMethod, allocationSum, isResetting, isUpdatingDistributionMethod]);
 
   type Filter = 'conflict' | 'no-conflict';
   function sortAndPrepProjects(
