@@ -21,3 +21,21 @@ export function formatProjectAge(years: number): string {
     return `${years.toFixed(1)} year${years !== 1 ? 's' : ''}`;
   }
 }
+
+export const getSafeUrl = (url: string | string[] | undefined): string => {
+  if (typeof url === 'string') {
+    try {
+      return new URL(url).toString();
+    } catch {
+      return '#';
+    }
+  }
+  if (Array.isArray(url) && url.length > 0) {
+    try {
+      return new URL(url[0]).toString();
+    } catch {
+      return '#';
+    }
+  }
+  return '#';
+};
