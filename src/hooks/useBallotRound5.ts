@@ -114,26 +114,11 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
   const { address } = useAccount();
   const { refetch } = useRound5Ballot(address);
   const { signMessageAsync } = useSignMessage();
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async () => {
       const { data: ballot } = await refetch();
-      // const ballot_content: RetroFunding5BallotSubmissionContent = {
-      //   budget: ballot?.budget,
-      //   category_allocation: ballot?.category_allocations.map(
-      //     ({ category_slug, allocation, locked }) => ({
-      //       category_slug,
-      //       allocation,
-      //       locked,
-      //     })
-      //   ),
-      //   projects_allocation: ballot?.project_allocations.map(
-      //     ({ project_id, allocation, impact }) => ({
-      //       project_id,
-      //       allocation,
-      //       impact,
-      //     })
-      //   ),
-      // };
       const ballot_content = ballot?.payload_for_signature;
       const signature = await signMessageAsync({
         message: JSON.stringify(ballot_content),
@@ -146,7 +131,6 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
           ballot_content,
           signature,
         });
-        console.log('submission', submission);
         if (submission.status != 200) {
           throw new Error('Failed submitting ballot', {
             cause: submission.status,
@@ -156,15 +140,6 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
         console.error(error);
         throw new Error('Error submitting ballot');
       }
-      // const submission = await request
-      //   .post(`${agoraRoundsAPI}/ballots/${address}/submit`, {
-      //     json: {
-      //       address,
-      //       ballot_content,
-      //       signature,
-      //     },
-      //   })
-      //   .json<any>();
 
       saveBallotSubmissionToLocalStorage({
         address,
@@ -172,7 +147,10 @@ export function useSubmitBallot({ onSuccess }: { onSuccess: () => void }) {
         signature,
       });
 
-      refetch();
+      await queryClient.invalidateQueries({
+        queryKey: ['ballot-round5', address],
+      });
+      await refetch();
 
       return submission;
     },

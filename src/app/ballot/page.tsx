@@ -208,6 +208,7 @@ function YourBallot() {
   };
 
   const displayProjects = searchTerm ? filteredProjects : projectList;
+  const isSavingBallot = useIsSavingRound5Ballot();
 
   const isMovable =
     distributionMethod === DistributionMethod.TOP_TO_BOTTOM ||
@@ -343,7 +344,7 @@ function YourBallot() {
                         // max={projectList?.length ?? 0}
                         className="text-center"
                         value={proj.positionInput}
-                        disabled={!isMovable}
+                        disabled={!isMovable || isSubmitting || isSavingBallot}
                         onChange={async (e) => {
                           const newIndex =
                             parseInt(e.currentTarget.value, 10) - 1;
@@ -417,6 +418,7 @@ function YourBallot() {
                       min={0}
                       max={100}
                       step={1}
+                      disabled={isSubmitting || isSavingBallot}
                       placeholder="--"
                       className="text-center w-[112px]"
                       value={proj.allocationInput || ''}
