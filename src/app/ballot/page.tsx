@@ -272,12 +272,14 @@ function YourBallot() {
                 className={`flex justify-between flex-1 border-b gap-1 py-6 ${
                   i === 0 ? 'pt-0' : ''
                 }`}
-                draggable="true"
+                draggable={isMovable}
                 onDragStart={(e) => {
-                  e.dataTransfer.setData(
-                    'text/plain',
-                    JSON.stringify({ index: i, id: proj.project_id })
-                  );
+                  if (isMovable) {
+                    e.dataTransfer.setData(
+                      'text/plain',
+                      JSON.stringify({ index: i, id: proj.project_id })
+                    );
+                  }
                 }}
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -285,7 +287,7 @@ function YourBallot() {
                 onDrop={(e) => {
                   e.preventDefault();
                   const data = e.dataTransfer.getData('text/plain');
-                  if (data) {
+                  if (data && isMovable) {
                     const { index: draggedIndex, id: draggedId } =
                       JSON.parse(data);
                     const newIndex = i;
