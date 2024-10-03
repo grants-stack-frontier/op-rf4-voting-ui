@@ -1,17 +1,23 @@
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { votingEndDate } from '@/config';
-import { Round5Ballot, useSubmitBallot } from '@/hooks/useBallotRound5';
+import {
+  Round5Ballot,
+  useRound5Ballot,
+  useSubmitBallot,
+} from '@/hooks/useBallotRound5';
 import { formatDate } from '@/lib/utils';
 import { ArrowDownToLineIcon } from 'lucide-react';
 import mixpanel from 'mixpanel-browser';
 import Image from 'next/image';
-import { ComponentProps, useState } from 'react';
+import { ComponentProps, useEffect, useState } from 'react';
 import VotingSuccess_OPStack from '../../../public/RetroFunding_R5_IVoted_16x9.png';
 import { Button } from '../ui/button';
 import { Heading } from '../ui/headings';
 import { Text } from '../ui/text';
 import { Feedback, Form } from './feedback-form';
 import { exportRound5Ballot } from './import-ballot5';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAccount } from 'wagmi';
 
 export function SubmitRound5Dialog({
   open,
@@ -21,10 +27,27 @@ export function SubmitRound5Dialog({
   const [feedbackProgress, setFeedbackProgress] = useState<
     'init' | 'in_progress' | 'submit' | 'done'
   >(ballot?.status === 'SUBMITTED' ? 'submit' : 'init');
+  const { address } = useAccount();
+
+  const { refetch: refetchBallot } = useRound5Ballot(address);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (open) {
+      setFeedbackProgress(ballot?.status === 'SUBMITTED' ? 'submit' : 'init');
+    }
+  }, [open, ballot?.status]);
 
   const submit = useSubmitBallot({
-    onSuccess: () => setFeedbackProgress('done'),
+    onSuccess: async () => {
+      setFeedbackProgress('done');
+      await queryClient.invalidateQueries({
+        queryKey: ['ballot-round5', address],
+      });
+      await refetchBallot();
+    },
   });
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
