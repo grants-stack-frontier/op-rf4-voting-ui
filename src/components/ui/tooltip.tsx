@@ -27,4 +27,53 @@ const TooltipContent = React.forwardRef<
 ));
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
+interface DisabledTooltipProps {
+  children: React.ReactElement;
+  content: React.ReactNode;
+  isDisabled: boolean;
+}
+
+const DisabledTooltip: React.FC<DisabledTooltipProps> = ({
+  children,
+  content,
+  isDisabled,
+}) => {
+  const [open, setOpen] = React.useState(false);
+
+  const handleMouseEnter = React.useCallback(() => {
+    if (isDisabled) {
+      setOpen(true);
+    }
+  }, [isDisabled]);
+
+  const handleMouseLeave = React.useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  return (
+    <TooltipProvider>
+      <Tooltip open={isDisabled && open}>
+        <TooltipTrigger asChild>
+          <div
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+            style={{ display: 'inline-block' }}
+          >
+            {children}
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="top" align="center">
+          {content}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+export {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+  DisabledTooltip,
+};

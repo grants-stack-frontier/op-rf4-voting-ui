@@ -23,7 +23,6 @@ import {
   useDistributionMethodFromLocalStorage,
   DistributionMethod,
   useDistributionMethod,
-  saveDistributionMethodToLocalStorage,
 } from '@/hooks/useBallotRound5';
 import { LoaderIcon, Menu } from 'lucide-react';
 import Link from 'next/link';
@@ -35,6 +34,8 @@ import { useVotingCategory } from '@/hooks/useVotingCategory';
 import { NumberInput } from '@/components/ui/number-input';
 import { Input } from '@/components/ui/input';
 import { useBudget } from '@/hooks/useBudget';
+import { useIsBadgeholder } from '@/hooks/useIsBadgeholder';
+import { DisabledTooltip } from '@/components/ui/tooltip';
 
 function formatAllocationOPAmount(amount?: number): string {
   if (amount === undefined) return '0';
@@ -117,11 +118,8 @@ function YourBallot() {
   const { data: projects } = useProjectsByCategory(
     votingCategory as CategoryId
   );
-  const {
-    data: distributionMethod,
-    refetch,
-    update: updateDistributionMethodLocally,
-  } = useDistributionMethodFromLocalStorage();
+  const { data: distributionMethod, update: updateDistributionMethodLocally } =
+    useDistributionMethodFromLocalStorage();
 
   const { mutate: redistribute } = useDistributionMethod();
   const budget = useMemo(() => {
@@ -535,6 +533,7 @@ function YourBallot() {
 function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
   const allocationSum = useRound5BallotWeightSum();
   const [seconds] = useVotingTimeLeft(votingEndDate);
+  const isBadgeholder = useIsBadgeholder();
   const {
     getBudget: { data: budgetData },
   } = useBudget(5);
@@ -547,15 +546,32 @@ function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
   if (Number(seconds) < 0) {
     return null;
   }
+
+  const isDisabled =
+    allocationSum !== 100 || isBudgetIncomplete || !isBadgeholder;
+
+  let tooltipMessage = '';
+  if (isDisabled) {
+    if (allocationSum !== 100) {
+      tooltipMessage = 'Ensure your allocation sums to 100%.';
+    } else if (isBudgetIncomplete) {
+      tooltipMessage = 'Ensure your budget is complete.';
+    } else if (!isBadgeholder) {
+      tooltipMessage = 'You must be a badgeholder to submit.';
+    }
+  }
+
   return (
-    <Button
-      disabled={allocationSum !== 100 || isBudgetIncomplete}
-      variant={'destructive'}
-      type="submit"
-      onClick={onClick}
-    >
-      Submit budget and ballot
-    </Button>
+    <DisabledTooltip isDisabled={isDisabled} content={tooltipMessage}>
+      <Button
+        disabled={isDisabled}
+        variant={'destructive'}
+        type="submit"
+        onClick={onClick}
+      >
+        Submit budget and ballot
+      </Button>
+    </DisabledTooltip>
   );
 }
 
