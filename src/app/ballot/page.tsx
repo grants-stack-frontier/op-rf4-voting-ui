@@ -140,6 +140,8 @@ function YourBallot() {
     sortAndPrepProjects(ballot?.project_allocations || [], 'conflict')
   );
 
+  const [isInputFocused, setIsInputFocused] = useState(false);
+
   useEffect(() => {
     setProjectList(
       sortAndPrepProjects(ballot?.project_allocations || [], 'no-conflict')
@@ -272,9 +274,9 @@ function YourBallot() {
                 className={`flex justify-between flex-1 border-b gap-1 py-6 ${
                   i === 0 ? 'pt-0' : ''
                 }`}
-                draggable={isMovable}
+                draggable={isMovable && !isInputFocused}
                 onDragStart={(e) => {
-                  if (isMovable) {
+                  if (isMovable && !isInputFocused) {
                     e.dataTransfer.setData(
                       'text/plain',
                       JSON.stringify({ index: i, id: proj.project_id })
@@ -287,7 +289,7 @@ function YourBallot() {
                 onDrop={(e) => {
                   e.preventDefault();
                   const data = e.dataTransfer.getData('text/plain');
-                  if (data && isMovable) {
+                  if (data && isMovable && !isInputFocused) {
                     const { index: draggedIndex, id: draggedId } =
                       JSON.parse(data);
                     const newIndex = i;
@@ -350,6 +352,13 @@ function YourBallot() {
                         className="text-center"
                         value={proj.positionInput}
                         disabled={!isMovable || isSubmitting || isSavingBallot}
+                        onFocus={(e) => {
+                          setIsInputFocused(true);
+                        }}
+                        onFocusCapture={(e) => {
+                          e.preventDefault();
+                          setIsInputFocused(true);
+                        }}
                         onChange={async (e) => {
                           const newIndex =
                             parseInt(e.currentTarget.value, 10) - 1;
@@ -374,6 +383,7 @@ function YourBallot() {
                           }
                         }}
                         onBlur={async (e) => {
+                          setIsInputFocused(false);
                           if (e.target.value === '') {
                             const newProjects = [...projectList];
                             newProjects[i].positionInput = (i + 1).toString();
@@ -427,6 +437,13 @@ function YourBallot() {
                       placeholder="--"
                       className="text-center w-[112px]"
                       value={proj.allocationInput || ''}
+                      onFocus={(e) => {
+                        setIsInputFocused(true);
+                      }}
+                      onFocusCapture={(e) => {
+                        e.preventDefault();
+                        setIsInputFocused(true);
+                      }}
                       onChange={(e) => {
                         const inputValue = e.target.value;
                         const newAllocation = parseFloat(inputValue);
@@ -443,6 +460,7 @@ function YourBallot() {
                         );
                       }}
                       onBlur={() => {
+                        setIsInputFocused(false);
                         saveAllocation({
                           project_id: proj.project_id,
                           allocation: parseFloat(proj.allocationInput) || 0,
