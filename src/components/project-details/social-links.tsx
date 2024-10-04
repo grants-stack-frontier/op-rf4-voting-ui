@@ -1,28 +1,11 @@
 import { SocialLinks } from '@/__generated__/api/agora.schemas';
 import mixpanel from '@/lib/mixpanel';
+import { getSafeUrl } from '@/utils/projectUtils';
 import { RiLink, RiTwitterXLine } from '@remixicon/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Mirror from '../../../public/mirror.svg';
 import Warpcast from '../../../public/warpcast.svg';
-// Helper function to safely parse and validate URLs
-const getSafeUrl = (url: string | string[] | undefined): string => {
-  if (typeof url === 'string') {
-    try {
-      return new URL(url).toString();
-    } catch {
-      return '#';
-    }
-  }
-  if (Array.isArray(url) && url.length > 0) {
-    try {
-      return new URL(url[0]).toString();
-    } catch {
-      return '#';
-    }
-  }
-  return '#';
-};
 
 export function SocialLinksList({
   socialLinks,
