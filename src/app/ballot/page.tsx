@@ -573,7 +573,7 @@ function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
   }
 
   const isDisabled =
-    allocationSum !== 100 || isBudgetIncomplete || !isBadgeholder;
+    allocationSum !== 100 || isBudgetIncomplete;
 
   let tooltipMessage = '';
   if (isDisabled) {
@@ -581,8 +581,6 @@ function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
       tooltipMessage = 'Ensure your allocation sums to 100%.';
     } else if (isBudgetIncomplete) {
       tooltipMessage = 'Ensure your budget is complete.';
-    } else if (!isBadgeholder) {
-      tooltipMessage = 'You must be a badgeholder to submit.';
     }
   }
 
