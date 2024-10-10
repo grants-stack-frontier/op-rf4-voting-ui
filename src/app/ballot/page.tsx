@@ -558,7 +558,6 @@ function YourBallot() {
 function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
   const allocationSum = useRound5BallotWeightSum();
   const [seconds] = useVotingTimeLeft(votingEndDate);
-  const isBadgeholder = useIsBadgeholder();
   const {
     getBudget: { data: budgetData },
   } = useBudget(5);
@@ -572,8 +571,10 @@ function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
     return null;
   }
 
+  const votingExpired = Number(seconds) < 0
+
   const isDisabled =
-    allocationSum !== 100 || isBudgetIncomplete;
+    allocationSum !== 100 || isBudgetIncomplete || votingExpired;
 
   let tooltipMessage = '';
   if (isDisabled) {
@@ -581,6 +582,8 @@ function BallotSubmitButton({ onClick }: ComponentProps<typeof Button>) {
       tooltipMessage = 'Ensure your allocation sums to 100%.';
     } else if (isBudgetIncomplete) {
       tooltipMessage = 'Ensure your budget is complete.';
+    } else if (votingExpired) {
+      tooltipMessage = 'Voting has closed.';
     }
   }
 
@@ -603,11 +606,19 @@ function WeightsError() {
   const remainingAllocation = useMemo(() => {
     return 100 - allocationSum;
   }, [allocationSum]);
-
+  const [seconds] = useVotingTimeLeft(votingEndDate);
   const { data: distributionMethod } = useDistributionMethodFromLocalStorage();
   const {
     getBudget: { data: budgetData },
   } = useBudget(5);
+  
+  if (Number(seconds) < 0) {
+    return (
+      <span className="text-sm text-destructive">
+        Voting has closed! Results will be announced shortly.
+      </span>
+    )
+  }
 
   if (!distributionMethod)
     return (
