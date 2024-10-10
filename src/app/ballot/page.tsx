@@ -606,8 +606,12 @@ function WeightsError() {
   const remainingAllocation = useMemo(() => {
     return 100 - allocationSum;
   }, [allocationSum]);
-
   const [seconds] = useVotingTimeLeft(votingEndDate);
+  const { data: distributionMethod } = useDistributionMethodFromLocalStorage();
+  const {
+    getBudget: { data: budgetData },
+  } = useBudget(5);
+  
   if (Number(seconds) < 0) {
     return (
       <span className="text-sm text-destructive">
@@ -615,11 +619,6 @@ function WeightsError() {
       </span>
     )
   }
-
-  const { data: distributionMethod } = useDistributionMethodFromLocalStorage();
-  const {
-    getBudget: { data: budgetData },
-  } = useBudget(5);
 
   if (!distributionMethod)
     return (
