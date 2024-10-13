@@ -19,7 +19,9 @@ export function GrantsFundingRevenue({
         grantsAndFunding.ventureFunding.length === 0) &&
       (!grantsAndFunding.revenue || grantsAndFunding.revenue.length === 0) &&
       (!grantsAndFunding.investment ||
-        grantsAndFunding.investment.length === 0))
+        grantsAndFunding.investment.length === 0) &&
+      (!grantsAndFunding.investments ||
+        grantsAndFunding.investments.length === 0))
   ) {
     return (
       <div className="flex flex-col gap-2">
@@ -144,6 +146,9 @@ export function GrantsFundingRevenue({
       )}
       {grantsAndFunding.revenue?.map((item, index) =>
         renderItem(item, 'Revenue', index)
+      )}
+      {grantsAndFunding.investments?.map((item, index) =>
+        renderItem(item, 'Investment', index)
       )}
       {grantsAndFunding.investment?.map((item, index) =>
         renderItem(item, 'Investment', index)
